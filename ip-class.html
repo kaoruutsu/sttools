@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>IP Class Checker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #ip-display {
+            position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+            color: #00ffcc; font-size: 52px; font-weight: bold;
+            background: rgba(0, 30, 60, 0.95); padding: 15px 45px; border-radius: 12px;
+            border: 2px solid #00ffcc; font-family: monospace;
+        }
+        #choices { display: flex; justify-content: center; gap: 10px; width: 750px; margin: 30px auto; }
+        .choice-btn { flex: 1; padding: 25px 0; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <h1>IP Class Checker</h1>
+    <div id="game-info" style="width:750px; margin:0 auto; display:flex; justify-content:space-between;">
+        <div>Quest: <span id="q-count">0</span> / 5</div>
+        <div>Timer: <span id="timer">0.0</span> s</div>
+    </div>
+    <div class="game-container">
+        <div id="start-screen" class="overlay">
+            <h2>Class Analysis</h2>
+            <p>第1オクテットの範囲でA, B, C, Dを判別せよ。</p>
+            <button class="start-btn" onclick="startGame()">INITIATE</button>
+        </div>
+        <div id="result-screen" class="overlay hidden">
+            <h2>Complete</h2>
+            <p>Score: <span id="final-score"></span> / 5</p>
+            <button class="start-btn" onclick="location.reload()">RETRY</button>
+        </div>
+        <div id="judgment-mark" class="judgment-mark"></div>
+        <div id="ip-display" class="hidden"></div>
+        <a href="index.html" class="back-btn-ui">RETURN TO MENU</a>
+    </div>
+    <div id="choices">
+        <button class="choice-btn" id="cA" onclick="check('A')">Class A</button>
+        <button class="choice-btn" id="cB" onclick="check('B')">Class B</button>
+        <button class="choice-btn" id="cC" onclick="check('C')">Class C</button>
+        <button class="choice-btn" id="cD" onclick="check('D')">Class D</button>
+    </div>
+
+    <script>
+        let correctClass, score=0, currentQ=0, startTime, gameTimer, anim, ipY=-80, isWait=false;
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('ip-display').classList.remove('hidden');
+            startTime = Date.now();
+            gameTimer = setInterval(() => { document.getElementById('timer').innerText = ((Date.now()-startTime)/1000).toFixed(1); }, 100);
+            next();
+        }
+        function next() {
+            if(currentQ >= 5) { endGame(); return; }
+            currentQ++;
+            document.getElementById('q-count').innerText = currentQ;
+            const type = ['A','B','C','D'][Math.floor(Math.random()*4)];
+            correctClass = type;
+            let o1;
+            if(type==='A') o1=1+Math.floor(Math.random()*126);
+            else if(type==='B') o1=128+Math.floor(Math.random()*64);
+            else if(type==='C') o1=192+Math.floor(Math.random()*32);
+            else o1=224+Math.floor(Math.random()*16);
+            document.getElementById('ip-display').innerText = `${o1}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}`;
+            document.querySelectorAll('.choice-btn').forEach(b=>{ b.disabled=false; b.className='choice-btn'; });
+            ipY=-80; isWait=false; drop();
+        }
+        function drop() {
+            if(isWait) return;
+            ipY += 0.9;
+            document.getElementById('ip-display').style.top = ipY + 'px';
+            if(ipY > 320) handle(false); else anim = requestAnimationFrame(drop);
+        }
+        function check(c) { handle(c === correctClass, c); }
+        function handle(win, sel) {
+            isWait=true; cancelAnimationFrame(anim);
+            if(win) score++;
+            const m = document.getElementById('judgment-mark');
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = 'judgment-mark show-mark ' + (win ? 'mark-o' : 'mark-x');
+            document.querySelectorAll('.choice-btn').forEach(b => {
+                const cls = b.id.replace('c','');
+                if(cls === correctClass) b.classList.add('correct-btn');
+                else if(cls === sel) b.classList.add('wrong-btn');
+                b.disabled = true;
+            });
+            setTimeout(() => { m.className='judgment-mark'; next(); }, 1000);
+        }
+        function endGame() {
+            clearInterval(gameTimer);
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+        }
+    </script>
+</body>
+</html>

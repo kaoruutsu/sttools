@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Binary Master - Puzzle</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #decimal-display {
+            position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+            color: #00ffcc; font-size: 72px; font-weight: bold;
+            background: rgba(0, 30, 60, 0.95); padding: 20px 60px; border-radius: 15px;
+            border: 2px solid #00ffcc;
+        }
+        #bit-editor { display: flex; justify-content: center; gap: 8px; margin-top: 30px; }
+        .bit-btn {
+            width: 70px; height: 90px; font-size: 32px; font-weight: bold;
+            background: rgba(0, 123, 255, 0.1); border: 2px solid #007bff;
+            color: #fff; border-radius: 8px; cursor: pointer;
+        }
+        .bit-btn.active { background: #00ffcc; color: #020b14; box-shadow: 0 0 15px #00ffcc; }
+        #sum-display { font-size: 28px; margin: 20px; color: #4dd0e1; font-family: monospace; }
+        #hint { color: #f0ad4e; font-size: 14px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Binary Master</h1>
+    <div id="hint">ターゲットに合わせるため、1〜3箇所のビットを修正せよ！</div>
+
+    <div class="game-container">
+        <div id="start-screen" class="overlay">
+            <button class="start-btn" onclick="startGame()">INITIATE</button>
+        </div>
+        <div id="result-screen" class="overlay hidden">
+            <h2>Complete</h2>
+            <p>Time: <span id="final-time"></span> s</p>
+            <button class="start-btn" onclick="location.reload()">RETRY</button>
+        </div>
+        <div id="judgment-mark" class="judgment-mark"></div>
+        <div id="decimal-display" class="hidden">0</div>
+        <a href="index.html" class="back-btn-ui">RETURN TO MENU</a>
+    </div>
+
+    <div id="sum-display">Current Sum: 0</div>
+    <div id="bit-editor">
+        <button id="bit-7" class="bit-btn" onclick="toggleBit(7)">0</button>
+        <button id="bit-6" class="bit-btn" onclick="toggleBit(6)">0</button>
+        <button id="bit-5" class="bit-btn" onclick="toggleBit(5)">0</button>
+        <button id="bit-4" class="bit-btn" onclick="toggleBit(4)">0</button>
+        <button id="bit-3" class="bit-btn" onclick="toggleBit(3)">0</button>
+        <button id="bit-2" class="bit-btn" onclick="toggleBit(2)">0</button>
+        <button id="bit-1" class="bit-btn" onclick="toggleBit(1)">0</button>
+        <button id="bit-0" class="bit-btn" onclick="toggleBit(0)">0</button>
+    </div>
+
+    <script>
+        let targetValue = 0, currentBits = [0,0,0,0,0,0,0,0], currentQ = 0;
+        let startTime, gameTimer, animationFrame, ipY = -80, isWaiting = false;
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('decimal-display').classList.remove('hidden');
+            startTime = Date.now();
+            gameTimer = setInterval(() => {}, 1000); // 簡略化
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if(currentQ >= 5) { endGame(); return; }
+            currentQ++;
+            
+            // 1. 正解（ターゲット）をランダムに決める
+            targetValue = Math.floor(Math.random() * 254) + 1;
+            let targetBits = targetValue.toString(2).padStart(8, '0').split('').reverse().map(Number);
+            
+            // 2. 正解から1〜3箇所だけ反転させた「初期状態」を作る
+            currentBits = [...targetBits];
+            let diffCount = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+            let changedIndices = [];
+            while(changedIndices.length < diffCount) {
+                let r = Math.floor(Math.random() * 8);
+                if(!changedIndices.includes(r)) {
+                    currentBits[r] = currentBits[r] === 0 ? 1 : 0;
+                    changedIndices.push(r);
+                }
+            }
+
+            document.getElementById('decimal-display').innerText = targetValue;
+            updateUI();
+            ipY = -80; isWaiting = false;
+            drop();
+        }
+
+        function toggleBit(i) {
+            if(isWaiting) return;
+            currentBits[i] = currentBits[i] === 0 ? 1 : 0;
+            updateUI();
+            if(calculate() === targetValue) handle(true);
+        }
+
+        function calculate() { return currentBits.reduce((s, b, i) => s + b * Math.pow(2, i), 0); }
+
+        function updateUI() {
+            currentBits.forEach((b, i) => {
+                const btn = document.getElementById(`bit-${i}`);
+                btn.innerText = b;
+                btn.className = b === 1 ? 'bit-btn active' : 'bit-btn';
+            });
+            document.getElementById('sum-display').innerText = `Current Sum: ${calculate()}`;
+        }
+
+        function drop() {
+            if(isWaiting) return;
+            ipY += 0.5;
+            document.getElementById('decimal-display').style.top = ipY + 'px';
+            if(ipY > 300) handle(false);
+            else animationFrame = requestAnimationFrame(drop);
+        }
+
+        function handle(correct) {
+            isWaiting = true; cancelAnimationFrame(animationFrame);
+            const m = document.getElementById('judgment-mark');
+            m.innerText = correct ? '⭕️' : '❌';
+            m.className = 'judgment-mark show-mark ' + (correct ? 'mark-o' : 'mark-x');
+            setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1000);
+        }
+
+        function endGame() {
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-time').innerText = ((Date.now()-startTime)/1000).toFixed(1);
+        }
+    </script>
+</body>
+</html>
