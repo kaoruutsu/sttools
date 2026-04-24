@@ -25,16 +25,12 @@
         <div id="start-screen" class="overlay">
             <h2>Subnet Analysis</h2>
             <p>サブネットマスクに対応するCIDR(/XX)を選べ。</p>
-            <button class="start-btn" onclick="startGame()">INITIATE</button>
-        </div>
-        <div id="result-screen" class="overlay hidden">
-            <h2>Complete</h2>
-            <p>Score: <span id="final-score"></span> / 5</p>
-            <button class="start-btn" onclick="location.reload()">RETRY</button>
+            <button id="initiate-btn" class="start-btn" onclick="startGame()">INITIATE</button>
+            <button id="retry-btn" class="start-btn" style="display:none;" onclick="location.reload()">RETRY</button>
         </div>
         <div id="judgment-mark" class="judgment-mark"></div>
         <div id="mask-display" class="hidden"></div>
-        <a href="index.html" class="back-btn-ui">RETURN TO MENU</a>
+        <a href="index.html" class="back-btn-ui">メニューに戻る</a>
     </div>
     <div id="choices">
         </div>
@@ -100,9 +96,12 @@
 
         function endGame() {
             clearInterval(gameTimer);
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = score;
+            document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('initiate-btn').style.display = 'none';
+            document.getElementById('retry-btn').style.display = 'block';
         }
     </script>
+
+    <a href="index.html" style="display:block; text-align:center; margin:20px; color: #4dd0e1; text-decoration: none; font-size: 16px;">トップに戻る</a>
 </body>
 </html>

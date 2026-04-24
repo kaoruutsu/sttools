@@ -28,16 +28,11 @@
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <button class="start-btn" onclick="startGame()">INITIATE</button>
-        </div>
-        <div id="result-screen" class="overlay hidden">
-            <h2>Complete</h2>
-            <p>Time: <span id="final-time"></span> s</p>
-            <button class="start-btn" onclick="location.reload()">RETRY</button>
+            <button id="initiate-btn" class="start-btn" onclick="startGame()">INITIATE</button>
+            <button id="retry-btn" class="start-btn" style="display:none;" onclick="location.reload()">RETRY</button>
         </div>
         <div id="judgment-mark" class="judgment-mark"></div>
         <div id="decimal-display" class="hidden">0</div>
-        <a href="index.html" class="back-btn-ui">RETURN TO MENU</a>
     </div>
 
     <div id="sum-display">Current Sum: 0</div>
@@ -52,6 +47,8 @@
         <button id="bit-0" class="bit-btn" onclick="toggleBit(0)">0</button>
     </div>
 
+    <a href="index.html" style="display:block; text-align:center; margin:20px; color: #4dd0e1; text-decoration: none; font-size: 16px;">トップに戻る</a>
+
     <script>
         let targetValue = 0, currentBits = [0,0,0,0,0,0,0,0], currentQ = 0;
         let startTime, gameTimer, animationFrame, ipY = -80, isWaiting = false;
@@ -59,6 +56,7 @@
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('decimal-display').classList.remove('hidden');
+            document.getElementById('reset-btn').style.display = 'block';
             startTime = Date.now();
             gameTimer = setInterval(() => {}, 1000); // 簡略化
             nextQuestion();
@@ -125,8 +123,9 @@
         }
 
         function endGame() {
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('final-time').innerText = ((Date.now()-startTime)/1000).toFixed(1);
+            document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('initiate-btn').style.display = 'none';
+            document.getElementById('retry-btn').style.display = 'block';
         }
     </script>
 </body>
