@@ -7,42 +7,11 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ボタンレイアウトの最適化 */
-        .choices-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            max-width: 600px;
-            margin: 20px auto;
-            flex-wrap: wrap;
-        }
-        .num-pad {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr); /* 0-4, 5-9 の2行 */
-            gap: 8px;
-        }
-        .alpha-pad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* A-F を2行 */
-            gap: 8px;
-        }
-        .hex-btn {
-            width: 55px; height: 55px;
-            font-size: 22px; font-weight: bold;
-            background: rgba(0, 123, 255, 0.1);
-            border: 2px solid #007bff;
-            color: #fff; border-radius: 8px; cursor: pointer;
-        }
-        .hex-btn:hover { background: rgba(0, 123, 255, 0.3); }
-        
+        /* ページ固有の微調整：文字の重なりを防ぐために等幅フォントを指定 */
         .bin-display {
-            font-size: 55px; color: #00ffcc;
-            font-family: monospace; font-weight: bold;
-            letter-spacing: 8px;
-        }
-
-        @media (max-width: 600px) {
-            .hex-btn { width: 45px; height: 45px; font-size: 18px; }
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -86,6 +55,9 @@
         function createButtons() {
             const nPad = document.getElementById('num-pad');
             const aPad = document.getElementById('alpha-pad');
+            // 二重描画防止のため中身をクリア
+            nPad.innerHTML = ''; aPad.innerHTML = '';
+
             "0123456789".split("").forEach((c, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'hex-btn'; btn.innerText = c;
@@ -106,7 +78,9 @@
             document.getElementById('q-count').innerText = qNum;
             targetVal = Math.floor(Math.random() * 16);
             document.getElementById('target').innerText = targetVal.toString(2).padStart(4, '0');
-            y = -100; isWait = false; drop();
+            y = -100; isWait = false; 
+            document.getElementById('target').style.display = 'block';
+            drop();
         }
 
         function drop() {
@@ -135,23 +109,18 @@
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
         }
-        // キーボード入力対応
+        
+        // キーボード入力対応の修正
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
     
             const key = e.key.toUpperCase();
-    
-            // 0-9 または A-F の入力
             const hexChars = "0123456789ABCDEF";
             const index = hexChars.indexOf(key);
 
             if (index !== -1) {
-                inputHex(index, key);
-            }
-    
-            // Backspace または Delete で削除
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-                deleteLast();
+                // Easy版は inputHex ではなく check を呼ぶ
+                check(index);
             }
         });
     </script>
