@@ -135,6 +135,25 @@
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
         }
+        // キーボード入力対応
+        window.addEventListener('keydown', (e) => {
+            if (isWait) return;
+    
+            const key = e.key.toUpperCase();
+    
+            // 0-9 または A-F の入力
+            const hexChars = "0123456789ABCDEF";
+            const index = hexChars.indexOf(key);
+
+            if (index !== -1) {
+                inputHex(index, key);
+            }
+    
+            // Backspace または Delete で削除
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                deleteLast();
+            }
+        });
     </script>
 </body>
 </html>
