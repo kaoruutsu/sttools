@@ -7,7 +7,6 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ページ固有の微調整のみ（共通設定はstyle.cssに任せる） */
         .bin-display {
             font-family: 'Courier New', monospace;
             font-weight: bold;
@@ -28,6 +27,7 @@
 
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
+            <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
@@ -58,7 +58,7 @@
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
-        let targetVal, qNum = 0, startTime, isWait = false, y = -100, anim;
+        let targetVal, qNum = 0, correctCount = 0, startTime, isWait = false, y = -100, anim;
         let currentStep = 1; 
         let userInput = [null, null];
         const MAX_QUEST = 5;
@@ -124,7 +124,6 @@
         function deleteLast() {
             if(isWait) return;
             if(currentStep === 2 && userInput[0] !== null) {
-                // 1文字目は打ったけど2文字目を打つ前の状態
                 currentStep = 1;
                 userInput[0] = null;
             }
@@ -134,15 +133,11 @@
         function updateDisplay() {
             const h1 = document.getElementById('hex-1');
             const h2 = document.getElementById('hex-2');
-
             if(currentStep === 1) {
-                h1.className = "hex-box active";
-                h1.innerText = "?";
-                h2.className = "hex-box empty";
-                h2.innerText = "?";
+                h1.className = "hex-box active"; h1.innerText = "?";
+                h2.className = "hex-box empty"; h2.innerText = "?";
             } else {
-                h1.className = "hex-box";
-                h2.className = "hex-box active";
+                h1.className = "hex-box"; h2.className = "hex-box active";
                 if(userInput[1] === null) h2.innerText = "?";
             }
         }
@@ -156,6 +151,7 @@
 
         function handle(win) {
             isWait = true; cancelAnimationFrame(anim);
+            if(win) correctCount++;
             const m = document.getElementById('mark');
             m.innerText = win ? '⭕️' : '❌';
             m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
@@ -165,28 +161,18 @@
         function endGame() {
             const duration = ((Date.now() - startTime) / 1000).toFixed(2);
             document.getElementById('final-time').innerText = duration;
+            document.getElementById('final-score').innerText = correctCount;
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
         }
 
-        // キーボード入力対応
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
-    
             const key = e.key.toUpperCase();
-    
-            // 0-9 または A-F の入力
             const hexChars = "0123456789ABCDEF";
             const index = hexChars.indexOf(key);
-
-            if (index !== -1) {
-                inputHex(index, key);
-            }
-    
-            // Backspace または Delete で削除
-            if (e.key === 'Backspace' || e.key === 'Delete') {
-                deleteLast();
-            }
+            if (index !== -1) inputHex(index, key);
+            if (e.key === 'Backspace' || e.key === 'Delete') deleteLast();
         });
     </script>
 </body>

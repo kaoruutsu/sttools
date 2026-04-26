@@ -7,7 +7,6 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ページ固有の微調整：文字の重なりを防ぐために等幅フォントを指定 */
         .bin-display {
             font-family: 'Courier New', monospace;
             font-weight: bold;
@@ -27,6 +26,7 @@
         </div>
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>FINISH!</h2>
+            <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
@@ -42,7 +42,7 @@
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
-        let targetVal, qNum = 0, startTime, isWait = false, y = -100, anim;
+        let targetVal, qNum = 0, correctCount = 0, startTime, isWait = false, y = -100, anim;
         const MAX_QUEST = 5;
 
         function start() {
@@ -55,9 +55,7 @@
         function createButtons() {
             const nPad = document.getElementById('num-pad');
             const aPad = document.getElementById('alpha-pad');
-            // 二重描画防止のため中身をクリア
             nPad.innerHTML = ''; aPad.innerHTML = '';
-
             "0123456789".split("").forEach((c, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'hex-btn'; btn.innerText = c;
@@ -97,6 +95,7 @@
 
         function handle(win) {
             isWait = true; cancelAnimationFrame(anim);
+            if(win) correctCount++;
             const m = document.getElementById('mark');
             m.innerText = win ? '⭕️' : '❌';
             m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
@@ -106,22 +105,17 @@
         function endGame() {
             const duration = ((Date.now() - startTime) / 1000).toFixed(2);
             document.getElementById('final-time').innerText = duration;
+            document.getElementById('final-score').innerText = correctCount;
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
         }
         
-        // キーボード入力対応の修正
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
-    
             const key = e.key.toUpperCase();
             const hexChars = "0123456789ABCDEF";
             const index = hexChars.indexOf(key);
-
-            if (index !== -1) {
-                // Easy版は inputHex ではなく check を呼ぶ
-                check(index);
-            }
+            if (index !== -1) check(index);
         });
     </script>
 </body>

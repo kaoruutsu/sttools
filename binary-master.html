@@ -23,6 +23,7 @@
 
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
+            <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
@@ -38,7 +39,7 @@
 
     <script>
         let targetVal, currentBits = Array(8).fill(0), y = -100, isWait = false, anim;
-        let qNum = 0, startTime, useHint = false;
+        let qNum = 0, correctCount = 0, startTime, useHint = false;
         const MAX_QUEST = 5;
 
         function start(hint) { 
@@ -85,11 +86,17 @@
                 const btn = document.createElement('button');
                 btn.className = `bit-btn ${bit ? 'on' : ''}`;
                 btn.innerText = bit;
-                btn.onclick = () => { if(!isWait) { currentBits[realIdx] = currentBits[realIdx]?0:1; render(); check(); }};
+                btn.onclick = () => { if(!isWait) { toggleBit(realIdx); }};
                 column.appendChild(btn);
                 container.appendChild(column);
             });
             document.getElementById('sum-text').innerText = `Current: ${calculateSum()}`;
+        }
+
+        function toggleBit(idx) {
+            currentBits[idx] = currentBits[idx] ? 0 : 1;
+            render();
+            check();
         }
 
         function calculateSum() { return currentBits.reduce((s, b, i) => s + b * Math.pow(2, i), 0); }
@@ -105,6 +112,7 @@
 
         function handle(win) {
             isWait = true; cancelAnimationFrame(anim);
+            if(win) correctCount++;
             const m = document.getElementById('mark');
             m.innerText = win ? '⭕️' : '❌'; 
             m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
@@ -114,9 +122,17 @@
         function endGame() {
             const duration = ((Date.now() - startTime) / 1000).toFixed(2);
             document.getElementById('final-time').innerText = duration;
+            document.getElementById('final-score').innerText = correctCount;
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
         }
+
+        // キーボード入力 (1-8 キーで各ビットを操作)
+        window.addEventListener('keydown', (e) => {
+            if (isWait) return;
+            const keyMap = { '8':7, '7':6, '6':5, '5':4, '4':3, '3':2, '2':1, '1':0 };
+            if (keyMap[e.key] !== undefined) toggleBit(keyMap[e.key]);
+        });
     </script>
 </body>
 </html>
