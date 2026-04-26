@@ -7,80 +7,11 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ターゲット表示の微調整 */
+        /* ページ固有の微調整のみ（共通設定はstyle.cssに任せる） */
         .bin-display {
-            font-size: 45px; color: #00ffcc;
             font-family: 'Courier New', monospace;
             font-weight: bold;
             white-space: nowrap;
-        }
-        .bin-part { display: inline-block; letter-spacing: 4px; }
-        .bin-gap { display: inline-block; width: 0.5em; }
-
-        /* 入力エリアのデザイン */
-        .answer-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 15px;
-            font-weight: bold;
-        }
-
-        .input-label {
-            font-size: 18px;
-            color: #4dd0e1;
-        }
-
-        .hex-box-container {
-            display: flex;
-            gap: 5px;
-        }
-
-        .hex-box {
-            width: 40px;
-            height: 45px;
-            border: 2px solid #005c99;
-            border-radius: 6px;
-            background: rgba(0, 30, 60, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: #ffeb3b;
-            transition: 0.2s;
-        }
-
-        .hex-box.active {
-            border-color: #ffeb3b;
-            background: rgba(255, 235, 59, 0.1);
-            box-shadow: 0 0 10px rgba(255, 235, 59, 0.2);
-        }
-
-        .hex-box.empty {
-            color: rgba(255, 255, 255, 0.15); /* 薄い文字 */
-        }
-
-        /* 削除ボタン (Mac Backspace風) */
-        .delete-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #4dd0e1;
-            color: #4dd0e1;
-            border-radius: 6px;
-            width: 50px;
-            height: 45px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            margin-left: 10px;
-            transition: 0.2s;
-        }
-        .delete-btn:hover {
-            background: rgba(255, 51, 51, 0.2);
-            color: #ff3333;
-            border-color: #ff3333;
         }
     </style>
 </head>
@@ -94,17 +25,17 @@
             <p>16進数を2桁入力して正解を導け！</p>
             <button class="start-btn" onclick="start()">START</button>
         </div>
+
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
+
         <div id="mark" class="judgment-mark"></div>
         
         <div id="target" class="bin-display">
-            <span id="bin-high" class="bin-part">0000</span>
-            <span class="bin-gap"></span>
-            <span id="bin-low" class="bin-part">0000</span>
+            <span id="bin-high">0000</span><span class="bin-gap"></span><span id="bin-low">0000</span>
         </div>
     </div>
 
@@ -142,6 +73,7 @@
         function createButtons() {
             const nPad = document.getElementById('num-pad');
             const aPad = document.getElementById('alpha-pad');
+            nPad.innerHTML = ''; aPad.innerHTML = '';
             "0123456789".split("").forEach((c, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'hex-btn'; btn.innerText = c;
@@ -190,9 +122,12 @@
         }
 
         function deleteLast() {
-            if(isWait || currentStep === 1) return;
-            currentStep = 1;
-            userInput[0] = null;
+            if(isWait) return;
+            if(currentStep === 2 && userInput[0] !== null) {
+                // 1文字目は打ったけど2文字目を打つ前の状態
+                currentStep = 1;
+                userInput[0] = null;
+            }
             updateDisplay();
         }
 
@@ -206,7 +141,6 @@
                 h2.className = "hex-box empty";
                 h2.innerText = "?";
             } else {
-                // 1桁目が入力済み
                 h1.className = "hex-box";
                 h2.className = "hex-box active";
                 if(userInput[1] === null) h2.innerText = "?";
