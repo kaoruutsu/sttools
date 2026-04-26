@@ -111,7 +111,7 @@ h1::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px; /* 数字ブロックとA-Fブロックの間の隙間 */
+    gap: 60px; /* ★30pxから60pxに増やして隙間を広くしました */
     max-width: 800px;
     margin: 20px auto;
     flex-wrap: wrap;
