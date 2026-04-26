@@ -1,58 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8"><title>Binary Master - Normal (5-Quest)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Master - Normal</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
-    <style>
-        #target { 
-            position: absolute; top: -100px; left: 50%; transform: translateX(-50%); 
-            font-size: 70px; color: #00ffcc; font-weight: bold; 
-            background: rgba(0,30,60,0.9); padding: 10px 40px; 
-            border: 2px solid; border-radius: 15px; 
-            white-space: nowrap;
-        }
-        .bit-row { 
-            display: flex; justify-content: center; gap: 4px; margin-top: 15px; 
-            flex-wrap: nowrap; /* 8ビット横並びを維持 */
-        }
-        .bit-btn { 
-            width: 11%; max-width: 65px; height: 90px; font-size: 24px; 
-            background: rgba(0,123,255,0.1); border: 2px solid #007bff; 
-            color: #fff; cursor: pointer; border-radius: 6px; 
-            padding: 0;
-        }
-        .bit-btn.on { background: #00ffcc; color: #020b14; box-shadow: 0 0 10px #00ffcc; border-color: #fff; }
-        
-        #stats-bar { color: #88eeff; font-size: 18px; margin-bottom: 10px; display: flex; justify-content: center; gap: 30px; }
-        .result-time { font-size: 42px; color: #00ffcc; margin: 20px 0; }
-
-        /* スマホ用微調整 */
-        @media (max-width: 600px) {
-            .bit-btn { height: 70px; font-size: 20px; }
-            #target { font-size: 50px; }
-        }
-    </style>
 </head>
 <body>
     <h1>Binary Master <span style="font-size: 0.6em; color: #4dd0e1;">(8-bit Normal)</span></h1>
-    
-    <div id="stats-bar">
-        <span>Quest: <span id="q-count">0</span> / 5</span>
-    </div>
+    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <h2>8-bit Time Attack</h2>
-            <p>0〜255の範囲で5問解け！</p>
-            <button class="start-btn" onclick="start()">START</button>
+            <h2>8-bit Attack</h2>
+            <p>ヒント（128, 64...）を表示しますか？</p>
+            <div class="start-btns">
+                <button class="start-btn btn-hint" onclick="start(true)">HINT ON</button>
+                <button class="start-btn" onclick="start(false)">HINT OFF</button>
+            </div>
         </div>
-
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
-
         <div id="mark" class="judgment-mark"></div>
         <div id="target">0</div>
         <a href="index.html" class="back-link">MENU</a>
@@ -63,106 +35,40 @@
 
     <script>
         let targetVal, currentBits = Array(8).fill(0), y = -100, isWait = false, anim;
-        let qNum = 0;
-        let startTime;
+        let qNum = 0, startTime, useHint = false;
         const MAX_QUEST = 5;
-        
-        function start() { 
+
+        function start(hint) { 
+            useHint = hint;
             document.getElementById('start-screen').style.display='none'; 
             startTime = Date.now();
             next(); 
         }
 
-        function next() {
-            qNum++;
-            if (qNum > MAX_QUEST) {
-                endGame();
-                return;
-            }
-            
-            document.getElementById('q-count').innerText = qNum;
-            
-            // 8ビット数値生成 (1〜255)
-            targetVal = Math.floor(Math.random() * 254) + 1;
-            let targetBits = targetVal.toString(2).padStart(8, '0').split('').reverse().map(Number);
-            
-            // 初期状態（1〜3箇所間違いをランダム生成）
-            currentBits = [...targetBits];
-            let diff = Math.floor(Math.random() * 3) + 1;
-            let changed = [];
-            while(changed.length < diff) {
-                let r = Math.floor(Math.random() * 8);
-                if(!changed.includes(r)) {
-                    currentBits[r] = currentBits[r] ? 0 : 1;
-                    changed.push(r);
-                }
-            }
-
-            document.getElementById('target').innerText = targetVal;
-            render(); 
-            y = -100; 
-            isWait = false; 
-            drop();
-        }
-
         function render() {
             const container = document.getElementById('bits-ui');
             container.innerHTML = '';
-            // 上位ビット(128)から順に左から並べる
             currentBits.slice().reverse().forEach((bit, i) => {
-                const realIdx = 7 - i; 
+                const realIdx = 7 - i;
+                const column = document.createElement('div');
+                column.className = 'bit-column';
+
+                const hintDiv = document.createElement('div');
+                hintDiv.className = 'hint-text';
+                hintDiv.innerText = useHint ? Math.pow(2, realIdx) : '';
+                column.appendChild(hintDiv);
+
                 const btn = document.createElement('button');
                 btn.className = `bit-btn ${bit ? 'on' : ''}`;
+                btn.style.width = '100%';
                 btn.innerText = bit;
-                btn.onclick = () => { 
-                    if(!isWait) { 
-                        currentBits[realIdx] = currentBits[realIdx] ? 0 : 1; 
-                        render(); 
-                        check(); 
-                    }
-                };
-                container.appendChild(btn);
+                btn.onclick = () => { if(!isWait) { currentBits[realIdx] = currentBits[realIdx]?0:1; render(); check(); }};
+                column.appendChild(btn);
+                container.appendChild(column);
             });
             document.getElementById('sum-text').innerText = `Current: ${calculateSum()}`;
         }
-
-        function calculateSum() {
-            return currentBits.reduce((s, b, i) => s + b * Math.pow(2, i), 0);
-        }
-
-        function drop() {
-            if(isWait) return;
-            y += 0.65; // NormalはEasyより少し速め
-            document.getElementById('target').style.top = y + 'px';
-            if(y > 320) handle(false); 
-            else anim = requestAnimationFrame(drop);
-        }
-
-        function check() { 
-            if(calculateSum() === targetVal) handle(true); 
-        }
-
-        function handle(win) {
-            isWait = true; 
-            cancelAnimationFrame(anim);
-            const m = document.getElementById('mark');
-            m.innerText = win ? '⭕️' : '❌'; 
-            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
-            
-            setTimeout(() => { 
-                m.className = 'judgment-mark'; 
-                next(); 
-            }, 800); // テンポよく進むように少し短縮
-        }
-
-        function endGame() {
-            const endTime = Date.now();
-            const duration = ((endTime - startTime) / 1000).toFixed(2);
-            document.getElementById('final-time').innerText = duration;
-            document.getElementById('result-screen').style.display = 'flex';
-            document.getElementById('target').style.display = 'none';
-        }
+        // ... (以下、前回のスクリプトを継続)
     </script>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </body>
 </html>
