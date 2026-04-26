@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex Master - Normal</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .choices-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            max-width: 600px;
+            margin: 10px auto;
+            flex-wrap: wrap;
+        }
+        .num-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .alpha-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        
+        .hex-btn {
+            width: 50px; height: 50px;
+            font-size: 20px; font-weight: bold;
+            background: rgba(0, 123, 255, 0.1);
+            border: 2px solid #007bff;
+            color: #fff; border-radius: 6px; cursor: pointer;
+        }
+        .hex-btn:hover { background: rgba(0, 123, 255, 0.3); }
+
+        /* ビット間のスペース調整 */
+        .bin-display {
+            font-size: 45px; color: #00ffcc;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .bin-part { display: inline-block; letter-spacing: 4px; }
+        .bin-gap { display: inline-block; width: 25px; } /* 4bit目と5bit目の間の余白 */
+
+        #answer-display { font-size: 24px; color: #ffeb3b; margin: 10px; height: 30px; }
+        .active-part { border-bottom: 3px solid #ffeb3b; padding: 0 5px; }
+    </style>
+</head>
+<body>
+    <h1>Hex Master <span style="font-size: 0.6em; color: #4dd0e1;">(8-bit Normal)</span></h1>
+    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
+
+    <div class="game-container">
+        <div id="start-screen" class="overlay">
+            <h2>8-bit Hex Attack</h2>
+            <p>16進数を2桁入力せよ</p>
+            <button class="start-btn" onclick="start()">START</button>
+        </div>
+        <div id="result-screen" class="overlay" style="display:none;">
+            <h2>MISSION COMPLETE</h2>
+            <div class="result-time"><span id="final-time">0.00</span> sec</div>
+            <button class="start-btn" onclick="location.reload()">RETRY</button>
+        </div>
+        <div id="mark" class="judgment-mark"></div>
+        
+        <div id="target" class="bin-display">
+            <span id="bin-high" class="bin-part">0000</span>
+            <span class="bin-gap"></span>
+            <span id="bin-low" class="bin-part">0000</span>
+        </div>
+    </div>
+
+    <div id="answer-display">Input: <span id="hex-1">?</span><span id="hex-2">?</span></div>
+    
+    <div class="choices-container">
+        <div class="num-pad" id="num-pad"></div>
+        <div class="alpha-pad" id="alpha-pad"></div>
+    </div>
+
+    <a href="index.html" class="back-link">MENUへ戻る</a>
+
+    <script>
+        let targetVal, qNum = 0, startTime, isWait = false, y = -100, anim;
+        let currentStep = 1; 
+        let userInput = [null, null];
+        const MAX_QUEST = 5;
+
+        function start() {
+            document.getElementById('start-screen').style.display='none';
+            startTime = Date.now();
+            createButtons();
+            next();
+        }
+
+        function createButtons() {
+            const nPad = document.getElementById('num-pad');
+            const aPad = document.getElementById('alpha-pad');
+            "0123456789".split("").forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'hex-btn'; btn.innerText = c;
+                btn.onclick = () => inputHex(i, c);
+                nPad.appendChild(btn);
+            });
+            "ABCDEF".split("").forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'hex-btn'; btn.innerText = c;
+                btn.onclick = () => inputHex(i + 10, c);
+                aPad.appendChild(btn);
+            });
+        }
+
+        function next() {
+            qNum++;
+            if (qNum > MAX_QUEST) { endGame(); return; }
+            currentStep = 1; userInput = [null, null];
+            updateDisplay();
+            
+            document.getElementById('q-count').innerText = qNum;
+            targetVal = Math.floor(Math.random() * 255) + 1;
+            const binStr = targetVal.toString(2).padStart(8, '0');
+            document.getElementById('bin-high').innerText = binStr.substring(0, 4);
+            document.getElementById('bin-low').innerText = binStr.substring(4, 8);
+            
+            y = -100; isWait = false; drop();
+        }
+
+        function inputHex(val, char) {
+            if(isWait) return;
+            if(currentStep === 1) {
+                userInput[0] = val;
+                document.getElementById('hex-1').innerText = char;
+                currentStep = 2;
+                updateDisplay();
+            } else {
+                userInput[1] = val;
+                document.getElementById('hex-2').innerText = char;
+                const finalVal = (userInput[0] << 4) | userInput[1];
+                if(finalVal === targetVal) handle(true); else handle(false);
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('hex-1').className = (currentStep === 1) ? 'active-part' : '';
+            document.getElementById('hex-2').className = (currentStep === 2) ? 'active-part' : '';
+            if(currentStep === 1) {
+                document.getElementById('hex-1').innerText = '?';
+                document.getElementById('hex-2').innerText = '?';
+            }
+        }
+
+        function drop() {
+            if(isWait) return;
+            y += 0.55;
+            document.getElementById('target').style.top = y + 'px';
+            if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
+        }
+
+        function handle(win) {
+            isWait = true; cancelAnimationFrame(anim);
+            const m = document.getElementById('mark');
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            setTimeout(() => { m.className = 'judgment-mark'; next(); }, 800);
+        }
+
+        function endGame() {
+            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('final-time').innerText = duration;
+            document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

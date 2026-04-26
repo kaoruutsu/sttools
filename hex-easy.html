@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex Master - Easy</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ボタンレイアウトの最適化 */
+        .choices-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            max-width: 600px;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+        .num-pad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 0-4, 5-9 の2行 */
+            gap: 8px;
+        }
+        .alpha-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* A-F を2行 */
+            gap: 8px;
+        }
+        .hex-btn {
+            width: 55px; height: 55px;
+            font-size: 22px; font-weight: bold;
+            background: rgba(0, 123, 255, 0.1);
+            border: 2px solid #007bff;
+            color: #fff; border-radius: 8px; cursor: pointer;
+        }
+        .hex-btn:hover { background: rgba(0, 123, 255, 0.3); }
+        
+        .bin-display {
+            font-size: 55px; color: #00ffcc;
+            font-family: monospace; font-weight: bold;
+            letter-spacing: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .hex-btn { width: 45px; height: 45px; font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Hex Master <span style="font-size: 0.6em; color: #00ffcc;">(4-bit Hex)</span></h1>
+    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
+
+    <div class="game-container">
+        <div id="start-screen" class="overlay">
+            <h2>Hex Easy</h2>
+            <p>2進数を16進数に変換せよ</p>
+            <button class="start-btn" onclick="start()">START</button>
+        </div>
+        <div id="result-screen" class="overlay" style="display:none;">
+            <h2>FINISH!</h2>
+            <div class="result-time"><span id="final-time">0.00</span> sec</div>
+            <button class="start-btn" onclick="location.reload()">RETRY</button>
+        </div>
+        <div id="mark" class="judgment-mark"></div>
+        <div id="target" class="bin-display">0000</div>
+    </div>
+
+    <div class="choices-container">
+        <div class="num-pad" id="num-pad"></div>
+        <div class="alpha-pad" id="alpha-pad"></div>
+    </div>
+
+    <a href="index.html" class="back-link">MENUへ戻る</a>
+
+    <script>
+        let targetVal, qNum = 0, startTime, isWait = false, y = -100, anim;
+        const MAX_QUEST = 5;
+
+        function start() {
+            document.getElementById('start-screen').style.display='none';
+            startTime = Date.now();
+            createButtons();
+            next();
+        }
+
+        function createButtons() {
+            const nPad = document.getElementById('num-pad');
+            const aPad = document.getElementById('alpha-pad');
+            "0123456789".split("").forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'hex-btn'; btn.innerText = c;
+                btn.onclick = () => check(i);
+                nPad.appendChild(btn);
+            });
+            "ABCDEF".split("").forEach((c, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'hex-btn'; btn.innerText = c;
+                btn.onclick = () => check(i + 10);
+                aPad.appendChild(btn);
+            });
+        }
+
+        function next() {
+            qNum++;
+            if (qNum > MAX_QUEST) { endGame(); return; }
+            document.getElementById('q-count').innerText = qNum;
+            targetVal = Math.floor(Math.random() * 16);
+            document.getElementById('target').innerText = targetVal.toString(2).padStart(4, '0');
+            y = -100; isWait = false; drop();
+        }
+
+        function drop() {
+            if(isWait) return;
+            y += 0.7;
+            document.getElementById('target').style.top = y + 'px';
+            if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
+        }
+
+        function check(val) {
+            if(isWait) return;
+            if(val === targetVal) handle(true); else handle(false);
+        }
+
+        function handle(win) {
+            isWait = true; cancelAnimationFrame(anim);
+            const m = document.getElementById('mark');
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            setTimeout(() => { m.className = 'judgment-mark'; next(); }, 800);
+        }
+
+        function endGame() {
+            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('final-time').innerText = duration;
+            document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
