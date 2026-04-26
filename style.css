@@ -1,4 +1,4 @@
-/* style.css - Full Version */
+/* style.css - Final Integrated Version */
 
 /* 1. 基本レイアウト */
 body {
@@ -15,7 +15,7 @@ body {
     overflow-x: hidden;
 }
 
-/* 2. タイトルロゴ (favicon.svgを使用) */
+/* 2. タイトルロゴ */
 h1::before {
     content: "";
     display: inline-block;
@@ -42,7 +42,7 @@ h1::before {
     box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
 }
 
-/* 4. 落下ターゲット (数字/2進数) */
+/* 4. 落下ターゲット */
 #target { 
     position: absolute; 
     top: -100px; 
@@ -57,9 +57,16 @@ h1::before {
     border-radius: 15px; 
     white-space: nowrap;
     z-index: 5;
+    font-family: 'Courier New', monospace; /* 桁を揃える */
 }
 
-/* 5. 2進数ビットボタンの並び (Binary Master用) */
+/* 8ビット用の中間スペース (半角スペース程度に厳密に固定) */
+.bin-gap { 
+    display: inline-block !important; 
+    width: 0.5ch !important; /* 半角文字0.5文字分の幅 */
+}
+
+/* 5. 2進数ビットボタン (Binary Master用) */
 .bit-row { 
     display: flex !important;
     justify-content: center; 
@@ -76,7 +83,7 @@ h1::before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 11%; /* 8bit用デフォルト */
+    width: 11%;
 }
 
 .hint-text {
@@ -106,28 +113,23 @@ h1::before {
     border-color: #fff; 
 }
 
-/* 6. 16進数ボタンの並び (Hex Master用) */
+/* 6. 16進数選択エリア (Hex Master用) */
 .choices-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 60px; /* ★30pxから60pxに増やして隙間を広くしました */
+    gap: 60px; /* 数字とA-Fの間の大きな隙間 */
     max-width: 800px;
     margin: 20px auto;
     flex-wrap: wrap;
 }
 
-.num-pad {
+.num-pad, .alpha-pad {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
 }
-
-.alpha-pad {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
+.num-pad { grid-template-columns: repeat(5, 1fr); }
+.alpha-pad { grid-template-columns: repeat(3, 1fr); }
 
 .hex-btn {
     width: 55px;
@@ -141,77 +143,92 @@ h1::before {
     cursor: pointer;
     transition: 0.2s;
 }
+.hex-btn:hover { background: rgba(0, 255, 204, 0.2); border-color: #00ffcc; }
 
-.hex-btn:hover { 
-    background: rgba(0, 255, 204, 0.2); 
-    border-color: #00ffcc;
+/* 7. Hex Master用 入力フォーム・削除ボタン */
+.answer-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 15px;
+    font-weight: bold;
 }
 
-/* 7. オーバーレイ (スタート・リザルト画面) */
+.input-label { font-size: 18px; color: #4dd0e1; }
+
+.hex-box-container { display: flex; gap: 5px; }
+
+.hex-box {
+    width: 40px;
+    height: 45px;
+    border: 2px solid #005c99;
+    border-radius: 6px;
+    background: rgba(0, 30, 60, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: #ffeb3b;
+    transition: 0.2s;
+}
+.hex-box.active { border-color: #ffeb3b; background: rgba(255, 235, 59, 0.1); }
+.hex-box.empty { color: rgba(255, 255, 255, 0.15); }
+
+.delete-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #4dd0e1;
+    color: #4dd0e1;
+    border-radius: 6px;
+    width: 50px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    margin-left: 10px;
+}
+.delete-btn:hover { background: rgba(255, 51, 51, 0.2); color: #ff3333; border-color: #ff3333; }
+
+/* 8. オーバーレイ */
 .overlay {
-    position: absolute; 
-    inset: 0; 
+    position: absolute; inset: 0; 
     background: rgba(1, 8, 16, 0.95);
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 20;
+    display: flex; flex-direction: column; 
+    justify-content: center; align-items: center; z-index: 20;
 }
-
 .start-btns { display: flex; gap: 15px; margin-top: 20px; }
-
 .start-btn { 
-    padding: 15px 30px; 
-    font-size: 18px; 
-    font-weight: bold; 
-    background: #00bcd4; 
-    border: none; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    color: #020b14; 
+    padding: 15px 30px; font-size: 18px; font-weight: bold; 
+    background: #00bcd4; border: none; border-radius: 5px; 
+    cursor: pointer; color: #020b14; 
 }
-
 .btn-hint { background: #005c99; color: white; border: 1px solid #00bcd4; }
 
-/* 8. 判定マーク (○/×) */
+/* 9. 判定マーク */
 .judgment-mark { 
     position: absolute; top: 50%; left: 50%; 
     transform: translate(-50%, -50%) scale(0.5); 
     font-size: 120px; opacity: 0; pointer-events: none; 
     transition: 0.2s; z-index: 100; 
 }
-
 .show-mark { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
 .mark-o { color: #00ff00; } 
 .mark-x { color: #ff3333; }
 
-/* 9. 共通パーツ (メニュー戻る・統計) */
+/* 10. その他・スマホ対応 */
 #stats-bar { margin: 10px; color: #88eeff; font-size: 18px; }
-
 .result-time { font-size: 48px; color: #00ffcc; margin: 20px; }
 
 .back-link {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    color: #4dd0e1;
-    text-decoration: none;
-    font-size: 14px;
-    border: 1px solid #005c99;
-    padding: 8px 16px;
-    border-radius: 4px;
-    background: rgba(2, 18, 36, 0.8);
-    z-index: 1000;
-    transition: 0.3s;
+    position: fixed; bottom: 20px; right: 20px;
+    color: #4dd0e1; text-decoration: none; font-size: 14px;
+    border: 1px solid #005c99; padding: 8px 16px; border-radius: 4px;
+    background: rgba(2, 18, 36, 0.8); z-index: 1000;
 }
+.back-link:hover { background: #005c99; color: #fff; }
 
-.back-link:hover {
-    background: #005c99;
-    color: #fff;
-}
-
-/* 10. スマホ・レスポンシブ対応 */
 @media (max-width: 600px) {
     .game-container { height: 350px; }
     #target { font-size: 50px; padding: 5px 25px; }
@@ -219,4 +236,5 @@ h1::before {
     .hint-text { font-size: 12px; }
     .choices-container { gap: 15px; }
     .hex-btn { width: 45px; height: 45px; font-size: 18px; }
+    .bin-gap { width: 0.3ch !important; }
 }
