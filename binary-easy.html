@@ -20,18 +20,21 @@
                 <button class="start-btn" onclick="start(false)">HINT OFF</button>
             </div>
         </div>
+
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>FINISH!</h2>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
+
         <div id="mark" class="judgment-mark"></div>
         <div id="target">0</div>
-        <a href="index.html" class="back-link">MENU</a>
     </div>
 
     <div id="sum-text" style="font-size: 28px; margin: 15px; font-weight: bold;">Current: 0</div>
     <div class="bit-row" id="bits-ui"></div>
+
+    <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
         let targetVal, currentBits = Array(4).fill(0), y = -100, isWait = false, anim;
@@ -45,6 +48,29 @@
             next(); 
         }
 
+        function next() {
+            qNum++;
+            if (qNum > MAX_QUEST) { endGame(); return; }
+            document.getElementById('q-count').innerText = qNum;
+            
+            // ターゲット生成 (1-15)
+            targetVal = Math.floor(Math.random() * 15) + 1;
+            let targetBits = targetVal.toString(2).padStart(4, '0').split('').reverse().map(Number);
+            
+            // 初期状態（1〜2箇所間違い）
+            currentBits = [...targetBits];
+            let diff = Math.floor(Math.random() * 2) + 1;
+            let changed = [];
+            while(changed.length < diff) {
+                let r = Math.floor(Math.random() * 4);
+                if(!changed.includes(r)) { currentBits[r] = currentBits[r]?0:1; changed.push(r); }
+            }
+
+            document.getElementById('target').innerText = targetVal;
+            document.getElementById('target').style.display = 'block';
+            render(); y = -100; isWait = false; drop();
+        }
+
         function render() {
             const container = document.getElementById('bits-ui');
             container.innerHTML = '';
@@ -52,9 +78,8 @@
                 const realIdx = 3 - i;
                 const column = document.createElement('div');
                 column.className = 'bit-column';
-                column.style.width = '22%'; // Easy用に幅調整
+                column.style.width = '20%';
 
-                // ヒント表示
                 const hintDiv = document.createElement('div');
                 hintDiv.className = 'hint-text';
                 hintDiv.innerText = useHint ? Math.pow(2, realIdx) : '';
@@ -62,7 +87,6 @@
 
                 const btn = document.createElement('button');
                 btn.className = `bit-btn ${bit ? 'on' : ''}`;
-                btn.style.width = '100%'; 
                 btn.innerText = bit;
                 btn.onclick = () => { if(!isWait) { currentBits[realIdx] = currentBits[realIdx]?0:1; render(); check(); }};
                 column.appendChild(btn);
@@ -70,7 +94,32 @@
             });
             document.getElementById('sum-text').innerText = `Current: ${calculateSum()}`;
         }
-        // ... (以下、calculateSum, next, drop, check, handle, endGame は前回と同じ)
+
+        function calculateSum() { return currentBits.reduce((s, b, i) => s + b * Math.pow(2, i), 0); }
+
+        function drop() {
+            if(isWait) return;
+            y += 0.6;
+            document.getElementById('target').style.top = y + 'px';
+            if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
+        }
+
+        function check() { if(calculateSum() === targetVal) handle(true); }
+
+        function handle(win) {
+            isWait = true; cancelAnimationFrame(anim);
+            const m = document.getElementById('mark');
+            m.innerText = win ? '⭕️' : '❌'; 
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            setTimeout(() => { m.className = 'judgment-mark'; next(); }, 1000);
+        }
+
+        function endGame() {
+            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('final-time').innerText = duration;
+            document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'none';
+        }
     </script>
 </body>
 </html>
