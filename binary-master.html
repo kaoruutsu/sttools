@@ -32,7 +32,6 @@
             #target { font-size: 50px; }
         }
     </style>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
     <h1>Binary Master <span style="font-size: 0.6em; color: #4dd0e1;">(8-bit Normal)</span></h1>
@@ -148,4 +147,21 @@
             cancelAnimationFrame(anim);
             const m = document.getElementById('mark');
             m.innerText = win ? '⭕️' : '❌'; 
-            m.className = `judgment-mark show-mark ${win ? 'mark-o' : '
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            
+            setTimeout(() => { 
+                m.className = 'judgment-mark'; 
+                next(); 
+            }, 800); // テンポよく進むように少し短縮
+        }
+
+        function endGame() {
+            const endTime = Date.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            document.getElementById('final-time').innerText = duration;
+            document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
