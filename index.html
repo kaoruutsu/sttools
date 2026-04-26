@@ -3,122 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary & Hex Master</title>
+    <title>Binary & Hex Training Portal</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        .menu-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        .list-container { 
+            display: flex;
+            flex-direction: column; /* 一列に並べる */
+            gap: 15px; 
+            max-width: 600px; 
+            margin: 20px auto; 
+            padding: 0 15px;
         }
-
-        .menu-card {
-            background: rgba(2, 18, 36, 0.8);
-            border: 2px solid #005c99;
-            border-radius: 15px;
-            padding: 25px;
-            text-decoration: none;
-            color: #fff;
-            transition: 0.3s;
+        .card { 
+            background: rgba(0, 92, 153, 0.2); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid #005c99; 
+            text-decoration: none; 
+            color: #fff; 
+            transition: 0.3s; 
             display: flex;
             flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+        .card:hover { 
+            border-color: #00ffcc; 
+            transform: translateX(10px); /* 横に少しスライドする演出 */
+            background: rgba(0, 92, 153, 0.4); 
+        }
+        .card h3 { margin: 0 0 8px 0; color: #00ffcc; font-size: 1.3rem; }
+        .card p { margin: 0; font-size: 0.95rem; color: #b2ebf2; line-height: 1.4; }
+        
+        /* セクション分けのラベル */
+        .section-label {
+            text-align: left;
+            margin: 20px 0 5px 5px;
+            font-weight: bold;
+            color: #4dd0e1;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .menu-card:hover {
-            transform: translateY(-5px);
-            border-color: #00ffcc;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
-            background: rgba(0, 30, 60, 0.9);
-        }
-
-        .menu-card h2 {
-            margin: 0 0 10px 0;
-            color: #00ffcc;
-            font-size: 24px;
-        }
-
-        .menu-card p {
-            font-size: 14px;
-            color: #88eeff;
-            margin: 0;
-            line-height: 1.6;
-        }
-
-        /* Hardモード専用スタイル */
+        /* Hardモード用のアクセント（任意ですが、一目で分かるよう少し色を変えています） */
         .card-hard {
-            border-color: #ff5252;
+            border-color: #ff5252aa;
         }
-        .card-hard h2 {
+        .card-hard h3 {
             color: #ff5252;
         }
-        .card-hard:hover {
-            border-color: #ff5252;
-            box-shadow: 0 0 20px rgba(255, 82, 82, 0.3);
-        }
 
-        .badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-        .badge-easy { background: #00ffcc; color: #020b14; }
-        .badge-normal { background: #00bcd4; color: #020b14; }
-        .badge-hard { background: #ff5252; color: #fff; }
-
-        h1 {
-            font-size: 42px;
-            margin-top: 40px;
-            letter-spacing: 2px;
+        @media (max-width: 600px) {
+            h1 { font-size: 1.6rem; }
+            .card { padding: 15px; }
         }
     </style>
 </head>
 <body>
-    <h1>Binary & Hex Master</h1>
-    <p style="color: #4dd0e1;">実践的なビット換算トレーニング</p>
-
-    <div class="menu-container">
-        <a href="binary-easy.html" class="menu-card">
-            <span class="badge badge-easy">4-bit</span>
-            <h2>Binary Easy</h2>
-            <p>10進数に合わせてビットをON/OFF。<br>基礎的な2進数の仕組みを学ぶ。</p>
+    <h1>Training Portal</h1>
+    
+    <div class="list-container">
+        
+        <div class="section-label">Binary Training</div>
+        
+        <a href="binary-easy.html" class="card">
+            <h3>Binary Master (Easy)</h3>
+            <p>4ビット計算：2進数の基本をマスター（5問タイムアタック）</p>
         </a>
 
-        <a href="binary-master.html" class="menu-card">
-            <span class="badge badge-normal">8-bit</span>
-            <h2>Binary Normal</h2>
-            <p>0〜255までの数値を8ビットで作成。<br>より高度な計算能力を養う。</p>
+        <a href="binary-master.html" class="card">
+            <h3>Binary Master (Normal)</h3>
+            <p>8ビット計算：実践的な8桁の2進数変換トレーニング</p>
         </a>
 
-        <a href="hex-easy.html" class="menu-card">
-            <span class="badge badge-easy">4-bit</span>
-            <h2>Hex Easy</h2>
-            <p>4ビットの2進数を16進数1桁に変換。<br>基本のA〜Fをマスターする。</p>
+        <a href="binary-hard.html" class="card card-hard">
+            <h3>Binary Master (Hard)</h3>
+            <p>2進数 → 10進数 逆引き：落ちてくる2進数を5択から素早く選択</p>
         </a>
 
-        <a href="hex-master.html" class="menu-card">
-            <span class="badge badge-normal">8-bit</span>
-            <h2>Hex Normal</h2>
-            <p>8ビットの2進数を16進数2桁で入力。<br>実戦的な変換スピードを鍛える。</p>
+        <div class="section-label">Hexadecimal Training</div>
+
+        <a href="hex-easy.html" class="card" style="border-color: #ffeb3b44;">
+            <h3>Hex Master (Easy)</h3>
+            <p>4ビット 2進数 → 16進数：1桁の16進数（0-F）への変換</p>
         </a>
 
-        <a href="binary-hard.html" class="menu-card card-hard">
-            <span class="badge badge-hard">Hard</span>
-            <h2>Binary Hard</h2>
-            <p>落ちてくる2進数を10進数で即座に回答。<br>5択から選ぶ超高速換算モード。</p>
+        <a href="hex-master.html" class="card" style="border-color: #ffeb3b44;">
+            <h3>Hex Master (Normal)</h3>
+            <p>8ビット 2進数 → 16進数：2桁の16進数への素早い変換</p>
         </a>
+
     </div>
-
-    <footer style="margin-top: 40px; color: rgba(255,255,255,0.3); font-size: 12px;">
-        &copy; 2024 Binary & Hex Master Project
-    </footer>
 </body>
 </html>
