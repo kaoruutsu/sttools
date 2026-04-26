@@ -1,20 +1,26 @@
-/* style.css */
+/* style.css - Full Version */
+
+/* 1. 基本レイアウト */
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
     text-align: center;
-    margin: 0; padding: 10px;
+    margin: 0; 
+    padding: 10px;
     background-color: #020b14;
-    background-image: linear-gradient(rgba(0,150,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,150,255,0.1) 1px, transparent 1px);
+    background-image: 
+        linear-gradient(rgba(0,150,255,0.1) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(0,150,255,0.1) 1px, transparent 1px);
     background-size: 30px 30px;
     color: #e0f7fa;
     overflow-x: hidden;
 }
 
-/* タイトルロゴ */
+/* 2. タイトルロゴ (favicon.svgを使用) */
 h1::before {
     content: "";
     display: inline-block;
-    width: 1.2em; height: 1.2em;
+    width: 1.2em; 
+    height: 1.2em;
     background: url('favicon.svg') no-repeat center;
     background-size: contain;
     vertical-align: middle;
@@ -22,7 +28,7 @@ h1::before {
     filter: drop-shadow(0 0 5px #4dd0e1);
 }
 
-/* ゲームコンテナ */
+/* 3. ゲームメインコンテナ */
 .game-container {
     width: 100%;
     max-width: 750px;
@@ -36,10 +42,10 @@ h1::before {
     box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
 }
 
-/* 落下するターゲット数字のスタイル */
+/* 4. 落下ターゲット (数字/2進数) */
 #target { 
     position: absolute; 
-    top: -100px; /* JSでここから動かす */
+    top: -100px; 
     left: 50%; 
     transform: translateX(-50%); 
     font-size: 70px; 
@@ -53,9 +59,9 @@ h1::before {
     z-index: 5;
 }
 
-/* ビットボタンの並び (重要: ここを修正) */
+/* 5. 2進数ビットボタンの並び (Binary Master用) */
 .bit-row { 
-    display: flex !important; /* 強制的に横並び */
+    display: flex !important;
     justify-content: center; 
     align-items: flex-end;
     gap: 5px; 
@@ -66,7 +72,6 @@ h1::before {
     margin-right: auto;
 }
 
-/* 各ビットの列（ヒント＋ボタン） */
 .bit-column {
     display: flex;
     flex-direction: column;
@@ -74,7 +79,6 @@ h1::before {
     width: 11%; /* 8bit用デフォルト */
 }
 
-/* ヒントテキスト */
 .hint-text {
     font-size: 14px;
     color: #4dd0e1;
@@ -83,7 +87,6 @@ h1::before {
     font-weight: bold;
 }
 
-/* ビットボタン単体 */
 .bit-btn {
     width: 100%;
     height: 90px;
@@ -95,6 +98,7 @@ h1::before {
     border-radius: 8px;
     transition: 0.2s;
 }
+
 .bit-btn.on { 
     background: #00ffcc; 
     color: #020b14; 
@@ -102,31 +106,93 @@ h1::before {
     border-color: #fff; 
 }
 
-/* スタート・リザルト画面 */
-.overlay {
-    position: absolute; inset: 0; background: rgba(1, 8, 16, 0.95);
-    display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20;
+/* 6. 16進数ボタンの並び (Hex Master用) */
+.choices-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px; /* 数字ブロックとA-Fブロックの間の隙間 */
+    max-width: 800px;
+    margin: 20px auto;
+    flex-wrap: wrap;
 }
+
+.num-pad {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.alpha-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.hex-btn {
+    width: 55px;
+    height: 55px;
+    font-size: 22px;
+    font-weight: bold;
+    background: rgba(0, 123, 255, 0.1);
+    border: 2px solid #007bff;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.hex-btn:hover { 
+    background: rgba(0, 255, 204, 0.2); 
+    border-color: #00ffcc;
+}
+
+/* 7. オーバーレイ (スタート・リザルト画面) */
+.overlay {
+    position: absolute; 
+    inset: 0; 
+    background: rgba(1, 8, 16, 0.95);
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 20;
+}
+
 .start-btns { display: flex; gap: 15px; margin-top: 20px; }
-.start-btn { padding: 15px 30px; font-size: 18px; font-weight: bold; background: #00bcd4; border: none; border-radius: 5px; cursor: pointer; color: #020b14; }
+
+.start-btn { 
+    padding: 15px 30px; 
+    font-size: 18px; 
+    font-weight: bold; 
+    background: #00bcd4; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    color: #020b14; 
+}
+
 .btn-hint { background: #005c99; color: white; border: 1px solid #00bcd4; }
 
-/* 判定マーク */
+/* 8. 判定マーク (○/×) */
 .judgment-mark { 
     position: absolute; top: 50%; left: 50%; 
     transform: translate(-50%, -50%) scale(0.5); 
     font-size: 120px; opacity: 0; pointer-events: none; 
     transition: 0.2s; z-index: 100; 
 }
-.show-mark { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
-.mark-o { color: #00ff00; } .mark-x { color: #ff3333; }
 
-/* その他 */
+.show-mark { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
+.mark-o { color: #00ff00; } 
+.mark-x { color: #ff3333; }
+
+/* 9. 共通パーツ (メニュー戻る・統計) */
 #stats-bar { margin: 10px; color: #88eeff; font-size: 18px; }
+
 .result-time { font-size: 48px; color: #00ffcc; margin: 20px; }
-/* style.css の該当箇所を修正 */
+
 .back-link {
-    position: fixed; /* absoluteからfixedに変更するとより確実です */
+    position: fixed;
     bottom: 20px;
     right: 20px;
     color: #4dd0e1;
@@ -135,18 +201,22 @@ h1::before {
     border: 1px solid #005c99;
     padding: 8px 16px;
     border-radius: 4px;
-    background: rgba(2, 18, 36, 0.8); /* 背景色をつけて見やすく */
-    z-index: 1000; /* 最前面に表示 */
+    background: rgba(2, 18, 36, 0.8);
+    z-index: 1000;
     transition: 0.3s;
 }
+
 .back-link:hover {
     background: #005c99;
     color: #fff;
 }
-/* スマホ対応 */
+
+/* 10. スマホ・レスポンシブ対応 */
 @media (max-width: 600px) {
     .game-container { height: 350px; }
     #target { font-size: 50px; padding: 5px 25px; }
     .bit-btn { height: 70px; font-size: 18px; }
     .hint-text { font-size: 12px; }
+    .choices-container { gap: 15px; }
+    .hex-btn { width: 45px; height: 45px; font-size: 18px; }
 }
