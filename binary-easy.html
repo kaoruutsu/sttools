@@ -1,41 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8"><title>Binary Master - Normal (5-Quest)</title>
+    <meta charset="UTF-8">
+    <title>Binary Master - Easy (5-Quest)</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
         #target { 
             position: absolute; top: -100px; left: 50%; transform: translateX(-50%); 
-            font-size: 70px; color: #00ffcc; font-weight: bold; 
-            background: rgba(0,30,60,0.9); padding: 10px 40px; 
+            font-size: 80px; color: #00ffcc; font-weight: bold; 
+            background: rgba(0,30,60,0.9); padding: 10px 60px; 
             border: 2px solid; border-radius: 15px; 
-            white-space: nowrap;
         }
-        .bit-row { 
-            display: flex; justify-content: center; gap: 4px; margin-top: 15px; 
-            flex-wrap: nowrap; /* 8ビット横並びを維持 */
-        }
+        .bit-row { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
         .bit-btn { 
-            width: 11%; max-width: 65px; height: 90px; font-size: 24px; 
+            width: 90px; height: 120px; font-size: 40px; 
             background: rgba(0,123,255,0.1); border: 2px solid #007bff; 
-            color: #fff; cursor: pointer; border-radius: 6px; 
-            padding: 0;
+            color: #fff; cursor: pointer; border-radius: 8px; 
         }
-        .bit-btn.on { background: #00ffcc; color: #020b14; box-shadow: 0 0 10px #00ffcc; border-color: #fff; }
+        .bit-btn.on { background: #00ffcc; color: #020b14; box-shadow: 0 0 15px #00ffcc; border-color: #fff; }
         
         #stats-bar { color: #88eeff; font-size: 18px; margin-bottom: 10px; display: flex; justify-content: center; gap: 30px; }
         .result-time { font-size: 42px; color: #00ffcc; margin: 20px 0; }
-
-        /* スマホ用微調整 */
-        @media (max-width: 600px) {
-            .bit-btn { height: 70px; font-size: 20px; }
-            #target { font-size: 50px; }
-        }
     </style>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
-    <h1>Binary Master <span style="font-size: 0.6em; color: #4dd0e1;">(8-bit Normal)</span></h1>
+    <h1>Binary Master <span style="font-size: 0.6em; color: #00ffcc;">(4-bit Easy)</span></h1>
     
     <div id="stats-bar">
         <span>Quest: <span id="q-count">0</span> / 5</span>
@@ -43,13 +34,13 @@
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <h2>8-bit Time Attack</h2>
-            <p>0〜255の範囲で5問解け！</p>
+            <h2>Easy 5-Quest Attack</h2>
+            <p>5問解き終わるまでのタイムを競え！</p>
             <button class="start-btn" onclick="start()">START</button>
         </div>
 
         <div id="result-screen" class="overlay" style="display:none;">
-            <h2>MISSION COMPLETE</h2>
+            <h2>FINISH!</h2>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
@@ -63,7 +54,7 @@
     <div class="bit-row" id="bits-ui"></div>
 
     <script>
-        let targetVal, currentBits = Array(8).fill(0), y = -100, isWait = false, anim;
+        let targetVal, currentBits = Array(4).fill(0), y = -100, isWait = false, anim;
         let qNum = 0;
         let startTime;
         const MAX_QUEST = 5;
@@ -83,16 +74,16 @@
             
             document.getElementById('q-count').innerText = qNum;
             
-            // 8ビット数値生成 (1〜255)
-            targetVal = Math.floor(Math.random() * 254) + 1;
-            let targetBits = targetVal.toString(2).padStart(8, '0').split('').reverse().map(Number);
+            // 4ビット数値生成
+            targetVal = Math.floor(Math.random() * 15) + 1;
+            let targetBits = targetVal.toString(2).padStart(4, '0').split('').reverse().map(Number);
             
-            // 初期状態（1〜3箇所間違いをランダム生成）
+            // 初期状態（1〜2箇所間違い）
             currentBits = [...targetBits];
-            let diff = Math.floor(Math.random() * 3) + 1;
+            let diff = Math.floor(Math.random() * 2) + 1;
             let changed = [];
             while(changed.length < diff) {
-                let r = Math.floor(Math.random() * 8);
+                let r = Math.floor(Math.random() * 4);
                 if(!changed.includes(r)) {
                     currentBits[r] = currentBits[r] ? 0 : 1;
                     changed.push(r);
@@ -109,9 +100,8 @@
         function render() {
             const container = document.getElementById('bits-ui');
             container.innerHTML = '';
-            // 上位ビット(128)から順に左から並べる
             currentBits.slice().reverse().forEach((bit, i) => {
-                const realIdx = 7 - i; 
+                const realIdx = 3 - i; 
                 const btn = document.createElement('button');
                 btn.className = `bit-btn ${bit ? 'on' : ''}`;
                 btn.innerText = bit;
@@ -133,7 +123,7 @@
 
         function drop() {
             if(isWait) return;
-            y += 0.65; // NormalはEasyより少し速め
+            y += 0.8; // スピード調整
             document.getElementById('target').style.top = y + 'px';
             if(y > 320) handle(false); 
             else anim = requestAnimationFrame(drop);
@@ -148,4 +138,21 @@
             cancelAnimationFrame(anim);
             const m = document.getElementById('mark');
             m.innerText = win ? '⭕️' : '❌'; 
-            m.className = `judgment-mark show-mark ${win ? 'mark-o' : '
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            
+            setTimeout(() => { 
+                m.className = 'judgment-mark'; 
+                next(); 
+            }, 1000);
+        }
+
+        function endGame() {
+            const endTime = Date.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            document.getElementById('final-time').innerText = duration;
+            document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

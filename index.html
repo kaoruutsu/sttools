@@ -2,49 +2,55 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Network Training Portal</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Portal</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        .menu-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px; max-width: 900px; margin: 40px auto;
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 0 15px;
         }
-        .menu-card {
-            background: rgba(0, 92, 153, 0.2); border: 1px solid #005c99;
-            padding: 25px; border-radius: 12px; text-decoration: none; color: inherit;
-            transition: 0.3s; text-align: left;
+        .card { 
+            background: rgba(0, 92, 153, 0.2); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid #005c99; 
+            text-decoration: none; 
+            color: #fff; 
+            transition: 0.3s; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
         }
-        .menu-card:hover { background: rgba(0, 188, 212, 0.2); border-color: #00bcd4; transform: translateY(-5px); }
-        .menu-card h3 { color: #4dd0e1; margin: 0 0 10px 0; }
-        .menu-card p { font-size: 14px; opacity: 0.8; margin: 0; line-height: 1.5; }
+        .card:hover { border-color: #00bcd4; transform: scale(1.02); background: rgba(0, 92, 153, 0.4); }
+        .card h3 { margin: 0 0 10px 0; color: #00ffcc; font-size: 1.2rem; }
+        .card p { margin: 0; font-size: 0.9rem; color: #b2ebf2; line-height: 1.4; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; margin: 20px 0; }
+            .grid { grid-template-columns: 1fr; gap: 12px; }
+            .card { padding: 15px; }
+            .card h3 { font-size: 1.1rem; }
+        }
     </style>
 </head>
 <body>
-    <h1>Network Training Portal</h1>
-    <p>エンジニアの基礎体力を鍛えるトレーニングセンター</p>
-
- <div class="menu-grid">
-        <a href="binary-master.html" class="menu-card">
-            <h3>Binary Master</h3>
-            <p>ビットを反転させてターゲットの数値を生成。2進数の構造を理解するパズル。</p>
+    <h1>Training Portal</h1>
+    <div class="grid">
+        <a href="binary-easy.html" class="card" style="border-color: #00bcd4; background: rgba(0, 188, 212, 0.1);">
+            <h3>Binary Master (Easy)</h3>
+            <p>4ビット計算：まずはここからスタート（5問タイムアタック）</p>
         </a>
-        <a href="bin-to-dec.html" class="menu-card">
-            <h3>Binary to Decimal</h3>
-            <p>落下する8ビット2進数を素早く10進数に変換。計算の瞬発力を養う。</p>
+        <a href="binary-master.html" class="card">
+            <h3>Binary Master (Normal)</h3>
+            <p>8ビット計算：エンジニアの標準レベル</p>
         </a>
-        <a href="bin-to-hex.html" class="menu-card">
-            <h3>Binary to Hex</h3>
-            <p>8ビットを16進数(0xXX)へ。下4ビットのひっかけを回避し正確に変換。</p>
-        </a>
-        <a href="ip-class.html" class="menu-card">
-            <h3>IP Class Checker</h3>
-            <p>IPv4アドレスのクラス(A-D)を瞬時に判定。第1オクテットの範囲をマスター。</p>
-        </a>
-        <a href="subnet-master.html" class="menu-card">
-            <h3>Subnet Master</h3>
-            <p>CIDR表記(/XX)からサブネットマスクへの高速変換。設計の基本能力。</p>
-        </a>
-    </div>
+        </div>
 </body>
 </html>
