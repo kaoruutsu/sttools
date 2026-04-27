@@ -7,145 +7,27 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 全体レイアウト */
         body { max-width: 1200px; margin: 0 auto; padding: 10px; }
-        
-        /* 上段：ソーステーブル（横並び） */
-        .source-section {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 15px;
-            overflow-x: auto;
-            margin-bottom: 15px;
-            background: rgba(0, 30, 60, 0.4);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #005c99;
-        }
-        .table-wrapper {
-            flex: 0 0 auto;
-            min-width: 280px;
-        }
-
-        /* 中段：ミッション表示 */
-        .mission-box {
-            background: rgba(0, 0, 0, 0.6);
-            border-left: 4px solid #ffeb3b;
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        /* 下段：パズル（左）と期待される結果（右） */
-        .bottom-container {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-        }
-        
-        /* 左側：パズルエリア */
-        .puzzle-side {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        /* 右側：出力結果エリア */
-        .goal-side {
-            width: 350px;
-            background: rgba(0, 30, 60, 0.7);
-            border: 1px solid #005c99;
-            border-radius: 8px;
-            padding: 10px;
-            overflow-x: auto;
-        }
-
-        /* テーブル共通スタイル */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-            background: rgba(0, 0, 0, 0.3);
-            white-space: nowrap;
-        }
+        .source-section { display: flex; flex-wrap: nowrap; gap: 15px; overflow-x: auto; margin-bottom: 15px; background: rgba(0, 30, 60, 0.4); padding: 10px; border-radius: 8px; border: 1px solid #005c99; }
+        .table-wrapper { flex: 0 0 auto; min-width: 280px; }
+        .mission-box { background: rgba(0, 0, 0, 0.6); border-left: 4px solid #ffeb3b; padding: 15px; margin-bottom: 15px; text-align: left; }
+        .bottom-container { display: flex; gap: 20px; align-items: flex-start; }
+        .puzzle-side { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .goal-side { width: 350px; background: rgba(0, 30, 60, 0.7); border: 1px solid #005c99; border-radius: 8px; padding: 10px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; background: rgba(0, 0, 0, 0.3); white-space: nowrap; }
         th, td { border: 1px solid #005c99; padding: 6px; text-align: center; }
         th { background: rgba(0, 123, 255, 0.3); color: #00ffcc; }
-
-        /* パズルUI */
-        .puzzle-area {
-            background: #111;
-            border: 2px dashed #005c99;
-            min-height: 80px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .chip {
-            padding: 8px 14px;
-            background: #007bff;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: monospace;
-            font-size: 14px;
-        }
+        .puzzle-area { background: #111; border: 2px dashed #005c99; min-height: 80px; display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; border-radius: 8px; }
+        .chip { padding: 8px 14px; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 14px; }
         .chip.keyword { background: #c2185b; }
         .chip.operator { background: #6c757d; }
-        
-        .chip-pool {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 10px 0;
-        }
-
-        /* フィードバック表示（不正解時など） */
-        #feedback-area {
-            display: none;
-            background: rgba(255, 82, 82, 0.2);
-            border: 1px solid #ff5252;
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 8px;
-            text-align: left;
-        }
-        .correct-ans {
-            color: #ffeb3b;
-            font-family: monospace;
-            display: block;
-            margin: 10px 0;
-            background: #000;
-            padding: 10px;
-        }
-
-        .timer-badge {
-            position: fixed;
-            top: 10px;
-            right: 20px;
-            color: #ffeb3b;
-            font-size: 1.2rem;
-            z-index: 100;
-        }
-
-        .next-btn {
-            background: #ffeb3b;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        
+        .chip-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
+        #feedback-area { display: none; background: rgba(255, 82, 82, 0.2); border: 1px solid #ff5252; padding: 15px; margin-top: 10px; border-radius: 8px; text-align: left; }
+        .correct-ans { color: #ffeb3b; font-family: monospace; display: block; margin: 10px 0; background: #000; padding: 10px; }
+        .timer-badge { position: fixed; top: 10px; right: 20px; color: #ffeb3b; font-size: 1.2rem; z-index: 100; }
+        .next-btn { background: #ffeb3b; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
         .small-title { font-size: 0.8em; color: #4dd0e1; margin-bottom: 5px; font-weight: bold; text-align: left;}
-
-        @media (max-width: 900px) {
-            .bottom-container { flex-direction: column; }
-            .goal-side { width: 100%; }
-        }
+        @media (max-width: 900px) { .bottom-container { flex-direction: column; } .goal-side { width: 100%; } }
     </style>
 </head>
 <body>
@@ -155,7 +37,7 @@
 
     <div id="start-screen" class="overlay">
         <h2>SQL Normal Mode</h2>
-        <p>結合・集計関数を含む実践トレーニング</p>
+        <p>結合・集計関数・AS句のトレーニング</p>
         <button class="start-btn" onclick="start()">START GAME</button>
     </div>
 
@@ -167,7 +49,6 @@
     </div>
 
     <div id="mark" class="judgment-mark"></div>
-
     <div class="source-section" id="source-tables"></div>
 
     <div class="mission-box">
@@ -180,13 +61,10 @@
             <div class="small-title">▼ SQL PUZZLE</div>
             <div class="puzzle-area" id="drop-zone" onclick="clearLastChip()"></div>
             <div style="font-size: 10px; color: #888;">※チップクリックで追加、枠内クリックで1つ削除</div>
-            
             <div class="chip-pool" id="chip-pool"></div>
-            
             <div id="action-bar">
                 <button id="run-btn" class="start-btn" style="background:#00c853; width:200px;" onclick="checkAnswer()">回答実行 (RUN)</button>
             </div>
-
             <div id="feedback-area">
                 <div style="color:#ff5252; font-weight:bold;">MISS! 正解は以下の通りです：</div>
                 <code class="correct-ans" id="correct-sql"></code>
@@ -224,21 +102,14 @@
         };
 
         const QUESTIONS = [
-            { q: "生徒の合計人数を計算せよ", ans: ["SELECT", "COUNT(*)", "FROM", "生徒名簿"], goal: [{人数: 5}] },
-            { q: "生徒の平均年齢を計算せよ", ans: ["SELECT", "AVG(年齢)", "FROM", "生徒名簿"], goal: [{"平均年齢": 15.2}] },
+            { q: "生徒の合計人数を「人数」という名前で計算せよ", ans: ["SELECT", "COUNT(*)", "AS", "人数", "FROM", "生徒名簿"], goal: [{人数: 5}] },
+            { q: "生徒の平均年齢を「平均」という名前で算出せよ", ans: ["SELECT", "AVG(年齢)", "AS", "平均", "FROM", "生徒名簿"], goal: [{"平均": 15.2}] },
             { q: "生徒の「氏名」とその「クラス名」を表示せよ", ans: ["SELECT", "氏名,", "クラス名", "FROM", "生徒名簿,", "クラス一覧", "WHERE", "生徒名簿.クラスID", "=", "クラス一覧.クラスID"], goal: [{氏名:"佐藤",クラス名:"1組"},{氏名:"鈴木",クラス名:"1組"},{氏名:"高橋",クラス名:"2組"},{氏名:"田中",クラス名:"2組"},{氏名:"伊藤",クラス名:"3組"}] },
-            { q: "「数学」を担当している担任の「氏名」を表示せよ", ans: ["SELECT", "氏名", "FROM", "担任一覧", "WHERE", "教科", "=", "'数学'"], goal: [{氏名: "岡田"}] },
-            { q: "最年少の生徒の年齢を表示せよ", ans: ["SELECT", "MIN(年齢)", "FROM", "生徒名簿"], goal: [{"MIN(年齢)": 14}] },
-            { q: "1組（クラスID='A'）の生徒の人数を数えよ", ans: ["SELECT", "COUNT(*)", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: [{人数: 2}] },
-            { q: "クラス名が「2組」の担任IDを表示せよ", ans: ["SELECT", "担任ID", "FROM", "クラス一覧", "WHERE", "クラス名", "=", "'2組'"], goal: [{担任ID: 102}] },
-            { q: "「岡田」先生が担任の「クラス名」を表示せよ", ans: ["SELECT", "クラス名", "FROM", "クラス一覧,", "担任一覧", "WHERE", "クラス一覧.担任ID", "=", "担任一覧.担任ID", "AND", "氏名", "=", "'岡田'"], goal: [{クラス名: "1組"}] },
-            { q: "教科が「英語」ではない担任の情報を全て表示せよ", ans: ["SELECT", "*", "FROM", "担任一覧", "WHERE", "教科", "<>", "'英語'"], goal: [DB.担任一覧[0], DB.担任一覧[2]] },
-            { q: "すべてのクラスIDを重複なく表示せよ", ans: ["SELECT", "DISTINCT", "クラスID", "FROM", "生徒名簿"], goal: [{クラスID:"A"},{クラスID:"B"},{クラスID:"C"}] },
-            { q: "1組(A)の担任の「氏名」と「教科」を表示せよ", ans: ["SELECT", "氏名,", "教科", "FROM", "クラス一覧,", "担任一覧", "WHERE", "クラス一覧.担任ID", "=", "担任一覧.担任ID", "AND", "クラスID", "=", "'A'"], goal: [{氏名:"岡田", 教科:"数学"}] },
-            { q: "生徒名簿の年齢の合計を算出せよ", ans: ["SELECT", "SUM(年齢)", "FROM", "生徒名簿"], goal: [{"合計": 76}] },
-            { q: "16歳の生徒の氏名を表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿", "WHERE", "年齢", "=", "16"], goal: [{氏名:"鈴木"},{氏名:"伊藤"}] },
-            { q: "「佐々木」先生の担当教科を表示せよ", ans: ["SELECT", "教科", "FROM", "担任一覧", "WHERE", "氏名", "=", "'佐々木'"], goal: [{教科:"理科"}] },
-            { q: "クラス一覧の全ての情報を表示せよ", ans: ["SELECT", "*", "FROM", "クラス一覧"], goal: DB.クラス一覧 }
+            { q: "最年少の年齢を「最小年齢」として表示せよ", ans: ["SELECT", "MIN(年齢)", "AS", "最小年齢", "FROM", "生徒名簿"], goal: [{"最小年齢": 14}] },
+            { q: "1組（A）に所属する生徒の人数を「生徒数」として数えよ", ans: ["SELECT", "COUNT(*)", "AS", "生徒数", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: [{生徒数: 2}] },
+            { q: "「岡田」先生が担任をしている「クラス名」を表示せよ", ans: ["SELECT", "クラス名", "FROM", "クラス一覧,", "担任一覧", "WHERE", "クラス一覧.担任ID", "=", "担任一覧.担任ID", "AND", "氏名", "=", "'岡田'"], goal: [{クラス名: "1組"}] },
+            { q: "生徒名簿の年齢の合計を「合計年齢」として算出せよ", ans: ["SELECT", "SUM(年齢)", "AS", "合計年齢", "FROM", "生徒名簿"], goal: [{"合計年齢": 76}] },
+            { q: "すべてのクラスIDを重複なく表示せよ", ans: ["SELECT", "DISTINCT", "クラスID", "FROM", "生徒名簿"], goal: [{クラスID:"A"},{クラスID:"B"},{クラスID:"C"}] }
         ];
 
         let currentQ, qIdx = 0, correctCount = 0, startTime, timerInt, userPuzzle = [], isWait = false, selectedQuestions = [];
@@ -248,8 +119,7 @@
             document.getElementById('start-screen').style.display = 'none';
             startTime = Date.now();
             timerInt = setInterval(() => { document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1); }, 100);
-            renderSource(); 
-            nextQuestion();
+            renderSource(); nextQuestion();
         }
 
         function renderSource() {
@@ -280,7 +150,6 @@
             if (qIdx >= 3) { endGame(); return; }
             qIdx++; isWait = false; userPuzzle = [];
             currentQ = selectedQuestions[qIdx - 1];
-            
             document.getElementById('feedback-area').style.display = 'none';
             document.getElementById('run-btn').style.display = 'inline-block';
             document.getElementById('q-count').innerText = qIdx;
@@ -293,11 +162,11 @@
         function renderChips() {
             const pool = document.getElementById('chip-pool');
             pool.innerHTML = '';
-            let pieces = Array.from(new Set([...currentQ.ans, "DISTINCT", "AND", "生徒名簿.クラスID", "クラス一覧.クラスID", "クラス一覧.担任ID", "担任一覧.担任ID", "'B'", "15", "103"]));
+            let pieces = Array.from(new Set([...currentQ.ans, "AS", "人数", "合計年齢", "平均", "MIN(年齢)", "MAX(年齢)", "AND", "生徒名簿.クラスID", "クラス一覧.クラスID", "クラス一覧.担任ID", "担任一覧.担任ID", "'B'", "15"]));
             pieces.sort(() => 0.5 - Math.random()).forEach(txt => {
                 const chip = document.createElement('div');
                 chip.className = "chip";
-                if (["SELECT","FROM","WHERE","AND","DISTINCT"].includes(txt)) chip.classList.add('keyword');
+                if (["SELECT","FROM","WHERE","AND","AS","DISTINCT"].includes(txt)) chip.classList.add('keyword');
                 if (["=","<",">","<>"].includes(txt)) chip.classList.add('operator');
                 chip.innerText = txt;
                 chip.onclick = () => { if(!isWait){userPuzzle.push(txt); updateUI();} };
@@ -321,22 +190,16 @@
         function checkAnswer() {
             if (isWait || userPuzzle.length === 0) return;
             isWait = true;
-            const userStr = userPuzzle.join(" ");
             const ansStr = currentQ.ans.join(" ");
-            const isCorrect = (userStr === ansStr);
-            
+            const isCorrect = (userPuzzle.join(" ") === ansStr);
             const m = document.getElementById('mark');
             m.innerText = isCorrect ? '⭕️' : '❌';
             m.className = `judgment-mark show-mark ${isCorrect ? 'mark-o' : 'mark-x'}`;
-            
             if (isCorrect) {
                 correctCount++;
                 setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1200);
             } else {
-                setTimeout(() => {
-                    m.className = 'judgment-mark';
-                    showFeedback(ansStr);
-                }, 800);
+                setTimeout(() => { m.className = 'judgment-mark'; showFeedback(ansStr); }, 800);
             }
         }
 
@@ -348,8 +211,7 @@
 
         function endGame() {
             clearInterval(timerInt);
-            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-            document.getElementById('final-time').innerText = duration;
+            document.getElementById('final-time').innerText = ((Date.now() - startTime) / 1000).toFixed(2);
             document.getElementById('score-info').innerText = `正解数: ${correctCount} / 3`;
             document.getElementById('result-screen').style.display = 'flex';
         }
