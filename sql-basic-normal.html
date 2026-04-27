@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Master - Basic Normal</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .game-main { display: flex; gap: 15px; margin: 10px auto; max-width: 1000px; justify-content: center; }
+        .data-panel { background: rgba(0, 30, 60, 0.7); border: 1px solid #005c99; border-radius: 8px; padding: 10px; width: 48%; min-height: 300px; overflow-x: auto; }
+        .panel-title { font-size: 0.8em; color: #4dd0e1; margin-bottom: 8px; text-align: left; font-weight: bold; border-bottom: 1px solid #005c99; padding-bottom: 3px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; background: rgba(0, 0, 0, 0.3); white-space: nowrap; }
+        th, td { border: 1px solid #005c99; padding: 5px; text-align: center; }
+        th { background: rgba(0, 123, 255, 0.3); color: #00ffcc; }
+        .question-box { background: rgba(0, 0, 0, 0.5); border-left: 4px solid #ffeb3b; padding: 10px; margin: 10px auto; max-width: 900px; text-align: left; }
+        .puzzle-area { background: #111; border: 2px dashed #005c99; min-height: 60px; margin: 10px auto; max-width: 900px; display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; border-radius: 8px; align-items: center; }
+        .chip { padding: 6px 12px; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 14px; user-select: none; }
+        .chip.operator { background: #6c757d; }
+        .chip.keyword { background: #c2185b; }
+        .source-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 900px; margin: 0 auto; }
+        .timer-badge { position: absolute; top: 15px; right: 20px; color: #ffeb3b; font-family: monospace; font-size: 1.1rem; }
+        .small-table-title { font-size: 10px; color: #fff; margin-bottom: 3px; text-align: left;}
+        @media (max-width: 800px) { .game-main { flex-direction: column; } .data-panel { width: 100%; } }
+    </style>
+</head>
+<body>
+    <h1>SQL Master <span style="font-size: 0.6em; color: #4dd0e1;">(Basic Normal)</span></h1>
+    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 3</span></div>
+    <div class="timer-badge">TIME: <span id="timer">0.0</span>s</div>
+
+    <div class="game-container">
+        <div id="start-screen" class="overlay">
+            <h2>Normal Mode</h2>
+            <p>結合と集計関数のトレーニング</p>
+            <div class="start-btns">
+                <button class="start-btn" onclick="start(false)">WHEREなし含む</button>
+                <button class="start-btn btn-hint" onclick="start(true)">WHERE必須モード</button>
+            </div>
+        </div>
+        <div id="result-screen" class="overlay" style="display:none;">
+            <h2>MISSION COMPLETE</h2>
+            <div id="score-info" style="font-size: 20px; color: #fff; margin-bottom: 10px;"></div>
+            <div class="result-time"><span id="final-time">0.00</span> sec</div>
+            <button class="start-btn" onclick="location.reload()">RETRY</button>
+        </div>
+        <div id="mark" class="judgment-mark"></div>
+
+        <div class="game-main">
+            <div class="data-panel"><div class="panel-title">▼ 元の表</div><div id="source-tables-ui" style="display:flex; flex-direction:column; gap:15px;"></div></div>
+            <div class="data-panel"><div class="panel-title">▼ 期待される結果</div><div id="goal-table-ui"></div></div>
+        </div>
+    </div>
+
+    <div class="question-box"><span style="color:#ffeb3b; font-weight:bold;">Mission:</span> <span id="question-text"></span></div>
+    <div class="puzzle-area" id="drop-zone" onclick="clearLastChip()"></div>
+    <div class="source-chips" id="chip-pool"></div>
+    <div style="margin-top: 15px;"><button class="start-btn" style="background:#00c853; padding: 10px 40px;" onclick="checkAnswer()">回答実行 (RUN)</button></div>
+    <a href="index.html" class="back-link">MENUへ戻る</a>
+
+    <script>
+        const DB = {
+            生徒名簿: [
+                { id: 1, 氏名: "佐藤", 年齢: 15, クラスID: "A" },
+                { id: 2, 氏名: "鈴木", 年齢: 16, クラスID: "A" },
+                { id: 3, 氏名: "高橋", 年齢: 14, クラスID: "B" },
+                { id: 4, 氏名: "田中", 年齢: 15, クラスID: "B" },
+                { id: 5, 氏名: "伊藤", 年齢: 16, クラスID: "C" }
+            ],
+            クラス一覧: [
+                { クラスID: "A", クラス名: "1組", 担任ID: 101 },
+                { クラスID: "B", クラス名: "2組", 担任ID: 102 },
+                { クラスID: "C", クラス名: "3組", 担任ID: 103 }
+            ],
+            担任一覧: [
+                { 担任ID: 101, 氏名: "岡田", 教科: "数学" },
+                { 担任ID: 102, 氏名: "松本", 教科: "英語" },
+                { 担任ID: 103, 氏名: "佐々木", 教科: "理科" }
+            ]
+        };
+
+        const QUESTIONS = [
+            { q: "生徒の合計人数を計算せよ", ans: ["SELECT", "COUNT(*)", "FROM", "生徒名簿"], goal: [{人数: 5}], where: false },
+            { q: "生徒の平均年齢を計算せよ", ans: ["SELECT", "AVG(年齢)", "FROM", "生徒名簿"], goal: [{"AVG(年齢)": 15.2}], where: false },
+            { q: "生徒の「氏名」とその「クラス名」を表示せよ", ans: ["SELECT", "氏名,", "クラス名", "FROM", "生徒名簿,", "クラス一覧", "WHERE", "生徒名簿.クラスID", "=", "クラス一覧.クラスID"], goal: [{氏名:"佐藤",クラス名:"1組"},{氏名:"鈴木",クラス名:"1組"},{氏名:"高橋",クラス名:"2組"},{氏名:"田中",クラス名:"2組"},{氏名:"伊藤",クラス名:"3組"}], where: true },
+            { q: "「数学」を担当している担任の「氏名」を表示せよ", ans: ["SELECT", "氏名", "FROM", "担任一覧", "WHERE", "教科", "=", "'数学'"], goal: [{氏名: "岡田"}], where: true },
+            { q: "最年少の生徒の年齢を表示せよ", ans: ["SELECT", "MIN(年齢)", "FROM", "生徒名簿"], goal: [{"MIN(年齢)": 14}], where: false },
+            { q: "最年長の生徒の年齢を表示せよ", ans: ["SELECT", "MAX(年齢)", "FROM", "生徒名簿"], goal: [{"MAX(年齢)": 16}], where: false },
+            { q: "1組（クラスID='A'）に所属する生徒の人数を数えよ", ans: ["SELECT", "COUNT(*)", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: [{人数: 2}], where: true },
+            { q: "担任一覧の全ての情報を表示せよ", ans: ["SELECT", "*", "FROM", "担任一覧"], goal: DB.担任一覧, where: false },
+            { q: "クラス名が「2組」の担任IDを表示せよ", ans: ["SELECT", "担任ID", "FROM", "クラス一覧", "WHERE", "クラス名", "=", "'2組'"], goal: [{担任ID: 102}], where: true },
+            { q: "「岡田」先生が担任をしている「クラス名」を表示せよ", ans: ["SELECT", "クラス名", "FROM", "クラス一覧,", "担任一覧", "WHERE", "クラス一覧.担任ID", "=", "担任一覧.担任ID", "AND", "氏名", "=", "'岡田'"], goal: [{クラス名: "1組"}], where: true },
+            { q: "年齢が15歳より上の生徒の名前を表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿", "WHERE", "年齢", ">", "15"], goal: [{氏名:"鈴木"},{氏名:"伊藤"}], where: true },
+            { q: "教科が「英語」ではない担任の情報を全て表示せよ", ans: ["SELECT", "*", "FROM", "担任一覧", "WHERE", "教科", "<>", "'英語'"], goal: [DB.担任一覧[0], DB.担任一覧[2]], where: true },
+            { q: "すべてのクラスIDを重複なく表示せよ", ans: ["SELECT", "DISTINCT", "クラスID", "FROM", "生徒名簿"], goal: [{クラスID:"A"},{クラスID:"B"},{クラスID:"C"}], where: false },
+            { q: "1組(A)の担任の「氏名」と「教科」を表示せよ", ans: ["SELECT", "氏名,", "教科", "FROM", "クラス一覧,", "担任一覧", "WHERE", "クラス一覧.担任ID", "=", "担任一覧.担任ID", "AND", "クラスID", "=", "'A'"], goal: [{氏名:"岡田", 教科:"数学"}], where: true },
+            { q: "生徒名簿の年齢の合計を算出せよ", ans: ["SELECT", "SUM(年齢)", "FROM", "生徒名簿"], goal: [{"SUM(年齢)": 76}], where: false }
+        ];
+
+        let currentQ, qIdx = 0, correctCount = 0, startTime, timerInt, userPuzzle = [], isWait = false, selectedQuestions = [];
+
+        function start(mustWhere) {
+            let pool = mustWhere ? QUESTIONS.filter(x => x.where) : QUESTIONS;
+            selectedQuestions = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
+            document.getElementById('start-screen').style.display = 'none';
+            startTime = Date.now();
+            timerInt = setInterval(() => { document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1); }, 100);
+            renderSource(); nextQuestion();
+        }
+
+        function renderSource() {
+            const container = document.getElementById('source-tables-ui'); container.innerHTML = '';
+            Object.keys(DB).forEach(key => {
+                let div = document.createElement('div');
+                div.innerHTML = `<div class="small-table-title">■ ${key}</div>` + createTableHTML(DB[key]);
+                container.appendChild(div);
+            });
+        }
+
+        function createTableHTML(data) {
+            if (!data || data.length === 0) return "<table><tr><td>No Data</td></tr></table>";
+            let html = "<table><thead><tr>";
+            Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
+            html += "</tr></thead><tbody>";
+            data.forEach(row => { html += "<tr>"; Object.values(row).forEach(v => html += `<td>${v}</td>`); html += "</tr>"; });
+            return html + "</tbody></table>";
+        }
+
+        function nextQuestion() {
+            if (qIdx >= 3) { endGame(); return; }
+            qIdx++; isWait = false; userPuzzle = [];
+            currentQ = selectedQuestions[qIdx - 1];
+            document.getElementById('q-count').innerText = qIdx;
+            document.getElementById('question-text').innerText = currentQ.q;
+            document.getElementById('drop-zone').innerHTML = '';
+            document.getElementById('goal-table-ui').innerHTML = createTableHTML(currentQ.goal);
+            renderChips();
+        }
+
+        function renderChips() {
+            const pool = document.getElementById('chip-pool'); pool.innerHTML = '';
+            let pieces = Array.from(new Set([...currentQ.ans, "COUNT(*)", "AVG(年齢)", "SUM(年齢)", "MAX(年齢)", "MIN(年齢)", "DISTINCT", "AND", "生徒名簿.クラスID", "クラス一覧.クラスID", "クラス一覧.担任ID", "担任一覧.担任ID", "'B'", "'英語'"]));
+            pieces.sort(() => 0.5 - Math.random()).forEach(txt => {
+                let chip = document.createElement('div'); chip.className = "chip";
+                if (["SELECT","FROM","WHERE","AND","DISTINCT"].includes(txt)) chip.classList.add('keyword');
+                if (["=","<",">","<>"].includes(txt)) chip.classList.add('operator');
+                chip.innerText = txt; chip.onclick = () => { if(!isWait){userPuzzle.push(txt); updateUI();} };
+                pool.appendChild(chip);
+            });
+        }
+
+        function updateUI() {
+            const zone = document.getElementById('drop-zone'); zone.innerHTML = '';
+            userPuzzle.forEach(txt => { let c = document.createElement('div'); c.className = "chip"; c.innerText = txt; zone.appendChild(c); });
+        }
+        function clearLastChip() { if(!isWait){userPuzzle.pop(); updateUI();} }
+
+        function checkAnswer() {
+            if (isWait || userPuzzle.length === 0) return;
+            isWait = true;
+            const isCorrect = (userPuzzle.join(" ") === currentQ.ans.join(" "));
+            if (isCorrect) correctCount++;
+            const m = document.getElementById('mark');
+            m.innerText = isCorrect ? '⭕️' : '❌';
+            m.className = `judgment-mark show-mark ${isCorrect ? 'mark-o' : 'mark-x'}`;
+            setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1200);
+        }
+
+        function endGame() {
+            clearInterval(timerInt);
+            document.getElementById('final-time').innerText = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('score-info').innerText = `正解数: ${correctCount} / 3`;
+            document.getElementById('result-screen').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
