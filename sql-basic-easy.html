@@ -7,53 +7,198 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        .game-main { display: flex; gap: 15px; margin: 10px auto; max-width: 1000px; justify-content: center; }
-        .data-panel { background: rgba(0, 30, 60, 0.7); border: 1px solid #005c99; border-radius: 8px; padding: 10px; width: 48%; min-height: 280px; overflow-x: auto; }
-        .panel-title { font-size: 0.8em; color: #00ffcc; margin-bottom: 8px; text-align: left; font-weight: bold; border-bottom: 1px solid #005c99; padding-bottom: 3px; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; background: rgba(0, 0, 0, 0.3); white-space: nowrap; }
-        th, td { border: 1px solid #005c99; padding: 5px; text-align: center; }
+        /* 全体レイアウト */
+        body { max-width: 1200px; margin: 0 auto; padding: 10px; }
+        
+        /* 上段：ソーステーブル（横並び） */
+        .source-section {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 15px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            background: rgba(0, 30, 60, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #005c99;
+        }
+        .table-wrapper {
+            flex: 0 0 auto;
+            min-width: 250px;
+        }
+
+        /* 中段：ミッション表示 */
+        .mission-box {
+            background: rgba(0, 0, 0, 0.6);
+            border-left: 4px solid #00ffcc;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        /* 下段：パズル（左）と期待される結果（右） */
+        .bottom-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        /* 左側：パズルエリア */
+        .puzzle-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* 右側：出力結果エリア */
+        .goal-side {
+            width: 320px;
+            background: rgba(0, 30, 60, 0.7);
+            border: 1px solid #005c99;
+            border-radius: 8px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        /* テーブル共通スタイル */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
+        th, td { border: 1px solid #005c99; padding: 6px; text-align: center; }
         th { background: rgba(0, 123, 255, 0.3); color: #00ffcc; }
-        .question-box { background: rgba(0, 0, 0, 0.5); border-left: 4px solid #00ffcc; padding: 10px; margin: 10px auto; max-width: 900px; text-align: left; }
-        .puzzle-area { background: #111; border: 2px dashed #005c99; min-height: 60px; margin: 10px auto; max-width: 900px; display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; border-radius: 8px; align-items: center; }
-        .chip { padding: 6px 12px; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 14px; user-select: none; }
-        .chip.operator { background: #6c757d; }
+
+        /* パズルUI */
+        .puzzle-area {
+            background: #111;
+            border: 2px dashed #005c99;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .chip {
+            padding: 8px 14px;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 14px;
+        }
         .chip.keyword { background: #c2185b; }
-        .source-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 900px; margin: 0 auto; }
-        .timer-badge { position: absolute; top: 15px; right: 20px; color: #00ffcc; font-family: monospace; font-size: 1.1rem; }
-        .small-table-title { font-size: 10px; color: #fff; margin-bottom: 3px; text-align: left;}
-        @media (max-width: 800px) { .game-main { flex-direction: column; } .data-panel { width: 100%; } }
+        .chip.operator { background: #6c757d; }
+        
+        .chip-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 0;
+        }
+
+        #feedback-area {
+            display: none;
+            background: rgba(255, 82, 82, 0.2);
+            border: 1px solid #ff5252;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .correct-ans {
+            color: #ffeb3b;
+            font-family: monospace;
+            display: block;
+            margin: 10px 0;
+            background: #000;
+            padding: 10px;
+        }
+
+        .timer-badge {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            color: #00ffcc;
+            font-size: 1.2rem;
+            z-index: 100;
+        }
+
+        .next-btn {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .small-title { font-size: 0.8em; color: #00ffcc; margin-bottom: 5px; font-weight: bold; text-align: left;}
+
+        @media (max-width: 900px) {
+            .bottom-container { flex-direction: column; }
+            .goal-side { width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <h1>SQL Master <span style="font-size: 0.6em; color: #00ffcc;">(Basic Easy)</span></h1>
-    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 3</span></div>
+    <h1>SQL Master <span style="font-size: 0.6em; color: #00ffcc;">(Easy)</span></h1>
     <div class="timer-badge">TIME: <span id="timer">0.0</span>s</div>
+    <div id="stats-bar">Quest: <span id="q-count">0</span> / 3</div>
 
-    <div class="game-container">
-        <div id="start-screen" class="overlay">
-            <h2>Easy Mode</h2>
-            <p>選択(WHERE)と射影(列選択)のトレーニング</p>
-            <div class="start-btns">
-                <button class="start-btn" onclick="start(false)">WHEREなし含む</button>
-                <button class="start-btn btn-hint" onclick="start(true)">WHERE必須モード</button>
+    <div id="start-screen" class="overlay">
+        <h2>SQL Easy Mode</h2>
+        <p>選択(WHERE)と射影(列指定)の基礎</p>
+        <button class="start-btn" onclick="start()">START GAME</button>
+    </div>
+
+    <div id="result-screen" class="overlay" style="display:none;">
+        <h2>FINISH!</h2>
+        <div id="score-info" style="font-size: 20px; color: #fff; margin-bottom: 10px;"></div>
+        <div class="result-time"><span id="final-time">0.00</span> sec</div>
+        <button class="start-btn" onclick="location.reload()">RETRY</button>
+    </div>
+
+    <div id="mark" class="judgment-mark"></div>
+
+    <div class="source-section" id="source-tables"></div>
+
+    <div class="mission-box">
+        <span style="color:#00ffcc; font-weight:bold;">MISSION:</span> 
+        <span id="question-text">読み込み中...</span>
+    </div>
+
+    <div class="bottom-container">
+        <div class="puzzle-side">
+            <div class="small-title">▼ SQL PUZZLE</div>
+            <div class="puzzle-area" id="drop-zone" onclick="clearLastChip()"></div>
+            <div style="font-size: 10px; color: #888;">※チップクリックで追加、枠内クリックで1つ削除</div>
+            
+            <div class="chip-pool" id="chip-pool"></div>
+            
+            <div id="action-bar">
+                <button id="run-btn" class="start-btn" style="background:#00c853; width:200px;" onclick="checkAnswer()">回答実行 (RUN)</button>
+            </div>
+
+            <div id="feedback-area">
+                <div style="color:#ff5252; font-weight:bold;">MISS! 正解のSQL:</div>
+                <code class="correct-ans" id="correct-sql"></code>
+                <button class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
             </div>
         </div>
-        <div id="result-screen" class="overlay" style="display:none;">
-            <h2>FINISH!</h2>
-            <div id="score-info" style="font-size: 20px; color: #fff; margin-bottom: 10px;"></div>
-            <div class="result-time"><span id="final-time">0.00</span> sec</div>
-            <button class="start-btn" onclick="location.reload()">RETRY</button>
-        </div>
-        <div id="mark" class="judgment-mark"></div>
-        <div class="game-main">
-            <div class="data-panel"><div class="panel-title">▼ 元の表</div><div id="source-tables-ui" style="display:flex; flex-direction:column; gap:15px;"></div></div>
-            <div class="data-panel"><div class="panel-title">▼ 期待される結果</div><div id="goal-table-ui"></div></div>
+
+        <div class="goal-side">
+            <div class="small-title">▼ 期待される結果 (GOAL)</div>
+            <div id="goal-table"></div>
         </div>
     </div>
-    <div class="question-box"><span style="color:#00ffcc; font-weight:bold;">Mission:</span> <span id="question-text"></span></div>
-    <div class="puzzle-area" id="drop-zone" onclick="clearLastChip()"></div>
-    <div class="source-chips" id="chip-pool"></div>
-    <div style="margin-top: 15px;"><button class="start-btn" style="background:#00c853; padding: 10px 40px;" onclick="checkAnswer()">回答実行 (RUN)</button></div>
+
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
@@ -65,28 +210,26 @@
                 { id: 4, 氏名: "田中", 年齢: 15, クラスID: "B" },
                 { id: 5, 氏名: "伊藤", 年齢: 16, クラスID: "C" }
             ],
-            クラス一覧: [{ クラスID: "A", クラス名: "1組" }, { クラスID: "B", クラス名: "2組" }, { クラスID: "C", クラス名: "3組" }],
-            担任一覧: [{ 担任ID: 101, 氏名: "岡田", 教科: "数学" }, { 担任ID: 102, 氏名: "松本", 教科: "英語" }, { 担任ID: 103, 氏名: "佐々木", 教科: "理科" }]
+            クラス一覧: [{ クラスID: "A", クラス名: "1組" }, { クラスID: "B", クラス名: "2組" }, { クラスID: "C", クラス名: "3組" }]
         };
 
         const QUESTIONS = [
-            { q: "生徒名簿の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿"], goal: DB.生徒名簿, where: false },
-            { q: "生徒の「氏名」のみを表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿"], goal: DB.生徒名簿.map(r=>({氏名:r.氏名})), where: false },
-            { q: "16歳の生徒の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", "=", "16"], goal: DB.生徒名簿.filter(r=>r.年齢==16), where: true },
-            { q: "クラスIDが 'A' の生徒の「氏名」を表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: DB.生徒名簿.filter(r=>r.クラスID=='A').map(r=>({氏名:r.氏名})), where: true },
-            { q: "15歳未満の全生徒を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", "<", "15"], goal: DB.生徒名簿.filter(r=>r.年齢<15), where: true },
-            { q: "担任一覧の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "担任一覧"], goal: DB.担任一覧, where: false },
-            { q: "「数学」担当の担任の「氏名」を表示せよ", ans: ["SELECT", "氏名", "FROM", "担任一覧", "WHERE", "教科", "=", "'数学'"], goal: [{氏名:"岡田"}], where: true },
-            { q: "クラス一覧の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "クラス一覧"], goal: DB.クラス一覧, where: false },
-            { q: "「氏名」が '田中' の生徒の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "氏名", "=", "'田中'"], goal: DB.生徒名簿.filter(r=>r.氏名=='田中'), where: true },
-            { q: "年齢が 15 以上の全生徒を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", ">=", "15"], goal: DB.生徒名簿.filter(r=>r.年齢>=15), where: true }
+            { q: "生徒名簿の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿"], goal: DB.生徒名簿 },
+            { q: "生徒の「氏名」のみを表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿"], goal: DB.生徒名簿.map(r=>({氏名:r.氏名})) },
+            { q: "16歳の生徒の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", "=", "16"], goal: DB.生徒名簿.filter(r=>r.年齢==16) },
+            { q: "クラスIDが 'A' の生徒の「氏名」を表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: DB.生徒名簿.filter(r=>r.クラスID=='A').map(r=>({氏名:r.氏名})) },
+            { q: "15歳未満の全生徒を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", "<", "15"], goal: DB.生徒名簿.filter(r=>r.年齢<15) },
+            { q: "「田中」という名前の生徒の年齢を表示せよ", ans: ["SELECT", "年齢", "FROM", "生徒名簿", "WHERE", "氏名", "=", "'田中'"], goal: [{年齢:15}] },
+            { q: "クラス一覧の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "クラス一覧"], goal: DB.クラス一覧 },
+            { q: "年齢が 15 以上の全生徒を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", ">=", "15"], goal: DB.生徒名簿.filter(r=>r.年齢>=15) },
+            { q: "1組(1組)のクラス情報を表示せよ", ans: ["SELECT", "*", "FROM", "クラス一覧", "WHERE", "クラス名", "=", "'1組'"], goal: [DB.クラス一覧[0]] },
+            { q: "生徒の「氏名」と「クラスID」を表示せよ", ans: ["SELECT", "氏名,", "クラスID", "FROM", "生徒名簿"], goal: DB.生徒名簿.map(r=>({氏名:r.氏名, クラスID:r.クラスID})) }
         ];
 
         let currentQ, qIdx = 0, correctCount = 0, startTime, timerInt, userPuzzle = [], isWait = false, selectedQuestions = [];
 
-        function start(mustWhere) {
-            let pool = mustWhere ? QUESTIONS.filter(x => x.where) : QUESTIONS;
-            selectedQuestions = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
+        function start() {
+            selectedQuestions = QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 3);
             document.getElementById('start-screen').style.display = 'none';
             startTime = Date.now();
             timerInt = setInterval(() => { document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1); }, 100);
@@ -94,11 +237,13 @@
         }
 
         function renderSource() {
-            const container = document.getElementById('source-tables-ui'); container.innerHTML = '';
+            const container = document.getElementById('source-tables');
+            container.innerHTML = '';
             Object.keys(DB).forEach(key => {
-                let div = document.createElement('div');
-                div.innerHTML = `<div class="small-table-title">■ ${key}</div>` + createTableHTML(DB[key]);
-                container.appendChild(div);
+                const wrap = document.createElement('div');
+                wrap.className = 'table-wrapper';
+                wrap.innerHTML = `<div class="small-title">■ ${key}</div>` + createTableHTML(DB[key]);
+                container.appendChild(wrap);
             });
         }
 
@@ -106,7 +251,11 @@
             let html = "<table><thead><tr>";
             Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
             html += "</tr></thead><tbody>";
-            data.forEach(row => { html += "<tr>"; Object.values(row).forEach(v => html += `<td>${v}</td>`); html += "</tr>"; });
+            data.forEach(row => {
+                html += "<tr>";
+                Object.values(row).forEach(v => html += `<td>${v}</td>`);
+                html += "</tr>";
+            });
             return html + "</tbody></table>";
         }
 
@@ -114,40 +263,64 @@
             if (qIdx >= 3) { endGame(); return; }
             qIdx++; isWait = false; userPuzzle = [];
             currentQ = selectedQuestions[qIdx - 1];
+            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('run-btn').style.display = 'inline-block';
             document.getElementById('q-count').innerText = qIdx;
             document.getElementById('question-text').innerText = currentQ.q;
             document.getElementById('drop-zone').innerHTML = '';
-            document.getElementById('goal-table-ui').innerHTML = createTableHTML(currentQ.goal);
+            document.getElementById('goal-table').innerHTML = createTableHTML(currentQ.goal);
             renderChips();
         }
 
         function renderChips() {
-            const pool = document.getElementById('chip-pool'); pool.innerHTML = '';
-            let pieces = Array.from(new Set([...currentQ.ans, "AND", "OR", "生徒名簿", "担任一覧", "氏名", "年齢", "15", "16", "'A'", "'数学'"]));
+            const pool = document.getElementById('chip-pool');
+            pool.innerHTML = '';
+            let pieces = Array.from(new Set([...currentQ.ans, "AND", "OR", "クラスID", "氏名", "15", "'B'", "id"]));
             pieces.sort(() => 0.5 - Math.random()).forEach(txt => {
-                let chip = document.createElement('div'); chip.className = "chip";
-                if (["SELECT","FROM","WHERE","AND","OR"].includes(txt)) chip.classList.add('keyword');
+                const chip = document.createElement('div');
+                chip.className = "chip";
+                if (["SELECT","FROM","WHERE","AND"].includes(txt)) chip.classList.add('keyword');
                 if (["=","<",">",">="].includes(txt)) chip.classList.add('operator');
-                chip.innerText = txt; chip.onclick = () => { if(!isWait){userPuzzle.push(txt); updateUI();} };
+                chip.innerText = txt;
+                chip.onclick = () => { if(!isWait){userPuzzle.push(txt); updateUI();} };
                 pool.appendChild(chip);
             });
         }
 
         function updateUI() {
-            const zone = document.getElementById('drop-zone'); zone.innerHTML = '';
-            userPuzzle.forEach(txt => { let c = document.createElement('div'); c.className = "chip"; c.innerText = txt; zone.appendChild(c); });
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = '';
+            userPuzzle.forEach(txt => {
+                const c = document.createElement('div');
+                c.className = "chip";
+                c.innerText = txt;
+                zone.appendChild(c);
+            });
         }
+
         function clearLastChip() { if(!isWait){userPuzzle.pop(); updateUI();} }
 
         function checkAnswer() {
             if (isWait || userPuzzle.length === 0) return;
             isWait = true;
-            const isCorrect = (userPuzzle.join(" ") === currentQ.ans.join(" "));
-            if (isCorrect) correctCount++;
+            const ansStr = currentQ.ans.join(" ");
+            const isCorrect = (userPuzzle.join(" ") === ansStr);
             const m = document.getElementById('mark');
             m.innerText = isCorrect ? '⭕️' : '❌';
             m.className = `judgment-mark show-mark ${isCorrect ? 'mark-o' : 'mark-x'}`;
-            setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1200);
+            
+            if (isCorrect) {
+                correctCount++;
+                setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1200);
+            } else {
+                setTimeout(() => { m.className = 'judgment-mark'; showFeedback(ansStr); }, 800);
+            }
+        }
+
+        function showFeedback(correctSql) {
+            document.getElementById('run-btn').style.display = 'none';
+            document.getElementById('correct-sql').innerText = correctSql;
+            document.getElementById('feedback-area').style.display = 'block';
         }
 
         function endGame() {
