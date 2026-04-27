@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Master - Basic Easy</title>
+    <title>SQL BASIC - Easy</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -31,13 +31,13 @@
     </style>
 </head>
 <body>
-    <h1>SQL Master <span style="font-size: 0.6em; color: #00ffcc;">(Easy)</span></h1>
+    <h1>SQL BASIC <span style="font-size: 0.6em; color: #00ffcc;">(Easy)</span></h1>
     <div class="timer-badge">TIME: <span id="timer">0.0</span>s</div>
     <div id="stats-bar">Quest: <span id="q-count">0</span> / 3</div>
 
     <div id="start-screen" class="overlay">
-        <h2>SQL Easy Mode</h2>
-        <p>選択と射影の基礎</p>
+        <h2>SQL BASIC: Easy</h2>
+        <p>選択と射影の基礎トレーニング</p>
         <button class="start-btn" onclick="start()">START GAME</button>
     </div>
 
@@ -81,7 +81,6 @@
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
-        // データとロジックは前回同様ですが、Normalと挙動を合わせています
         const DB = {
             生徒名簿: [
                 { id: 1, 氏名: "佐藤", 年齢: 15, クラスID: "A" },

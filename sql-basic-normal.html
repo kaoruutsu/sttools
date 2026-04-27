@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Master - Basic Normal</title>
+    <title>SQL BASIC - Normal</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -31,12 +31,12 @@
     </style>
 </head>
 <body>
-    <h1>SQL Master <span style="font-size: 0.6em; color: #4dd0e1;">(Normal)</span></h1>
+    <h1>SQL BASIC <span style="font-size: 0.6em; color: #4dd0e1;">(Normal)</span></h1>
     <div class="timer-badge">TIME: <span id="timer">0.0</span>s</div>
     <div id="stats-bar">Quest: <span id="q-count">0</span> / 3</div>
 
     <div id="start-screen" class="overlay">
-        <h2>SQL Normal Mode</h2>
+        <h2>SQL BASIC: Normal</h2>
         <p>結合・集計関数・AS句のトレーニング</p>
         <button class="start-btn" onclick="start()">START GAME</button>
     </div>
@@ -126,8 +126,7 @@
             const container = document.getElementById('source-tables');
             container.innerHTML = '';
             Object.keys(DB).forEach(key => {
-                const wrap = document.createElement('div');
-                wrap.className = 'table-wrapper';
+                const wrap = document.createElement('div'); wrap.className = 'table-wrapper';
                 wrap.innerHTML = `<div class="small-title">■ ${key}</div>` + createTableHTML(DB[key]);
                 container.appendChild(wrap);
             });
@@ -184,7 +183,6 @@
                 zone.appendChild(c);
             });
         }
-
         function clearLastChip() { if(!isWait){userPuzzle.pop(); updateUI();} }
 
         function checkAnswer() {
