@@ -7,11 +7,11 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        .bin-display {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            white-space: nowrap;
-        }
+        .speed-select { margin-bottom: 20px; }
+        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
+        .bin-display { font-family: 'Courier New', monospace; font-weight: bold; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -21,6 +21,16 @@
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>Hex Easy</h2>
+            
+            <div class="speed-select">
+                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
+                <div class="speed-btns">
+                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.7, 's-low')">LOW</button>
+                    <button id="s-mid" class="speed-btn" onclick="setSpeed(1.2, 's-mid')">MID</button>
+                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.8, 's-high')">HIGH</button>
+                </div>
+            </div>
+
             <p>2進数を16進数に変換せよ</p>
             <button class="start-btn" onclick="start()">START</button>
         </div>
@@ -33,17 +43,22 @@
         <div id="mark" class="judgment-mark"></div>
         <div id="target" class="bin-display">0000</div>
     </div>
-
     <div class="choices-container">
         <div class="num-pad" id="num-pad"></div>
         <div class="alpha-pad" id="alpha-pad"></div>
     </div>
-
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
         let targetVal, qNum = 0, correctCount = 0, startTime, isWait = false, y = -100, anim;
+        let dropSpeed = 0.7; // LOW
         const MAX_QUEST = 5;
+
+        function setSpeed(val, btnId) {
+            dropSpeed = val;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(btnId).classList.add('active');
+        }
 
         function start() {
             document.getElementById('start-screen').style.display='none';
@@ -83,7 +98,7 @@
 
         function drop() {
             if(isWait) return;
-            y += 0.7;
+            y += dropSpeed;
             document.getElementById('target').style.top = y + 'px';
             if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
         }
@@ -113,8 +128,7 @@
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
             const key = e.key.toUpperCase();
-            const hexChars = "0123456789ABCDEF";
-            const index = hexChars.indexOf(key);
+            const index = "0123456789ABCDEF".indexOf(key);
             if (index !== -1) check(index);
         });
     </script>

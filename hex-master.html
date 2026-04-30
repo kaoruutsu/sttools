@@ -7,11 +7,11 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        .bin-display {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            white-space: nowrap;
-        }
+        .speed-select { margin-bottom: 20px; }
+        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
+        .bin-display { font-family: 'Courier New', monospace; font-weight: bold; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -21,24 +21,30 @@
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>8-bit Hex Attack</h2>
+            
+            <div class="speed-select">
+                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
+                <div class="speed-btns">
+                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.55, 's-low')">LOW</button>
+                    <button id="s-mid" class="speed-btn" onclick="setSpeed(0.9, 's-mid')">MID</button>
+                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.3, 's-high')">HIGH</button>
+                </div>
+            </div>
+
             <p>16進数を2桁入力して正解を導け！</p>
             <button class="start-btn" onclick="start()">START</button>
         </div>
-
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
             <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
-
         <div id="mark" class="judgment-mark"></div>
-        
         <div id="target" class="bin-display">
             <span id="bin-high">0000</span><span class="bin-gap"></span><span id="bin-low">0000</span>
         </div>
     </div>
-
     <div class="answer-area">
         <span class="input-label">16進数：</span>
         <div class="hex-box-container">
@@ -49,19 +55,23 @@
             <span style="transform: scaleX(1.2);">⌫</span>
         </button>
     </div>
-    
     <div class="choices-container">
         <div class="num-pad" id="num-pad"></div>
         <div class="alpha-pad" id="alpha-pad"></div>
     </div>
-
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
         let targetVal, qNum = 0, correctCount = 0, startTime, isWait = false, y = -100, anim;
-        let currentStep = 1; 
-        let userInput = [null, null];
+        let currentStep = 1; let userInput = [null, null];
+        let dropSpeed = 0.55; // LOW
         const MAX_QUEST = 5;
+
+        function setSpeed(val, btnId) {
+            dropSpeed = val;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(btnId).classList.add('active');
+        }
 
         function start() {
             document.getElementById('start-screen').style.display='none';
@@ -93,13 +103,11 @@
             if (qNum > MAX_QUEST) { endGame(); return; }
             currentStep = 1; userInput = [null, null];
             updateDisplay();
-            
             document.getElementById('q-count').innerText = qNum;
             targetVal = Math.floor(Math.random() * 255) + 1;
             const binStr = targetVal.toString(2).padStart(8, '0');
             document.getElementById('bin-high').innerText = binStr.substring(0, 4);
             document.getElementById('bin-low').innerText = binStr.substring(4, 8);
-            
             y = -100; isWait = false; 
             document.getElementById('target').style.display = 'block';
             drop();
@@ -108,13 +116,10 @@
         function inputHex(val, char) {
             if(isWait) return;
             if(currentStep === 1) {
-                userInput[0] = val;
-                document.getElementById('hex-1').innerText = char;
-                currentStep = 2;
-                updateDisplay();
+                userInput[0] = val; document.getElementById('hex-1').innerText = char;
+                currentStep = 2; updateDisplay();
             } else {
-                userInput[1] = val;
-                document.getElementById('hex-2').innerText = char;
+                userInput[1] = val; document.getElementById('hex-2').innerText = char;
                 updateDisplay();
                 const finalVal = (userInput[0] << 4) | userInput[1];
                 if(finalVal === targetVal) handle(true); else handle(false);
@@ -123,16 +128,12 @@
 
         function deleteLast() {
             if(isWait) return;
-            if(currentStep === 2 && userInput[0] !== null) {
-                currentStep = 1;
-                userInput[0] = null;
-            }
+            if(currentStep === 2 && userInput[0] !== null) { currentStep = 1; userInput[0] = null; }
             updateDisplay();
         }
 
         function updateDisplay() {
-            const h1 = document.getElementById('hex-1');
-            const h2 = document.getElementById('hex-2');
+            const h1 = document.getElementById('hex-1'), h2 = document.getElementById('hex-2');
             if(currentStep === 1) {
                 h1.className = "hex-box active"; h1.innerText = "?";
                 h2.className = "hex-box empty"; h2.innerText = "?";
@@ -144,7 +145,7 @@
 
         function drop() {
             if(isWait) return;
-            y += 0.55;
+            y += dropSpeed;
             document.getElementById('target').style.top = y + 'px';
             if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
         }
@@ -168,10 +169,8 @@
 
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
-            const key = e.key.toUpperCase();
-            const hexChars = "0123456789ABCDEF";
-            const index = hexChars.indexOf(key);
-            if (index !== -1) inputHex(index, key);
+            const index = "0123456789ABCDEF".indexOf(e.key.toUpperCase());
+            if (index !== -1) inputHex(index, e.key.toUpperCase());
             if (e.key === 'Backspace' || e.key === 'Delete') deleteLast();
         });
     </script>

@@ -6,6 +6,13 @@
     <title>Binary Master - Easy</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* スピード選択ボタンのスタイル */
+        .speed-select { margin-bottom: 20px; }
+        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
+    </style>
 </head>
 <body>
     <h1>Binary Master <span style="font-size: 0.6em; color: #00ffcc;">(4-bit Easy)</span></h1>
@@ -14,6 +21,16 @@
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>Easy Mode</h2>
+            
+            <div class="speed-select">
+                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
+                <div class="speed-btns">
+                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.6, 's-low')">LOW</button>
+                    <button id="s-mid" class="speed-btn" onclick="setSpeed(1.0, 's-mid')">MID</button>
+                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.5, 's-high')">HIGH</button>
+                </div>
+            </div>
+
             <p>ヒント（8, 4, 2, 1）を表示しますか？</p>
             <div class="start-btns">
                 <button class="start-btn btn-hint" onclick="start(true)">HINT ON</button>
@@ -40,7 +57,15 @@
     <script>
         let targetVal, currentBits = Array(4).fill(0), y = -100, isWait = false, anim;
         let qNum = 0, correctCount = 0, startTime, useHint = false;
+        let dropSpeed = 0.6; // デフォルトスピード (LOW)
         const MAX_QUEST = 5;
+
+        // スピード設定関数
+        function setSpeed(val, btnId) {
+            dropSpeed = val;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(btnId).classList.add('active');
+        }
 
         function start(hint) { 
             useHint = hint;
@@ -104,7 +129,7 @@
 
         function drop() {
             if(isWait) return;
-            y += 0.6;
+            y += dropSpeed; // 設定されたスピードを使用
             document.getElementById('target').style.top = y + 'px';
             if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
         }
@@ -128,7 +153,6 @@
             document.getElementById('target').style.display = 'none';
         }
 
-        // キーボード入力 (1, 2, 3, 4 キーで各ビットを操作)
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
             const keyMap = { '4': 3, '3': 2, '2': 1, '1': 0 };

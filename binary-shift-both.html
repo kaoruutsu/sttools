@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .shift-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
-        .shift-btn { padding: 12px 18px; font-size: 16px; background: rgba(0, 123, 255, 0.2); border: 2px solid #007bff; color: #fff; border-radius: 8px; cursor: pointer; transition: 0.2s; flex: 1; min-width: 100px; max-width: 140px; }
+        .shift-btn { padding: 12px 18px; font-size: 16px; background: rgba(0, 123, 255, 0.2); border: 2px solid #007bff; color: #fff; border-radius: 8px; cursor: pointer; transition: 0.2s; flex: 1; min-width: 100px; max-width: 140px; text-align: center; }
         .shift-btn:hover { background: rgba(0, 255, 204, 0.2); border-color: #00ffcc; }
         
         .info-panel { display: flex; justify-content: center; margin: 10px 0; font-size: 20px; }
@@ -20,7 +20,7 @@
         .bit-display { display: flex; justify-content: center; flex-wrap: wrap; gap: 3px; margin: 15px auto; max-width: 100%; }
         .bit-cell { width: 40px; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
         .bit-cell .weight { font-size: 10px; color: #4dd0e1; margin-bottom: 5px; height: 12px; }
-        .bit-cell .value { width: 100%; height: 45px; line-height: 45px; font-size: 20px; font-weight: bold; background: rgba(0, 80, 120, 0.3); border: 2px solid #005c99; border-radius: 8px; color: #fff; text-align: center; user-select: none; }
+        .bit-cell .value { width: 100%; height: 45px; line-height: 45px; font-size: 20px; font-weight: bold; background: rgba(0, 80, 120, 0.3); border: 2px solid #005c99; border-radius: 8px; color: #fff; cursor: pointer; text-align: center; user-select: none; }
         .bit-cell .value.one { background: rgba(0, 255, 204, 0.3); border-color: #00ffcc; color: #00ffcc; }
         
         .fixed-point-marker { font-size: 28px; color: #ffeb3b; align-self: flex-end; margin-bottom: 5px; width: 10px; text-align: center; }
@@ -54,7 +54,8 @@
     <div class="shift-controls">
         <button class="shift-btn" onclick="shiftLeft()">← 左シフト</button>
         <button class="shift-btn" onclick="shiftRight()">右シフト →</button>
-        <button class="shift-btn" onclick="resetBits()" style="background: rgba(100,100,100,0.2); border-color: #666;">RANDOM RESET</button>
+        <button class="shift-btn" onclick="clearBits()" style="background: rgba(100,100,100,0.2); border-color: #666;">CLEAR</button>
+        <button class="shift-btn" onclick="randomBits()" style="background: rgba(128, 0, 128, 0.2); border-color: #800080;">RANDOM</button>
     </div>
 
     <a href="index.html" class="back-link">MENUへ戻る</a>
@@ -65,11 +66,9 @@
         let bits = [];
         
         function init() {
-            // 全ビットをランダムに設定。ただし最上位ビット(MSB)は必ず0にする
+            // 全ビットを0で初期化
             const totalBits = intBits + fracBits;
-            bits = Array.from({length: totalBits}, (_, i) => 
-                (i === totalBits - 1) ? 0 : Math.floor(Math.random() * 2)
-            );
+            bits = Array(totalBits).fill(0);
             render();
         }
         
@@ -98,6 +97,8 @@
                 const value = document.createElement('div');
                 value.className = 'value' + (bits[i] ? ' one' : '');
                 value.innerText = bits[i];
+                // タップで反転
+                value.onclick = () => toggleBit(i);
                 
                 cell.appendChild(weight);
                 cell.appendChild(value);
@@ -115,6 +116,11 @@
             document.getElementById('dec-display').innerText = dec.toFixed(4).replace(/\.?0+$/, "");
             document.getElementById('decimal-detail').innerText = `整数部: ${Math.floor(dec)} | 小数部: ${dec % 1}`;
             document.getElementById('overflow-msg').innerText = '';
+        }
+        
+        function toggleBit(idx) {
+            bits[idx] = bits[idx] ? 0 : 1;
+            render();
         }
         
         function shiftLeft() {
@@ -139,8 +145,18 @@
             render();
         }
         
-        function resetBits() {
+        function clearBits() {
+            // 全ビットを0にして初期化
             init();
+        }
+
+        function randomBits() {
+            // 整数部の最上位ビット(index: intBits + fracBits - 1)を0にするランダム生成
+            const totalBits = intBits + fracBits;
+            bits = Array.from({length: totalBits}, (_, i) => 
+                (i === totalBits - 1) ? 0 : Math.floor(Math.random() * 2)
+            );
+            render();
         }
         
         init();

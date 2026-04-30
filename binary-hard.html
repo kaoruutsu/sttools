@@ -7,44 +7,16 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
     <style>
-        .bin-display {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            white-space: nowrap;
-        }
-        /* 5択ボタンのレイアウト */
-        .choice-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            max-width: 800px;
-            margin: 20px auto;
-        }
-        .choice-btn {
-            height: 80px;
-            font-size: 28px;
-            font-weight: bold;
-            background: rgba(0, 123, 255, 0.1);
-            border: 2px solid #007bff;
-            color: #fff;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-        }
+        .speed-select { margin-bottom: 20px; }
+        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
+        .bin-display { font-family: 'Courier New', monospace; font-weight: bold; white-space: nowrap; }
+        .choice-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-width: 800px; margin: 20px auto; }
+        .choice-btn { height: 80px; font-size: 28px; font-weight: bold; background: rgba(0, 123, 255, 0.1); border: 2px solid #007bff; color: #fff; border-radius: 12px; cursor: pointer; transition: 0.2s; position: relative; }
         .choice-btn:hover { background: rgba(0, 255, 204, 0.2); border-color: #00ffcc; }
-        .choice-btn::before {
-            content: attr(data-key);
-            position: absolute;
-            top: 5px;
-            left: 8px;
-            font-size: 12px;
-            color: #4dd0e1;
-        }
-        @media (max-width: 600px) {
-            .choice-grid { grid-template-columns: repeat(3, 1fr); }
-            .choice-btn { height: 60px; font-size: 20px; }
-        }
+        .choice-btn::before { content: attr(data-key); position: absolute; top: 5px; left: 8px; font-size: 12px; color: #4dd0e1; }
+        @media (max-width: 600px) { .choice-grid { grid-template-columns: repeat(3, 1fr); } .choice-btn { height: 60px; font-size: 20px; } }
     </style>
 </head>
 <body>
@@ -54,6 +26,16 @@
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>Select Mode</h2>
+            
+            <div class="speed-select">
+                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
+                <div class="speed-btns">
+                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.65, 's-low')">LOW</button>
+                    <button id="s-mid" class="speed-btn" onclick="setSpeed(1.1, 's-mid')">MID</button>
+                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.6, 's-high')">HIGH</button>
+                </div>
+            </div>
+
             <p>落ちてくる2進数を10進数で答えろ！</p>
             <div class="start-btns">
                 <button class="start-btn" onclick="start('4')">4-bit</button>
@@ -61,26 +43,29 @@
                 <button class="start-btn btn-hint" onclick="start('mix')">MIX</button>
             </div>
         </div>
-
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
             <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
-
         <div id="mark" class="judgment-mark"></div>
         <div id="target" class="bin-display"></div>
     </div>
-
     <div class="choice-grid" id="choices"></div>
-
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
         let targetVal, qNum = 0, correctCount = 0, startTime, isWait = false, y = -100, anim;
-        let gameMode = '4'; // '4', '8', 'mix'
+        let gameMode = '4';
+        let dropSpeed = 0.65; // LOW
         const MAX_QUEST = 5;
+
+        function setSpeed(val, btnId) {
+            dropSpeed = val;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(btnId).classList.add('active');
+        }
 
         function start(mode) {
             gameMode = mode;
@@ -93,23 +78,15 @@
             qNum++;
             if (qNum > MAX_QUEST) { endGame(); return; }
             document.getElementById('q-count').innerText = qNum;
-
-            // モードに応じてビット数を決定
             let currentBitLength = 4;
             if (gameMode === '8') currentBitLength = 8;
             if (gameMode === 'mix') currentBitLength = Math.random() > 0.5 ? 8 : 4;
-
             targetVal = Math.floor(Math.random() * (currentBitLength === 4 ? 15 : 255)) + 1;
             const binStr = targetVal.toString(2).padStart(currentBitLength, '0');
-
-            // 表示の作成
             const targetEl = document.getElementById('target');
             if (currentBitLength === 8) {
                 targetEl.innerHTML = `<span>${binStr.substring(0, 4)}</span><span class="bin-gap"></span><span>${binStr.substring(4, 8)}</span>`;
-            } else {
-                targetEl.innerText = binStr;
-            }
-
+            } else { targetEl.innerText = binStr; }
             createChoices(targetVal, currentBitLength);
             y = -100; isWait = false; 
             targetEl.style.display = 'block';
@@ -119,28 +96,16 @@
         function createChoices(correct, bitLen) {
             const container = document.getElementById('choices');
             container.innerHTML = '';
-            
             let options = new Set();
             options.add(correct);
-
-            // 間違えそうな選択肢を生成
             while (options.size < 5) {
                 let choice;
                 const r = Math.random();
-                if (r < 0.4) {
-                    // 1ビットだけ違う（惜しいミス）
-                    choice = correct ^ (1 << Math.floor(Math.random() * bitLen));
-                } else if (r < 0.7) {
-                    // 近い数値
-                    choice = correct + (Math.floor(Math.random() * 7) - 3);
-                } else {
-                    // 全然違う数値
-                    choice = Math.floor(Math.random() * (bitLen === 4 ? 15 : 255)) + 1;
-                }
+                if (r < 0.4) choice = correct ^ (1 << Math.floor(Math.random() * bitLen));
+                else if (r < 0.7) choice = correct + (Math.floor(Math.random() * 7) - 3);
+                else choice = Math.floor(Math.random() * (bitLen === 4 ? 15 : 255)) + 1;
                 if (choice >= 0 && choice <= (bitLen === 4 ? 15 : 255)) options.add(choice);
             }
-
-            // シャッフルして配置
             [...options].sort(() => Math.random() - 0.5).forEach((val, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
@@ -153,7 +118,7 @@
 
         function drop() {
             if (isWait) return;
-            y += 0.65;
+            y += dropSpeed;
             document.getElementById('target').style.top = y + 'px';
             if (y > 320) handle(false); else anim = requestAnimationFrame(drop);
         }
@@ -180,7 +145,6 @@
             document.getElementById('target').style.display = 'none';
         }
 
-        // キーボード入力 (1-5キー)
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
             const idx = parseInt(e.key) - 1;

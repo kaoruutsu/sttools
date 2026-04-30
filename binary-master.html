@@ -6,6 +6,12 @@
     <title>Binary Master - Normal</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .speed-select { margin-bottom: 20px; }
+        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
+    </style>
 </head>
 <body>
     <h1>Binary Master <span style="font-size: 0.6em; color: #4dd0e1;">(8-bit Normal)</span></h1>
@@ -14,33 +20,46 @@
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>8-bit Attack</h2>
+            
+            <div class="speed-select">
+                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
+                <div class="speed-btns">
+                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.75, 's-low')">LOW</button>
+                    <button id="s-mid" class="speed-btn" onclick="setSpeed(1.2, 's-mid')">MID</button>
+                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.8, 's-high')">HIGH</button>
+                </div>
+            </div>
+
             <p>ヒント（128, 64...）を表示しますか？</p>
             <div class="start-btns">
                 <button class="start-btn btn-hint" onclick="start(true)">HINT ON</button>
                 <button class="start-btn" onclick="start(false)">HINT OFF</button>
             </div>
         </div>
-
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>MISSION COMPLETE</h2>
             <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
             <div class="result-time"><span id="final-time">0.00</span> sec</div>
             <button class="start-btn" onclick="location.reload()">RETRY</button>
         </div>
-
         <div id="mark" class="judgment-mark"></div>
         <div id="target">0</div>
     </div>
-
     <div id="sum-text" style="font-size: 28px; margin: 15px; font-weight: bold;">Current: 0</div>
     <div class="bit-row" id="bits-ui"></div>
-
     <a href="index.html" class="back-link">MENUへ戻る</a>
 
     <script>
         let targetVal, currentBits = Array(8).fill(0), y = -100, isWait = false, anim;
         let qNum = 0, correctCount = 0, startTime, useHint = false;
+        let dropSpeed = 0.75; // LOW
         const MAX_QUEST = 5;
+
+        function setSpeed(val, btnId) {
+            dropSpeed = val;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(btnId).classList.add('active');
+        }
 
         function start(hint) { 
             useHint = hint;
@@ -53,10 +72,8 @@
             qNum++;
             if (qNum > MAX_QUEST) { endGame(); return; }
             document.getElementById('q-count').innerText = qNum;
-            
             targetVal = Math.floor(Math.random() * 254) + 1;
             let targetBits = targetVal.toString(2).padStart(8, '0').split('').reverse().map(Number);
-            
             currentBits = [...targetBits];
             let diff = Math.floor(Math.random() * 3) + 1;
             let changed = [];
@@ -64,7 +81,6 @@
                 let r = Math.floor(Math.random() * 8);
                 if(!changed.includes(r)) { currentBits[r] = currentBits[r]?0:1; changed.push(r); }
             }
-
             document.getElementById('target').innerText = targetVal;
             document.getElementById('target').style.display = 'block';
             render(); y = -100; isWait = false; drop();
@@ -77,12 +93,10 @@
                 const realIdx = 7 - i;
                 const column = document.createElement('div');
                 column.className = 'bit-column';
-
                 const hintDiv = document.createElement('div');
                 hintDiv.className = 'hint-text';
                 hintDiv.innerText = useHint ? Math.pow(2, realIdx) : '';
                 column.appendChild(hintDiv);
-
                 const btn = document.createElement('button');
                 btn.className = `bit-btn ${bit ? 'on' : ''}`;
                 btn.innerText = bit;
@@ -103,7 +117,7 @@
 
         function drop() {
             if(isWait) return;
-            y += 0.75;
+            y += dropSpeed;
             document.getElementById('target').style.top = y + 'px';
             if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
         }
@@ -127,7 +141,6 @@
             document.getElementById('target').style.display = 'none';
         }
 
-        // キーボード入力 (1-8 キーで各ビットを操作)
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
             const keyMap = { '8':7, '7':6, '6':5, '5':4, '4':3, '3':2, '2':1, '1':0 };
