@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Shift - Fixed Point</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .shift-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .shift-btn { padding: 12px 18px; font-size: 16px; background: rgba(0, 123, 255, 0.2); border: 2px solid #007bff; color: #fff; border-radius: 8px; cursor: pointer; transition: 0.2s; flex: 1; min-width: 100px; max-width: 140px; }
+        .shift-btn:hover { background: rgba(0, 255, 204, 0.2); border-color: #00ffcc; }
+        
+        .info-panel { display: flex; justify-content: center; margin: 10px 0; font-size: 20px; }
+        .info-item { background: rgba(0, 50, 80, 0.5); padding: 10px 30px; border-radius: 8px; border: 1px solid #005c99; }
+        .info-item span { color: #00ffcc; font-weight: bold; }
+        
+        .overflow-indicator { color: #ff5252; font-size: 14px; height: 40px; margin: 5px 15px; text-align: center; }
+        
+        .bit-display { display: flex; justify-content: center; flex-wrap: wrap; gap: 3px; margin: 15px auto; max-width: 100%; }
+        .bit-cell { width: 40px; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
+        .bit-cell .weight { font-size: 10px; color: #4dd0e1; margin-bottom: 5px; height: 12px; }
+        .bit-cell .value { width: 100%; height: 45px; line-height: 45px; font-size: 20px; font-weight: bold; background: rgba(0, 80, 120, 0.3); border: 2px solid #005c99; border-radius: 8px; color: #fff; text-align: center; user-select: none; }
+        .bit-cell .value.one { background: rgba(0, 255, 204, 0.3); border-color: #00ffcc; color: #00ffcc; }
+        
+        .fixed-point-marker { font-size: 28px; color: #ffeb3b; align-self: flex-end; margin-bottom: 5px; width: 10px; text-align: center; }
+        
+        .mode-select { margin: 15px 0; display: flex; justify-content: center; gap: 10px; }
+        .mode-select button { padding: 10px 15px; background: rgba(0, 123, 255, 0.1); border: 1px solid #007bff; color: #fff; border-radius: 5px; cursor: pointer; }
+        .mode-select button.active { background: rgba(0, 255, 204, 0.2); border-color: #00ffcc; }
+
+        .decimal-detail { font-size: 14px; color: #b2ebf2; text-align: center; margin-top: 5px; }
+
+        @media (max-width: 400px) { .bit-cell { width: 34px; } .bit-cell .value { height: 40px; line-height: 40px; font-size: 18px; } }
+    </style>
+</head>
+<body>
+    <h1>Binary Shift <span style="font-size: 0.6em; color: #ffeb3b;">(Fixed Point)</span></h1>
+    
+    <div class="mode-select">
+        <button id="mode-1-4" class="active" onclick="setMode(1, 4)">1.4bit</button>
+        <button id="mode-4-4" onclick="setMode(4, 4)">4.4bit</button>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-item">DEC: <span id="dec-display">0</span></div>
+    </div>
+    <div class="decimal-detail" id="decimal-detail"></div>
+
+    <div class="overflow-indicator" id="overflow-msg"></div>
+
+    <div class="bit-display" id="bit-display"></div>
+
+    <div class="shift-controls">
+        <button class="shift-btn" onclick="shiftLeft()">← 左シフト</button>
+        <button class="shift-btn" onclick="shiftRight()">右シフト →</button>
+        <button class="shift-btn" onclick="resetBits()" style="background: rgba(100,100,100,0.2); border-color: #666;">RANDOM RESET</button>
+    </div>
+
+    <a href="index.html" class="back-link">MENUへ戻る</a>
+
+    <script>
+        let intBits = 1;
+        let fracBits = 4;
+        let bits = [];
+        
+        function init() {
+            // 全ビットをランダムに設定。ただし最上位ビット(MSB)は必ず0にする
+            const totalBits = intBits + fracBits;
+            bits = Array.from({length: totalBits}, (_, i) => 
+                (i === totalBits - 1) ? 0 : Math.floor(Math.random() * 2)
+            );
+            render();
+        }
+        
+        function setMode(iBits, fBits) {
+            intBits = iBits;
+            fracBits = fBits;
+            document.getElementById('mode-1-4').className = iBits === 1 ? 'active' : '';
+            document.getElementById('mode-4-4').className = iBits === 4 ? 'active' : '';
+            init();
+        }
+        
+        function render() {
+            const container = document.getElementById('bit-display');
+            container.innerHTML = '';
+            let dec = 0;
+            
+            for (let i = intBits + fracBits - 1; i >= 0; i--) {
+                const cell = document.createElement('div');
+                cell.className = 'bit-cell';
+                
+                const weight = document.createElement('div');
+                weight.className = 'weight';
+                const exp = i - fracBits;
+                weight.innerText = exp >= 0 ? Math.pow(2, exp) : '2^' + exp;
+                
+                const value = document.createElement('div');
+                value.className = 'value' + (bits[i] ? ' one' : '');
+                value.innerText = bits[i];
+                
+                cell.appendChild(weight);
+                cell.appendChild(value);
+                container.appendChild(cell);
+                
+                if (i === fracBits) {
+                    const marker = document.createElement('div');
+                    marker.className = 'fixed-point-marker';
+                    marker.innerText = '.';
+                    container.appendChild(marker);
+                }
+                if (bits[i]) dec += Math.pow(2, i - fracBits);
+            }
+            
+            document.getElementById('dec-display').innerText = dec.toFixed(4).replace(/\.?0+$/, "");
+            document.getElementById('decimal-detail').innerText = `整数部: ${Math.floor(dec)} | 小数部: ${dec % 1}`;
+            document.getElementById('overflow-msg').innerText = '';
+        }
+        
+        function shiftLeft() {
+            const overflowBit = bits[intBits + fracBits - 1];
+            for (let i = intBits + fracBits - 1; i > 0; i--) {
+                bits[i] = bits[i - 1];
+            }
+            bits[0] = 0;
+            const overflowMsg = document.getElementById('overflow-msg');
+            if (overflowBit) overflowMsg.innerText = '⚠️ 桁あふれ: 最上位ビットが切り捨てられました';
+            render();
+        }
+        
+        function shiftRight() {
+            const overflowBit = bits[0];
+            for (let i = 0; i < intBits + fracBits - 1; i++) {
+                bits[i] = bits[i + 1];
+            }
+            bits[intBits + fracBits - 1] = 0;
+            const overflowMsg = document.getElementById('overflow-msg');
+            if (overflowBit) overflowMsg.innerText = '⚠️ 桁あふれ: 最下位ビットが切り捨てられました';
+            render();
+        }
+        
+        function resetBits() {
+            init();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

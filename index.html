@@ -12,25 +12,16 @@
         .card:hover { border-color: #00ffcc; transform: translateX(10px); background: rgba(0, 92, 153, 0.4); }
         .card h3 { margin: 0 0 8px 0; color: #00ffcc; font-size: 1.3rem; }
         .card p { margin: 0; font-size: 0.95rem; color: #b2ebf2; line-height: 1.4; }
-        .section-label { text-align: left; margin: 25px 0 5px 5px; font-weight: bold; color: #4dd0e1; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .section-label { text-align: left; margin-top: 15px; font-weight: bold; color: #4dd0e1; border-left: 4px solid #4dd0e1; padding-left: 10px; font-size: 1.1rem; }
         
-        /* セクション別カラー */
-        .card-hard { border-color: #ff5252aa; }
-        .card-hard h3 { color: #ff5252; }
-        
+        .card-master { border-color: #005c99; }
         .card-hex { border-color: #00bcd4aa; }
-        .card-hex h3 { color: #00bcd4; }
-        
-        .card-sql { border-color: #ffeb3baa; }
-        .card-sql h3 { color: #ffeb3b; }
-        
-        /* 無効・予定カード */
-        .card-disabled { border-color: #444; opacity: 0.6; cursor: default; }
-        .card-disabled:hover { transform: none; background: rgba(0, 92, 153, 0.2); border-color: #444; }
-        .card-disabled h3 { color: #888; }
-        .card-disabled p { color: #666; }
+        .card-shift { border-color: #ffeb3baa; }
+        .card-shift h3 { color: #ffeb3b; }
+        .card-sql { border-color: #8e44ad; }
+        .card-sql h3 { color: #d7bde2; }
 
-        @media (max-width: 600px) { h1 { font-size: 1.6rem; } .card { padding: 15px; } }
+        @media (max-width: 480px) { .card { padding: 15px; } .card h3 { font-size: 1.1rem; } }
     </style>
 </head>
 <body>
@@ -38,21 +29,17 @@
     
     <div class="list-container">
         
-        <div class="section-label">Binary Training</div>
-        <a href="binary-easy.html" class="card">
+        <div class="section-label">Binary Training (計算)</div>
+        <a href="binary-easy.html" class="card card-master">
             <h3>Binary Master (Easy)</h3>
             <p>4ビット計算：2進数の基本をマスター（5問タイムアタック）</p>
         </a>
-        <a href="binary-master.html" class="card">
+        <a href="binary-master.html" class="card card-master">
             <h3>Binary Master (Normal)</h3>
             <p>8ビット計算：実践的な8桁の2進数変換トレーニング</p>
         </a>
-        <a href="binary-hard.html" class="card card-hard">
-            <h3>Binary Master (Hard)</h3>
-            <p>2進数 → 10進数 逆引き：落ちてくる2進数を5択から素早く選択</p>
-        </a>
 
-        <div class="section-label">Hexadecimal Training</div>
+        <div class="section-label">Hexadecimal Training (16進数)</div>
         <a href="hex-easy.html" class="card card-hex">
             <h3>Hex Master (Easy)</h3>
             <p>4ビット 2進数 → 16進数：1桁の16進数（0-F）への変換</p>
@@ -62,20 +49,30 @@
             <p>8ビット 2進数 → 16進数：2桁の16進数への素早い変換</p>
         </a>
 
-        <div class="section-label">SQL Training</div>
+        <div class="section-label">Binary Shift Training (シフト演算)</div>
+        <a href="binary-shift-left.html" class="card card-shift">
+            <h3>Binary Shift (Basic)</h3>
+            <p>【観察】整数版：ランダムなビット列をシフトし、値が2倍・1/2倍になる挙動を確認。MSBは0から開始されます。</p>
+        </a>
+        <a href="binary-shift-both.html" class="card card-shift">
+            <h3>Binary Shift (Fixed Point)</h3>
+            <p>【観察】固定小数点版：小数点の位置を固定した状態でシフト。位取りの変化を視覚的に理解します。</p>
+        </a>
+
+        <div class="section-label">SQL Training (データベース)</div>
         <a href="sql-basic-easy.html" class="card card-sql">
-            <h3>SQL BASIC (Easy)</h3>
-            <p>選択と射影：WHERE句と列選択の基本パズル</p>
+            <h3>SQL Basic (Easy)</h3>
+            <p>抽出の基本：SELECT文とWHERE句によるデータの絞り込みを学びます。</p>
         </a>
         <a href="sql-basic-normal.html" class="card card-sql">
-            <h3>SQL BASIC (Normal)</h3>
-            <p>結合と集計：複数テーブルの結合や関数(COUNT/AVG)の活用</p>
+            <h3>SQL Basic (Normal)</h3>
+            <p>集計と並べ替え：GROUP BYやORDER BYを使った実戦的なクエリを作成します。</p>
         </a>
-        <div class="card card-disabled">
-            <h3>SQL MASTER</h3>
-            <p>Coming Soon...（より高度なクエリ作成・実践問題）</p>
-        </div>
 
     </div>
+
+    <footer style="margin-top: 30px; font-size: 0.8rem; color: #666; text-align: center;">
+        &copy; 2024 Binary & Hex Training Tools
+    </footer>
 </body>
 </html>
