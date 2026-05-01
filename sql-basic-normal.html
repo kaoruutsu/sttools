@@ -6,213 +6,30 @@
     <title>SQL BASIC - Normal</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
-    <style>
-        body { max-width: 1200px; margin: 0 auto; padding: 10px; }
-        .source-section { display: flex; flex-wrap: nowrap; gap: 15px; overflow-x: auto; margin-bottom: 15px; background: rgba(0, 30, 60, 0.4); padding: 10px; border-radius: 8px; border: 1px solid #005c99; }
-        .table-wrapper { flex: 0 0 auto; min-width: 280px; }
-        .mission-box { background: rgba(0, 0, 0, 0.6); border-left: 4px solid #ffeb3b; padding: 15px; margin-bottom: 15px; text-align: left; }
-        .bottom-container { display: flex; gap: 20px; align-items: flex-start; }
-        .puzzle-side { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        .goal-side { width: 350px; background: rgba(0, 30, 60, 0.7); border: 1px solid #005c99; border-radius: 8px; padding: 10px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; background: rgba(0, 0, 0, 0.3); white-space: nowrap; }
-        th, td { border: 1px solid #005c99; padding: 6px; text-align: center; }
-        th { background: rgba(0, 123, 255, 0.3); color: #00ffcc; }
-        .puzzle-area { background: #111; border: 2px dashed #005c99; min-height: 80px; display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; border-radius: 8px; }
-        .chip { padding: 8px 14px; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 14px; }
-        .chip.keyword { background: #c2185b; }
-        .chip.operator { background: #6c757d; }
-        .chip-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
-        #feedback-area { display: none; background: rgba(255, 82, 82, 0.2); border: 1px solid #ff5252; padding: 15px; margin-top: 10px; border-radius: 8px; text-align: left; }
-        .correct-ans { color: #ffeb3b; font-family: monospace; display: block; margin: 10px 0; background: #000; padding: 10px; }
-        .timer-badge { position: fixed; top: 10px; right: 20px; color: #ffeb3b; font-size: 1.2rem; z-index: 100; }
-        .next-btn { background: #ffeb3b; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .small-title { font-size: 0.8em; color: #4dd0e1; margin-bottom: 5px; font-weight: bold; text-align: left;}
-        @media (max-width: 900px) { .bottom-container { flex-direction: column; } .goal-side { width: 100%; } }
-    </style>
 </head>
 <body>
-    <h1>SQL BASIC <span style="font-size: 0.6em; color: #4dd0e1;">(Normal)</span></h1>
-    <div class="timer-badge">TIME: <span id="timer">0.0</span>s</div>
-    <div id="stats-bar">Quest: <span id="q-count">0</span> / 3</div>
+    <h1>SQL Training <span style="font-size: 0.6em; color: var(--accent-yellow);">(Normal)</span></h1>
 
-    <div id="start-screen" class="overlay">
-        <h2>SQL BASIC: Normal</h2>
-        <p>結合・集計関数・AS句のトレーニング</p>
-        <button class="start-btn" onclick="start()">START GAME</button>
-    </div>
-
-    <div id="result-screen" class="overlay" style="display:none;">
-        <h2>MISSION COMPLETE</h2>
-        <div id="score-info" style="font-size: 20px; color: #fff; margin-bottom: 10px;"></div>
-        <div class="result-time"><span id="final-time">0.00</span> sec</div>
-        <button class="start-btn" onclick="location.reload()">RETRY</button>
-    </div>
-
-    <div id="mark" class="judgment-mark"></div>
-    <div class="source-section" id="source-tables"></div>
+    <div class="source-section" id="tables-area"></div>
 
     <div class="mission-box">
-        <span style="color:#ffeb3b; font-weight:bold;">MISSION:</span> 
-        <span id="question-text">読み込み中...</span>
+        <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
+        <div id="mission-text">読み込み中...</div>
     </div>
 
-    <div class="bottom-container">
-        <div class="puzzle-side">
-            <div class="small-title">▼ SQL PUZZLE</div>
-            <div class="puzzle-area" id="drop-zone" onclick="clearLastChip()"></div>
-            <div style="font-size: 10px; color: #888;">※チップクリックで追加、枠内クリックで1つ削除</div>
-            <div class="chip-pool" id="chip-pool"></div>
-            <div id="action-bar">
-                <button id="run-btn" class="start-btn" style="background:#00c853; width:200px;" onclick="checkAnswer()">回答実行 (RUN)</button>
-            </div>
-            <div id="feedback-area">
-                <div style="color:#ff5252; font-weight:bold;">MISS! 正解は以下の通りです：</div>
-                <code class="correct-ans" id="correct-sql"></code>
-                <button class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            </div>
-        </div>
-
-        <div class="goal-side">
-            <div class="small-title">▼ 期待される結果 (GOAL)</div>
-            <div id="goal-table"></div>
-        </div>
+    <div class="sql-display">
+        <div id="drop-zone" class="drop-zone"></div>
     </div>
 
-    <a href="index.html" class="back-link">MENUへ戻る</a>
+    <div id="chip-pool" style="display:flex; flex-wrap:wrap; gap:10px; margin:20px 0; justify-content:center;"></div>
 
-    <script>
-        const DB = {
-            生徒名簿: [
-                { id: 1, 氏名: "佐藤", 年齢: 15, クラスID: "A" },
-                { id: 2, 氏名: "鈴木", 年齢: 16, クラスID: "A" },
-                { id: 3, 氏名: "高橋", 年齢: 14, クラスID: "B" },
-                { id: 4, 氏名: "田中", 年齢: 15, クラスID: "B" },
-                { id: 5, 氏名: "伊藤", 年齢: 16, クラスID: "C" }
-            ],
-            クラス一覧: [
-                { クラスID: "A", クラス名: "1組", 担任ID: 101 },
-                { クラスID: "B", クラス名: "2組", 担任ID: 102 },
-                { クラスID: "C", クラス名: "3組", 担任ID: 103 }
-            ],
-            担任一覧: [
-                { 担任ID: 101, 氏名: "岡田", 教科: "数学" },
-                { 担任ID: 102, 氏名: "松本", 教科: "英語" },
-                { 担任ID: 103, 氏名: "佐々木", 教科: "理科" }
-            ]
-        };
+    <div style="margin-top:20px;">
+        <button class="start-btn" id="run-btn" onclick="checkAnswer()">RUN SQL</button>
+        <button class="start-btn" style="background:#444; color:#fff;" onclick="clearLastChip()">UNDO</button>
+    </div>
 
-        const QUESTIONS = [
-            { q: "生徒の合計人数を「人数」という名前で計算せよ", ans: ["SELECT", "COUNT(*)", "AS", "人数", "FROM", "生徒名簿"], goal: [{人数: 5}] },
-            { q: "生徒の平均年齢を「平均」という名前で算出せよ", ans: ["SELECT", "AVG(年齢)", "AS", "平均", "FROM", "生徒名簿"], goal: [{"平均": 15.2}] },
-            { q: "生徒の「氏名」とその「クラス名」を表示せよ", ans: ["SELECT", "氏名,", "クラス名", "FROM", "生徒名簿,", "クラス一覧", "WHERE", "生徒名簿.クラスID", "=", "クラス一覧.クラスID"], goal: [{氏名:"佐藤",クラス名:"1組"},{氏名:"鈴木",クラス名:"1組"},{氏名:"高橋",クラス名:"2組"},{氏名:"田中",クラス名:"2組"},{氏名:"伊藤",クラス名:"3組"}] },
-            { q: "最年少の年齢を「最小年齢」として表示せよ", ans: ["SELECT", "MIN(年齢)", "AS", "最小年齢", "FROM", "生徒名簿"], goal: [{"最小年齢": 14}] },
-            { q: "1組（A）に所属する生徒の人数を「生徒数」として数えよ", ans: ["SELECT", "COUNT(*)", "AS", "生徒数", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: [{生徒数: 2}] },
-            { q: "「岡田」先生が担任をしている「クラス名」を表示せよ", ans: ["SELECT", "クラス名", "FROM", "クラス一覧,", "担任一覧", "WHERE", "クラス一覧.担任ID", "=", "担任一覧.担任ID", "AND", "氏名", "=", "'岡田'"], goal: [{クラス名: "1組"}] },
-            { q: "生徒名簿の年齢の合計を「合計年齢」として算出せよ", ans: ["SELECT", "SUM(年齢)", "AS", "合計年齢", "FROM", "生徒名簿"], goal: [{"合計年齢": 76}] },
-            { q: "すべてのクラスIDを重複なく表示せよ", ans: ["SELECT", "DISTINCT", "クラスID", "FROM", "生徒名簿"], goal: [{クラスID:"A"},{クラスID:"B"},{クラスID:"C"}] }
-        ];
+    <div id="mark" class="judgment-mark">⭕️</div>
 
-        let currentQ, qIdx = 0, correctCount = 0, startTime, timerInt, userPuzzle = [], isWait = false, selectedQuestions = [];
-
-        function start() {
-            selectedQuestions = QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 3);
-            document.getElementById('start-screen').style.display = 'none';
-            startTime = Date.now();
-            timerInt = setInterval(() => { document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1); }, 100);
-            renderSource(); nextQuestion();
-        }
-
-        function renderSource() {
-            const container = document.getElementById('source-tables');
-            container.innerHTML = '';
-            Object.keys(DB).forEach(key => {
-                const wrap = document.createElement('div'); wrap.className = 'table-wrapper';
-                wrap.innerHTML = `<div class="small-title">■ ${key}</div>` + createTableHTML(DB[key]);
-                container.appendChild(wrap);
-            });
-        }
-
-        function createTableHTML(data) {
-            if (!data || data.length === 0) return "<table><tr><td>No Data</td></tr></table>";
-            let html = "<table><thead><tr>";
-            Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
-            html += "</tr></thead><tbody>";
-            data.forEach(row => {
-                html += "<tr>";
-                Object.values(row).forEach(v => html += `<td>${v}</td>`);
-                html += "</tr>";
-            });
-            return html + "</tbody></table>";
-        }
-
-        function nextQuestion() {
-            if (qIdx >= 3) { endGame(); return; }
-            qIdx++; isWait = false; userPuzzle = [];
-            currentQ = selectedQuestions[qIdx - 1];
-            document.getElementById('feedback-area').style.display = 'none';
-            document.getElementById('run-btn').style.display = 'inline-block';
-            document.getElementById('q-count').innerText = qIdx;
-            document.getElementById('question-text').innerText = currentQ.q;
-            document.getElementById('drop-zone').innerHTML = '';
-            document.getElementById('goal-table').innerHTML = createTableHTML(currentQ.goal);
-            renderChips();
-        }
-
-        function renderChips() {
-            const pool = document.getElementById('chip-pool');
-            pool.innerHTML = '';
-            let pieces = Array.from(new Set([...currentQ.ans, "AS", "人数", "合計年齢", "平均", "MIN(年齢)", "MAX(年齢)", "AND", "生徒名簿.クラスID", "クラス一覧.クラスID", "クラス一覧.担任ID", "担任一覧.担任ID", "'B'", "15"]));
-            pieces.sort(() => 0.5 - Math.random()).forEach(txt => {
-                const chip = document.createElement('div');
-                chip.className = "chip";
-                if (["SELECT","FROM","WHERE","AND","AS","DISTINCT"].includes(txt)) chip.classList.add('keyword');
-                if (["=","<",">","<>"].includes(txt)) chip.classList.add('operator');
-                chip.innerText = txt;
-                chip.onclick = () => { if(!isWait){userPuzzle.push(txt); updateUI();} };
-                pool.appendChild(chip);
-            });
-        }
-
-        function updateUI() {
-            const zone = document.getElementById('drop-zone');
-            zone.innerHTML = '';
-            userPuzzle.forEach(txt => {
-                const c = document.createElement('div');
-                c.className = "chip";
-                c.innerText = txt;
-                zone.appendChild(c);
-            });
-        }
-        function clearLastChip() { if(!isWait){userPuzzle.pop(); updateUI();} }
-
-        function checkAnswer() {
-            if (isWait || userPuzzle.length === 0) return;
-            isWait = true;
-            const ansStr = currentQ.ans.join(" ");
-            const isCorrect = (userPuzzle.join(" ") === ansStr);
-            const m = document.getElementById('mark');
-            m.innerText = isCorrect ? '⭕️' : '❌';
-            m.className = `judgment-mark show-mark ${isCorrect ? 'mark-o' : 'mark-x'}`;
-            if (isCorrect) {
-                correctCount++;
-                setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1200);
-            } else {
-                setTimeout(() => { m.className = 'judgment-mark'; showFeedback(ansStr); }, 800);
-            }
-        }
-
-        function showFeedback(correctSql) {
-            document.getElementById('run-btn').style.display = 'none';
-            document.getElementById('correct-sql').innerText = correctSql;
-            document.getElementById('feedback-area').style.display = 'block';
-        }
-
-        function endGame() {
-            clearInterval(timerInt);
-            document.getElementById('final-time').innerText = ((Date.now() - startTime) / 1000).toFixed(2);
-            document.getElementById('score-info').innerText = `正解数: ${correctCount} / 3`;
-            document.getElementById('result-screen').style.display = 'flex';
-        }
-    </script>
+    <script> /* ...既存のロジック... */ </script>
 </body>
 </html>

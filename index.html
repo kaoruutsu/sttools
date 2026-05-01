@@ -6,79 +6,58 @@
     <title>Binary & Hex Training Portal</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .list-container { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: rgba(0, 92, 153, 0.2); padding: 20px; border-radius: 12px; border: 1px solid #005c99; text-decoration: none; color: #fff; transition: 0.3s; display: flex; flex-direction: column; text-align: left; }
-        .card:hover { border-color: #00ffcc; transform: translateX(10px); background: rgba(0, 92, 153, 0.4); }
-        .card h3 { margin: 0 0 8px 0; color: #00ffcc; font-size: 1.3rem; }
-        .card p { margin: 0; font-size: 0.95rem; color: #b2ebf2; line-height: 1.4; }
-        .section-label { text-align: left; margin-top: 15px; font-weight: bold; color: #4dd0e1; border-left: 4px solid #4dd0e1; padding-left: 10px; font-size: 1.1rem; }
-        
-        .card-master { border-color: #005c99; }
-        .card-hard { border-color: #ff5252aa; } /* Hard用に追加 */
-        .card-hard h3 { color: #ff5252; }       /* Hard用に追加 */
-        .card-hex { border-color: #00bcd4aa; }
-        .card-shift { border-color: #ffeb3baa; }
-        .card-shift h3 { color: #ffeb3b; }
-        .card-sql { border-color: #8e44ad; }
-        .card-sql h3 { color: #d7bde2; }
-
-        @media (max-width: 480px) { .card { padding: 15px; } .card h3 { font-size: 1.1rem; } }
-    </style>
 </head>
 <body>
     <h1>Training Portal</h1>
     
     <div class="list-container">
-        
-        <div class="section-label">Binary Training (計算)</div>
-        <a href="binary-easy.html" class="card card-master">
+        <div class="section-label">Binary Training</div>
+        <a href="binary-easy.html" class="card">
             <h3>Binary Master (Easy)</h3>
-            <p>4ビット計算：2進数の基本をマスター（5問タイムアタック）</p>
+            <p>4ビット計算：ヒント付きで2進数の基礎をマスター</p>
         </a>
-        <a href="binary-master.html" class="card card-master">
+        <a href="binary-master.html" class="card">
             <h3>Binary Master (Normal)</h3>
             <p>8ビット計算：実践的な8桁の2進数変換トレーニング</p>
         </a>
-        <a href="binary-hard.html" class="card card-hard">
+        <a href="binary-hard.html" class="card">
             <h3>Binary Master (Hard)</h3>
-            <p>2進数 → 10進数 逆引き：落ちてくる2進数を5択から素早く選択</p>
+            <p>2進数 → 10進数 逆引き：落ちてくる2進数を5択から選択</p>
         </a>
 
-        <div class="section-label">Hexadecimal Training (16進数)</div>
-        <a href="hex-easy.html" class="card card-hex">
+        <div class="section-label">Hexadecimal Training</div>
+        <a href="hex-easy.html" class="card">
             <h3>Hex Master (Easy)</h3>
-            <p>4ビット 2進数 → 16進数：1桁の16進数（0-F）への変換</p>
+            <p>4ビット 2進数 → 16進数への変換</p>
         </a>
-        <a href="hex-master.html" class="card card-hex">
+        <a href="hex-master.html" class="card">
             <h3>Hex Master (Normal)</h3>
-            <p>8ビット 2進数 → 16進数：2桁の16進数への素早い変換</p>
+            <p>8ビット 2進数 → 2桁の16進数への変換</p>
         </a>
 
-        <div class="section-label">Binary Shift Training (シフト演算)</div>
-        <a href="binary-shift-left.html" class="card card-shift">
+        <div class="section-label">Binary Shift Training</div>
+        <a href="binary-shift-left.html" class="card">
             <h3>Binary Shift (Basic)</h3>
-            <p>【観察】整数版：ランダムなビット列をシフトし、値が2倍・1/2倍になる挙動を確認。MSBは0から開始されます。</p>
+            <p>整数版：シフト演算による値の変化を確認</p>
         </a>
-        <a href="binary-shift-both.html" class="card card-shift">
+        <a href="binary-shift-both.html" class="card">
             <h3>Binary Shift (Fixed Point)</h3>
-            <p>【観察】固定小数点版：小数点の位置を固定した状態でシフト。位取りの変化を視覚的に理解します。</p>
+            <p>固定小数点版：小数点の位置を固定したシフト演算</p>
         </a>
 
-        <div class="section-label">SQL Training (データベース)</div>
-        <a href="sql-basic-easy.html" class="card card-sql">
+        <div class="section-label">Network & SQL</div>
+        <a href="ip-class.html" class="card">
+            <h3>IP Class Checker</h3>
+            <p>IPアドレスの第1オクテットからクラス(A/B/C)を判別</p>
+        </a>
+        <a href="subnet-master.html" class="card">
+            <h3>Subnet Master</h3>
+            <p>サブネットマスクからCIDR表記を導き出す</p>
+        </a>
+        <a href="sql-basic-easy.html" class="card">
             <h3>SQL Basic (Easy)</h3>
-            <p>抽出の基本：SELECT文とWHERE句によるデータの絞り込みを学びます。</p>
+            <p>基本的なSELECT文の組み立て</p>
         </a>
-        <a href="sql-basic-normal.html" class="card card-sql">
-            <h3>SQL Basic (Normal)</h3>
-            <p>集計と並べ替え：GROUP BYやORDER BYを使った実戦的なクエリを作成します。</p>
-        </a>
-
     </div>
-
-    <footer style="margin-top: 30px; font-size: 0.8rem; color: #666; text-align: center;">
-        &copy; 2024 Binary & Hex Training Tools
-    </footer>
 </body>
 </html>
