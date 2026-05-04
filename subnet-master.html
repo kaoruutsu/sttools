@@ -4,70 +4,79 @@
     <meta charset="UTF-8">
     <title>Subnet Master</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        #mask-display {
-            position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
-            color: #00ffcc; font-size: 64px; font-weight: bold;
-            background: rgba(0, 30, 60, 0.95); padding: 15px 50px; border-radius: 12px;
-            border: 2px solid #00ffcc; font-family: monospace;
-        }
-        #choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 750px; margin: 30px auto; }
-        .choice-btn { padding: 15px 0; font-size: 22px; }
-    </style>
 </head>
 <body>
     <h1>Subnet Master</h1>
-    <div id="game-info" style="width:750px; margin:0 auto; display:flex; justify-content:space-between;">
+    <div id="game-info" style="max-width:750px; margin:0 auto; display:flex; justify-content:space-between; color:var(--accent-cyan); padding: 10px;">
         <div>Quest: <span id="q-count">0</span> / 5</div>
         <div>Timer: <span id="timer">0.0</span> s</div>
     </div>
+
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <h2>Subnet Analysis</h2>
-            <p>サブネットマスクに対応するCIDR(/XX)を選べ。</p>
-            <button id="initiate-btn" class="start-btn" onclick="startGame()">INITIATE</button>
-            <button id="retry-btn" class="start-btn" style="display:none;" onclick="location.reload()">RETRY</button>
+            <h2 id="status-title">Subnet Analysis</h2>
+            <p id="status-desc">サブネットマスクに対応するCIDRを選択せよ</p>
+            <button class="start-btn" id="initiate-btn" onclick="start()">INITIATE</button>
+            <button class="start-btn" id="retry-btn" style="display:none;" onclick="location.reload()">RETRY</button>
         </div>
-        <div id="judgment-mark" class="judgment-mark"></div>
-        <div id="mask-display" class="hidden"></div>
-        <a href="index.html" class="back-btn-ui">メニューに戻る</a>
+
+        <div id="mask-display" style="top: -100px;">255.255.255.0</div>
+        <div id="judgment-mark" class="judgment-mark">⭕️</div>
     </div>
-    <div id="choices">
+
+    <div id="choices" class="choice-grid" style="max-width:750px;">
         </div>
 
     <script>
-        let correctCIDR, score=0, currentQ=0, startTime, gameTimer, anim, ipY=-80, isWait=false;
-        const masks = {
-            8: "255.0.0.0", 16: "255.255.0.0", 24: "255.255.255.0",
-            25: "255.255.255.128", 26: "255.255.255.192", 27: "255.255.255.224",
-            28: "255.255.255.240", 29: "255.255.255.248", 30: "255.255.255.252"
-        };
+        const masks = [
+            {m:"255.0.0.0", c:"8"}, {m:"255.128.0.0", c:"9"}, {m:"255.192.0.0", c:"10"},
+            {m:"255.255.0.0", c:"16"}, {m:"255.255.128.0", c:"17"}, {m:"255.255.240.0", c:"20"},
+            {m:"255.255.255.0", c:"24"}, {m:"255.255.255.128", c:"25"}, {m:"255.255.255.192", c:"26"},
+            {m:"255.255.255.224", c:"27"}, {m:"255.255.255.240", c:"28"}, {m:"255.255.255.248", c:"29"},
+            {m:"255.255.255.252", c:"30"}
+        ];
 
-        function startGame() {
-            const container = document.getElementById('choices');
-            Object.keys(masks).forEach(cidr => {
-                const b = document.createElement('button');
-                b.className = 'choice-btn'; b.id = 'c'+cidr;
-                b.innerText = '/' + cidr;
-                b.onclick = () => check(cidr);
-                container.appendChild(b);
-            });
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('mask-display').classList.remove('hidden');
+        let qIdx = 0, score = 0, startTime, gameTimer, ipY = -100, anim, isWait = false, correctCIDR = '';
+
+        function start() {
+            document.getElementById('start-screen').style.display = 'none';
             startTime = Date.now();
-            gameTimer = setInterval(() => { document.getElementById('timer').innerText = ((Date.now()-startTime)/1000).toFixed(1); }, 100);
+            gameTimer = setInterval(() => {
+                document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1);
+            }, 100);
             next();
         }
 
         function next() {
-            if(currentQ >= 5) { endGame(); return; }
-            currentQ++;
-            document.getElementById('q-count').innerText = currentQ;
-            const keys = Object.keys(masks);
-            correctCIDR = keys[Math.floor(Math.random()*keys.length)];
-            document.getElementById('mask-display').innerText = masks[correctCIDR];
-            document.querySelectorAll('.choice-btn').forEach(b=>{ b.disabled=false; b.className='choice-btn'; });
-            ipY=-80; isWait=false; drop();
+            if(qIdx >= 5) return endGame();
+            qIdx++;
+            document.getElementById('q-count').innerText = qIdx;
+
+            const target = masks[Math.floor(Math.random()*masks.length)];
+            correctCIDR = target.c;
+            document.getElementById('mask-display').innerText = target.m;
+
+            // 選択肢（正解 + ランダム3つ）
+            let options = [target.c];
+            while(options.length < 4) {
+                let r = masks[Math.floor(Math.random()*masks.length)].c;
+                if(!options.includes(r)) options.push(r);
+            }
+            options.sort((a,b) => a-b);
+
+            const container = document.getElementById('choices');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = `/${opt}`;
+                btn.onclick = () => check(opt, btn);
+                container.appendChild(btn);
+            });
+
+            ipY = -100;
+            isWait = false;
+            drop();
         }
 
         function drop() {
@@ -77,18 +86,21 @@
             if(ipY > 320) handle(false); else anim = requestAnimationFrame(drop);
         }
 
-        function check(c) { handle(c === correctCIDR, c); }
+        function check(val, btn) { if(!isWait) handle(val === correctCIDR, btn); }
 
-        function handle(win, sel) {
-            isWait=true; cancelAnimationFrame(anim);
+        function handle(win, btnEl) {
+            isWait = true; cancelAnimationFrame(anim);
             if(win) score++;
             const m = document.getElementById('judgment-mark');
             m.innerText = win ? '⭕️' : '❌';
             m.className = 'judgment-mark show-mark ' + (win ? 'mark-o' : 'mark-x');
+            
             document.querySelectorAll('.choice-btn').forEach(b => {
-                const c = b.id.replace('c','');
-                if(c === correctCIDR) b.classList.add('correct-btn');
-                else if(c === sel) b.classList.add('wrong-btn');
+                if(b.innerText === `/${correctCIDR}`) {
+                    b.style.borderColor = "var(--success-green)";
+                } else if(b === btnEl) {
+                    b.style.borderColor = "var(--error-red)";
+                }
                 b.disabled = true;
             });
             setTimeout(() => { m.className='judgment-mark'; next(); }, 1000);
@@ -96,12 +108,13 @@
 
         function endGame() {
             clearInterval(gameTimer);
-            document.getElementById('start-screen').classList.remove('hidden');
+            const screen = document.getElementById('start-screen');
+            screen.style.display = 'flex';
+            document.getElementById('status-title').innerText = "FINISH!";
+            document.getElementById('status-desc').innerText = `Score: ${score} / 5 | Time: ${document.getElementById('timer').innerText}s`;
             document.getElementById('initiate-btn').style.display = 'none';
             document.getElementById('retry-btn').style.display = 'block';
         }
     </script>
-
-    <a href="index.html" style="display:block; text-align:center; margin:20px; color: #4dd0e1; text-decoration: none; font-size: 16px;">トップに戻る</a>
 </body>
 </html>

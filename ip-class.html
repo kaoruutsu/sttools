@@ -7,19 +7,20 @@
 </head>
 <body>
     <h1>IP Class Checker</h1>
-    <div id="game-info" style="max-width:750px; margin:0 auto; display:flex; justify-content:space-between; color:var(--accent-blue);">
+    <div id="game-info" style="max-width:750px; margin:0 auto; display:flex; justify-content:space-between; color:var(--accent-blue); padding: 10px;">
         <div>Quest: <span id="q-count">0</span> / 5</div>
         <div>Timer: <span id="timer">0.0</span> s</div>
     </div>
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <h2>Class Analysis</h2>
-            <p>第1オクテットからクラスを判別せよ</p>
+            <h2 id="status-title">Class Analysis</h2>
+            <p id="status-desc">第1オクテットからクラスを判別せよ</p>
             <button class="start-btn" id="initiate-btn" onclick="start()">INITIATE</button>
+            <button class="start-btn" id="retry-btn" style="display:none;" onclick="location.reload()">RETRY</button>
         </div>
 
-        <div id="ip-display">0.0.0.0</div>
+        <div id="ip-display" style="top: -100px;">0.0.0.0</div>
         <div id="judgment-mark" class="judgment-mark">⭕️</div>
     </div>
 
@@ -29,6 +30,87 @@
         <button class="choice-btn" id="cC" onclick="check('C')">Class C</button>
     </div>
 
-    <script> /* ...既存のロジック... */ </script>
+    <script>
+        let qIdx = 0, score = 0, startTime, gameTimer, ipY = -100, anim, isWait = false, correctClass = '';
+        
+        function start() {
+            document.getElementById('start-screen').style.display = 'none';
+            startTime = Date.now();
+            gameTimer = setInterval(() => {
+                document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1);
+            }, 100);
+            next();
+        }
+
+        function next() {
+            if(qIdx >= 5) return endGame();
+            qIdx++;
+            document.getElementById('q-count').innerText = qIdx;
+            
+            // 問題生成
+            const classes = [
+                {name:'A', range:[1, 126]},
+                {name:'B', range:[128, 191]},
+                {name:'C', range:[192, 223]}
+            ];
+            const target = classes[Math.floor(Math.random()*3)];
+            correctClass = target.name;
+            const first = Math.floor(Math.random()*(target.range[1]-target.range[0]+1))+target.range[0];
+            document.getElementById('ip-display').innerText = `${first}.${r()}.${r()}.${r()}`;
+            
+            // リセット
+            ipY = -80;
+            isWait = false;
+            document.querySelectorAll('.choice-btn').forEach(b => {
+                b.disabled = false;
+                b.style.borderColor = "#444";
+                b.style.background = "rgba(255,255,255,0.05)";
+            });
+            drop();
+        }
+
+        function r() { return Math.floor(Math.random()*256); }
+
+        function drop() {
+            if(isWait) return;
+            ipY += 1.0;
+            document.getElementById('ip-display').style.top = ipY + 'px';
+            if(ipY > 320) handle(false); else anim = requestAnimationFrame(drop);
+        }
+
+        function check(c) { if(!isWait) handle(c === correctClass, c); }
+
+        function handle(win, sel) {
+            isWait = true; cancelAnimationFrame(anim);
+            if(win) score++;
+            const m = document.getElementById('judgment-mark');
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = 'judgment-mark show-mark ' + (win ? 'mark-o' : 'mark-x');
+            
+            // ボタンの色分けフィードバック
+            document.querySelectorAll('.choice-btn').forEach(b => {
+                const cls = b.id.replace('c','');
+                if(cls === correctClass) {
+                    b.style.borderColor = "var(--success-green)";
+                    b.style.background = "rgba(0,255,0,0.1)";
+                } else if(cls === sel) {
+                    b.style.borderColor = "var(--error-red)";
+                    b.style.background = "rgba(255,0,0,0.1)";
+                }
+                b.disabled = true;
+            });
+            setTimeout(() => { m.className='judgment-mark'; next(); }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(gameTimer);
+            const screen = document.getElementById('start-screen');
+            screen.style.display = 'flex';
+            document.getElementById('status-title').innerText = "FINISH!";
+            document.getElementById('status-desc').innerText = `Score: ${score} / 5 | Time: ${document.getElementById('timer').innerText}s`;
+            document.getElementById('initiate-btn').style.display = 'none';
+            document.getElementById('retry-btn').style.display = 'block';
+        }
+    </script>
 </body>
 </html>

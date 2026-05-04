@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Switching Simulator</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .simulator-container {
+            position: relative;
+            width: 100%;
+            max-width: 750px;
+            height: 500px;
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 15px;
+            margin: 10px auto;
+            overflow: hidden;
+            border: 1px solid rgba(77, 208, 225, 0.3);
+        }
+
+        .pc {
+            position: absolute;
+            width: 50px;
+            height: 40px;
+            background: #263238;
+            border: 2px solid var(--accent-blue);
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 10px;
+            color: #fff;
+            z-index: 10;
+        }
+
+        .pc-l1 { left: 10%; top: 15%; }
+        .pc-l2 { left: 10%; top: 75%; }
+        .pc-r3 { right: 10%; top: 15%; }
+        .pc-r4 { right: 10%; top: 75%; }
+
+        svg.network-svg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .cable {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .packet {
+            position: absolute;
+            width: 36px; height: 36px;
+            border: 2px solid #8b4513;
+            border-radius: 4px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            font-size: 8px; font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            z-index: 20;
+            transition: border-color 0.2s;
+        }
+        /* 待機中のパケットを目立たせる（オプション） */
+        .packet.waiting {
+            border-color: #ff3333;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+        .p-from-pc1 { background-color: #d2b48c; border-top: 6px solid var(--accent-blue); color: #5d2e0a; }
+        .p-from-pc2 { background-color: #e3c191; border-top: 6px solid var(--accent-yellow); color: #5d2e0a; }
+
+        .dest-label {
+            background: rgba(255,255,255,0.9);
+            padding: 1px 2px; border-radius: 2px; margin-top: 1px;
+        }
+
+        .bottom-controls {
+            max-width: 750px;
+            margin: 10px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+        .main-btns { display: flex; gap: 10px; }
+        
+        .mode-selector-v3 { display: flex; gap: 5px; }
+        .mode-btn {
+            padding: 8px 12px;
+            background: rgba(0, 30, 60, 0.8);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.3s;
+        }
+        .mode-btn.active {
+            background: var(--accent-blue);
+            color: #020b14;
+            font-weight: bold;
+        }
+
+        .lightning {
+            fill: none; stroke: #ffeb3b; stroke-width: 4;
+            filter: drop-shadow(0 0 8px #ffeb3b);
+            stroke-dasharray: 10, 5;
+            stroke-linejoin: round;
+        }
+        
+        .desc-box { min-height: 80px; margin: 15px auto; max-width: 750px; padding: 15px; font-size: 13px; border: 1px solid rgba(77, 208, 225, 0.3); background: rgba(0,0,0,0.3); border-radius: 10px;}
+    </style>
+</head>
+<body>
+    <h1>Network Switching</h1>
+
+    <div class="simulator-container" id="sim-screen">
+        <div class="pc pc-l1">PC 1</div>
+        <div class="pc pc-l2">PC 2</div>
+        <div class="pc pc-r3">PC 3</div>
+        <div class="pc pc-r4">PC 4</div>
+
+        <svg class="network-svg">
+            <path id="base-cable" class="cable" d="" />
+            <path id="lightning-path" class="lightning" d="" style="display:none;"/>
+        </svg>
+        <div id="packet-layer"></div>
+    </div>
+
+    <div class="bottom-controls">
+        <div class="main-btns">
+            <button id="play-btn" class="start-btn" onclick="togglePlay()">PLAY</button>
+            <button class="start-btn btn-hint" onclick="reset()">RESET</button>
+        </div>
+        <div class="mode-selector-v3">
+            <div id="btn-packet" class="mode-btn active" onclick="setMode(true)">パケット交換</div>
+            <div id="btn-circuit" class="mode-btn" onclick="setMode(false)">回線交換</div>
+        </div>
+    </div>
+
+    <div class="desc-box">
+        <div id="desc-text">
+            <span class="highlight">【パケット交換方式】</span><br>
+            PC1から1.2倍のパケットを送信。パケットが重なりそうになると手前で待機するため、共有部で自然に渋滞が発生します。
+        </div>
+    </div>
+
+    <script>
+        let isPlaying = false;
+        let isPacketMode = true;
+        let animationId;
+        let frameCount = 0;
+        let circuitTarget = 4;
+        let circuitToggleTimer = 0;
+        const pts = {};
+        const activePackets = [];
+
+        function updateCoords() {
+            const w = document.getElementById('sim-screen').clientWidth;
+            const h = document.getElementById('sim-screen').clientHeight;
+            pts.pc1 = { x: w * 0.15, y: h * 0.20 };
+            pts.pc2 = { x: w * 0.15, y: h * 0.80 };
+            pts.pc3 = { x: w * 0.85, y: h * 0.20 };
+            pts.pc4 = { x: w * 0.85, y: h * 0.80 };
+            pts.m1 = { x: w * 0.35, y: h * 0.20 };
+            pts.m2 = { x: w * 0.35, y: h * 0.80 };
+            pts.h1 = { x: w * 0.35, y: h * 0.50 };
+            pts.h2 = { x: w * 0.65, y: h * 0.50 };
+            pts.m3 = { x: w * 0.65, y: h * 0.20 };
+            pts.m4 = { x: w * 0.65, y: h * 0.80 };
+
+            const d = `M ${pts.pc1.x} ${pts.pc1.y} L ${pts.m1.x} ${pts.m1.y} L ${pts.h1.x} ${pts.h1.y} ` +
+                      `M ${pts.pc2.x} ${pts.pc2.y} L ${pts.m2.x} ${pts.m2.y} L ${pts.h1.x} ${pts.h1.y} ` +
+                      `L ${pts.h2.x} ${pts.h2.y} ` +
+                      `L ${pts.m3.x} ${pts.m3.y} L ${pts.pc3.x} ${pts.pc3.y} ` +
+                      `M ${pts.h2.x} ${pts.h2.y} L ${pts.m4.x} ${pts.m4.y} L ${pts.pc4.x} ${pts.pc4.y}`;
+            document.getElementById('base-cable').setAttribute('d', d);
+        }
+
+        window.addEventListener('resize', updateCoords);
+        updateCoords();
+
+        function setMode(pkt) {
+            isPacketMode = pkt;
+            document.getElementById('btn-packet').className = pkt ? "mode-btn active" : "mode-btn";
+            document.getElementById('btn-circuit').className = !pkt ? "mode-btn active" : "mode-btn";
+            reset();
+            const desc = document.getElementById('desc-text');
+            if(!pkt) {
+                desc.innerHTML = `<span class="highlight">【回線交換方式】</span><br>物理的に回線を繋ぎ変えます。データはケーブル上を流れます。`;
+            } else {
+                desc.innerHTML = `<span class="highlight">【パケット交換方式】</span><br>PC1から約1.2倍のパケットを送信。パケットが重なりそうになると手前で待機するため、共有部で自然に渋滞が発生します。`;
+            }
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById('play-btn').innerText = isPlaying ? "PAUSE" : "PLAY";
+            if (isPlaying) animate();
+        }
+
+        function reset() {
+            isPlaying = false;
+            document.getElementById('play-btn').innerText = "PLAY";
+            document.getElementById('packet-layer').innerHTML = "";
+            document.getElementById('lightning-path').style.display = "none";
+            cancelAnimationFrame(animationId);
+            frameCount = 0;
+            circuitToggleTimer = 0;
+            activePackets.length = 0;
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+            if (isPacketMode) {
+                // PC1: 100フレーム毎(1.2倍), PC2: 120フレーム毎
+                if (frameCount % 100 === 0) createPacket(1, 4);
+                if (frameCount % 120 === 0) createPacket(2, 3);
+            } else {
+                circuitToggleTimer++;
+                if (circuitToggleTimer > 180) {
+                    circuitTarget = (circuitTarget === 4) ? 3 : 4;
+                    circuitToggleTimer = 0;
+                }
+                renderCircuitLine();
+            }
+            frameCount++;
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function createPacket(from, to) {
+            const el = document.createElement('div');
+            el.className = 'packet ' + (from === 1 ? 'p-from-pc1' : 'p-from-pc2');
+            el.innerHTML = `<span class="dest-label">PC${to}へ</span>`;
+            document.getElementById('packet-layer').appendChild(el);
+
+            const pktObj = {
+                el: el,
+                from: from,
+                to: to,
+                progress: 0,
+                x: 0,
+                y: 0,
+                isWaiting: false
+            };
+            activePackets.push(pktObj);
+
+            const baseSpeed = 0.004;
+
+            function move() {
+                if (!isPlaying) { if(el.parentNode) requestAnimationFrame(move); return; }
+
+                // 衝突検知ロジック
+                let canMove = true;
+                for (let other of activePackets) {
+                    if (other === pktObj) continue;
+                    // 自分より先にいる（進んでいる）パケットとの距離をチェック
+                    if (other.progress > pktObj.progress) {
+                        const dx = other.x - pktObj.x;
+                        const dy = other.y - pktObj.y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        // パケットサイズ(36px)に近い距離なら待機
+                        if (dist < 42) {
+                            canMove = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (canMove) {
+                    pktObj.progress += baseSpeed;
+                    el.classList.remove('waiting');
+                } else {
+                    el.classList.add('waiting');
+                }
+
+                const prg = pktObj.progress;
+                let pos = {x:0, y:0};
+
+                // コ-の字ルート計算
+                if (prg < 0.2) {
+                    let r = prg / 0.2;
+                    let start = from === 1 ? pts.pc1 : pts.pc2;
+                    let end = from === 1 ? pts.m1 : pts.m2;
+                    pos.x = start.x + (end.x - start.x) * r;
+                    pos.y = start.y + (end.y - start.y) * r;
+                } else if (prg < 0.35) {
+                    let r = (prg - 0.2) / 0.15;
+                    let start = from === 1 ? pts.m1 : pts.m2;
+                    pos.x = start.x;
+                    pos.y = start.y + (pts.h1.y - start.y) * r;
+                } else if (prg < 0.65) {
+                    let r = (prg - 0.35) / 0.3;
+                    pos.x = pts.h1.x + (pts.h2.x - pts.h1.x) * r;
+                    pos.y = pts.h1.y;
+                } else if (prg < 0.8) {
+                    let r = (prg - 0.65) / 0.15;
+                    let end = to === 3 ? pts.m3 : pts.m4;
+                    pos.x = pts.h2.x;
+                    pos.y = pts.h2.y + (end.y - pts.h2.y) * r;
+                } else if (prg < 1.0) {
+                    let r = (prg - 0.8) / 0.2;
+                    let start = to === 3 ? pts.m3 : pts.m4;
+                    let end = to === 3 ? pts.pc3 : pts.pc4;
+                    pos.x = start.x + (end.x - start.x) * r;
+                    pos.y = start.y + (end.y - start.y) * r;
+                } else {
+                    // 到着
+                    const idx = activePackets.indexOf(pktObj);
+                    if (idx > -1) activePackets.splice(idx, 1);
+                    el.remove();
+                    return;
+                }
+
+                pktObj.x = pos.x;
+                pktObj.y = pos.y;
+                el.style.left = pos.x + 'px';
+                el.style.top = pos.y + 'px';
+                el.style.transform = 'translate(-50%, -50%)';
+                
+                requestAnimationFrame(move);
+            }
+            move();
+        }
+
+        function renderCircuitLine() {
+            const lp = document.getElementById('lightning-path');
+            const is1to4 = (circuitTarget === 4);
+            const fromP = is1to4 ? pts.pc1 : pts.pc2;
+            const fromM = is1to4 ? pts.m1 : pts.m2;
+            const toP = is1to4 ? pts.pc4 : pts.pc3;
+            const toM = is1to4 ? pts.m4 : pts.m3;
+
+            const d = `M ${fromP.x} ${fromP.y} L ${fromM.x} ${fromM.y} L ${pts.h1.x} ${pts.h1.y} ` +
+                      `L ${pts.h2.x} ${pts.h2.y} L ${toM.x} ${toM.y} L ${toP.x} ${toP.y}`;
+            
+            lp.setAttribute('d', d);
+            lp.style.display = "block";
+            lp.style.strokeDashoffset = (frameCount * -4) % 30;
+        }
+    </script>
+</body>
+</html>

@@ -6,6 +6,22 @@
     <title>Binary & Hex Training Portal</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .list-container { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: rgba(0, 92, 153, 0.2); padding: 20px; border-radius: 12px; border: 1px solid #005c99; text-decoration: none; color: #fff; transition: 0.3s; display: flex; flex-direction: column; text-align: left; }
+        .card:hover { border-color: #00ffcc; transform: translateX(10px); background: rgba(0, 92, 153, 0.4); }
+        .card h3 { margin: 0 0 8px 0; color: #00ffcc; font-size: 1.3rem; }
+        .card p { margin: 0; font-size: 0.95rem; color: #b2ebf2; line-height: 1.4; }
+        .section-label { text-align: left; margin-top: 15px; font-weight: bold; color: #4dd0e1; border-bottom: 1px solid #005c99; padding-bottom: 5px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* カテゴリ別のアクセントカラー */
+        .card-binary { border-left: 5px solid #00ffcc; }
+        .card-hex { border-left: 5px solid #ffeb3b; }
+        .card-shift { border-left: 5px solid #e1bee7; }
+        .card-network { border-left: 5px solid #4dd0e1; }
+        .card-sql { border-left: 5px solid #81c784; }
+        .card-hard { border-left: 5px solid #ff5252; }
+    </style>
 </head>
 <body>
     <h1>Training Portal</h1>
@@ -46,6 +62,10 @@
         </a>
 
         <div class="section-label">Network Training</div>
+        <a href="packet-cs.html" class="card card-network">
+            <h3>Network Switching</h3>
+            <p>パケット交換方式と回線交換方式の違いをシミュレーション。パケットの渋滞や回線の占有を視覚的に理解します。</p>
+        </a>
         <a href="ip-class.html" class="card card-network">
             <h3>IP Class Checker</h3>
             <p>IPアドレスの第1オクテットからクラス(A/B/C)を判別</p>
@@ -58,11 +78,11 @@
         <div class="section-label">SQL Training</div>
         <a href="sql-basic-easy.html" class="card card-sql">
             <h3>SQL Basic (Easy)</h3>
-            <p>基本的なSELECT文の組み立て</p>
+            <p>基礎的なSELECT文の構築トレーニング</p>
         </a>
         <a href="sql-basic-normal.html" class="card card-sql">
             <h3>SQL Basic (Normal)</h3>
-            <p>WHERE句やORDER BYを含むクエリ構築</p>
+            <p>WHERE句やORDER BYを含む実践的なクエリ作成</p>
         </a>
     </div>
 </body>
