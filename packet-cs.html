@@ -11,35 +11,38 @@
             position: relative;
             width: 100%;
             max-width: 750px;
-            height: 500px;
+            height: 480px;
             background: rgba(0, 20, 40, 0.6);
             border-radius: 15px;
             margin: 10px auto;
             overflow: hidden;
             border: 1px solid rgba(77, 208, 225, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
+        /* PCユニットのデザイン */
         .pc {
             position: absolute;
             width: 50px;
             height: 40px;
             background: #263238;
             border: 2px solid var(--accent-blue);
-            border-radius: 5px;
+            border-radius: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 11px;
             color: #fff;
             z-index: 10;
+            box-shadow: 0 0 10px rgba(77, 208, 225, 0.2);
         }
-
         .pc-l1 { left: 10%; top: 15%; }
         .pc-l2 { left: 10%; top: 75%; }
         .pc-r3 { right: 10%; top: 15%; }
         .pc-r4 { right: 10%; top: 75%; }
 
+        /* ネットワーク経路（SVG） */
         svg.network-svg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -47,72 +50,104 @@
         }
         .cable {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.15);
-            stroke-width: 8;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 10;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+        .lightning {
+            fill: none; 
+            stroke: var(--accent-yellow); 
+            stroke-width: 4;
+            filter: drop-shadow(0 0 8px var(--accent-yellow));
+            stroke-dasharray: 10, 5;
+            stroke-linejoin: round;
+        }
 
+        /* パケットのデザイン */
         .packet {
             position: absolute;
-            width: 36px; height: 36px;
-            border: 2px solid #8b4513;
-            border-radius: 4px;
+            width: 38px; height: 38px;
+            border: 2px solid #5d2e0a;
+            border-radius: 6px;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            font-size: 8px; font-weight: bold;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            font-size: 9px; font-weight: bold;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
             z-index: 20;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, transform 0.2s;
         }
-        /* 待機中のパケットを目立たせる（オプション） */
         .packet.waiting {
-            border-color: #ff3333;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+            border-color: var(--error-red);
+            box-shadow: 0 0 12px rgba(255, 51, 51, 0.7);
+            transform: translate(-50%, -50%) scale(1.05);
         }
-        .p-from-pc1 { background-color: #d2b48c; border-top: 6px solid var(--accent-blue); color: #5d2e0a; }
-        .p-from-pc2 { background-color: #e3c191; border-top: 6px solid var(--accent-yellow); color: #5d2e0a; }
+        .p-from-pc1 { background-color: #d2b48c; border-top: 6px solid var(--accent-blue); color: #3e1f07; }
+        .p-from-pc2 { background-color: #e3c191; border-top: 6px solid var(--accent-yellow); color: #3e1f07; }
 
         .dest-label {
-            background: rgba(255,255,255,0.9);
-            padding: 1px 2px; border-radius: 2px; margin-top: 1px;
+            background: rgba(255,255,255,0.8);
+            padding: 1px 3px; border-radius: 3px; margin-top: 1px;
+            font-size: 8px;
         }
 
+        /* コントロールエリア */
         .bottom-controls {
             max-width: 750px;
-            margin: 10px auto;
+            margin: 15px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 10px;
         }
-        .main-btns { display: flex; gap: 10px; }
+        .main-btns { display: flex; gap: 12px; }
         
-        .mode-selector-v3 { display: flex; gap: 5px; }
+        .mode-selector-v3 { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 8px; }
         .mode-btn {
-            padding: 8px 12px;
-            background: rgba(0, 30, 60, 0.8);
-            border: 1px solid var(--accent-blue);
+            padding: 8px 15px;
+            background: transparent;
+            border: 1px solid rgba(77, 208, 225, 0.4);
             color: var(--accent-blue);
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             transition: 0.3s;
         }
+        .mode-btn:hover { background: rgba(77, 208, 225, 0.1); }
         .mode-btn.active {
             background: var(--accent-blue);
             color: #020b14;
             font-weight: bold;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(77, 208, 225, 0.3);
         }
 
-        .lightning {
-            fill: none; stroke: #ffeb3b; stroke-width: 4;
-            filter: drop-shadow(0 0 8px #ffeb3b);
-            stroke-dasharray: 10, 5;
-            stroke-linejoin: round;
+        /* 説明ボックス */
+        .desc-box { 
+            min-height: 70px; 
+            margin: 10px auto 30px; 
+            max-width: 750px; 
+            padding: 15px; 
+            font-size: 14px; 
+            border: 1px solid rgba(77, 208, 225, 0.3); 
+            background: rgba(0, 15, 30, 0.7); 
+            border-radius: 12px;
+            text-align: left;
+            line-height: 1.6;
         }
-        
-        .desc-box { min-height: 80px; margin: 15px auto; max-width: 750px; padding: 15px; font-size: 13px; border: 1px solid rgba(77, 208, 225, 0.3); background: rgba(0,0,0,0.3); border-radius: 10px;}
+        .highlight { color: var(--accent-cyan); font-weight: bold; }
+
+        /* ポータルに戻るリンク */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin: 20px 0 40px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .back-link:hover { color: var(--accent-cyan); transform: translateX(-5px); }
     </style>
 </head>
 <body>
@@ -134,7 +169,7 @@
     <div class="bottom-controls">
         <div class="main-btns">
             <button id="play-btn" class="start-btn" onclick="togglePlay()">PLAY</button>
-            <button class="start-btn btn-hint" onclick="reset()">RESET</button>
+            <button class="start-btn" style="background:transparent; border:1px solid #666; color:#aaa;" onclick="reset()">RESET</button>
         </div>
         <div class="mode-selector-v3">
             <div id="btn-packet" class="mode-btn active" onclick="setMode(true)">パケット交換</div>
@@ -145,9 +180,11 @@
     <div class="desc-box">
         <div id="desc-text">
             <span class="highlight">【パケット交換方式】</span><br>
-            PC1から1.2倍のパケットを送信。パケットが重なりそうになると手前で待機するため、共有部で自然に渋滞が発生します。
+            データを小分けにして送信します。複数のPCが同じ回線を共有するため、中心部でパケットが重なりそうになると手前で一時停止し、効率的に順番待ち（渋滞）が発生します。
         </div>
     </div>
+
+    <a href="index.html" class="back-link">← Portalに戻る</a>
 
     <script>
         let isPlaying = false;
@@ -162,6 +199,7 @@
         function updateCoords() {
             const w = document.getElementById('sim-screen').clientWidth;
             const h = document.getElementById('sim-screen').clientHeight;
+            // 座標計算ロジック（以前のバージョンを維持）
             pts.pc1 = { x: w * 0.15, y: h * 0.20 };
             pts.pc2 = { x: w * 0.15, y: h * 0.80 };
             pts.pc3 = { x: w * 0.85, y: h * 0.20 };
@@ -191,9 +229,9 @@
             reset();
             const desc = document.getElementById('desc-text');
             if(!pkt) {
-                desc.innerHTML = `<span class="highlight">【回線交換方式】</span><br>物理的に回線を繋ぎ変えます。データはケーブル上を流れます。`;
+                desc.innerHTML = `<span class="highlight">【回線交換方式】</span><br>通信を開始する前に、送信元と宛先の間に物理的な専用路を確立（占有）します。占有中は他のパケットは入り込めませんが、通信は安定します。`;
             } else {
-                desc.innerHTML = `<span class="highlight">【パケット交換方式】</span><br>PC1から約1.2倍のパケットを送信。パケットが重なりそうになると手前で待機するため、共有部で自然に渋滞が発生します。`;
+                desc.innerHTML = `<span class="highlight">【パケット交換方式】</span><br>データを細分化して送信します。回線を占有しないため複数の通信を同時に行えますが、混雑時には共有部でパケットの渋滞（待機）が発生します。`;
             }
         }
 
@@ -217,7 +255,7 @@
         function animate() {
             if (!isPlaying) return;
             if (isPacketMode) {
-                // PC1: 100フレーム毎(1.2倍), PC2: 120フレーム毎
+                // 渋滞を起こしやすくするため、生成頻度を調整
                 if (frameCount % 100 === 0) createPacket(1, 4);
                 if (frameCount % 120 === 0) createPacket(2, 3);
             } else {
@@ -249,22 +287,22 @@
             };
             activePackets.push(pktObj);
 
-            const baseSpeed = 0.004;
+            const baseSpeed = 0.005;
 
             function move() {
                 if (!isPlaying) { if(el.parentNode) requestAnimationFrame(move); return; }
 
-                // 衝突検知ロジック
+                // 衝突（接近）検知ロジック
                 let canMove = true;
                 for (let other of activePackets) {
                     if (other === pktObj) continue;
-                    // 自分より先にいる（進んでいる）パケットとの距離をチェック
-                    if (other.progress > pktObj.progress) {
+                    // 前方のパケットとの距離をチェック
+                    if (other.progress > pktObj.progress && other.progress - pktObj.progress < 0.2) {
                         const dx = other.x - pktObj.x;
                         const dy = other.y - pktObj.y;
                         const dist = Math.sqrt(dx*dx + dy*dy);
-                        // パケットサイズ(36px)に近い距離なら待機
-                        if (dist < 42) {
+                        // パケットサイズ+αの距離なら待機
+                        if (dist < 46) {
                             canMove = false;
                             break;
                         }
@@ -281,7 +319,7 @@
                 const prg = pktObj.progress;
                 let pos = {x:0, y:0};
 
-                // コ-の字ルート計算
+                // コの字型ルート計算
                 if (prg < 0.2) {
                     let r = prg / 0.2;
                     let start = from === 1 ? pts.pc1 : pts.pc2;
@@ -309,7 +347,6 @@
                     pos.x = start.x + (end.x - start.x) * r;
                     pos.y = start.y + (end.y - start.y) * r;
                 } else {
-                    // 到着
                     const idx = activePackets.indexOf(pktObj);
                     if (idx > -1) activePackets.splice(idx, 1);
                     el.remove();

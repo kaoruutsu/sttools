@@ -4,45 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Binary Master - Hard</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Binary Master <span style="font-size: 0.6em; color: #ffeb3b;">(Reverse Hard)</span></h1>
-    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
+    <h1>Binary Master <span>(Reverse Hard)</span></h1>
+    <div id="stats-bar">
+        <div>Quest: <span id="q-count">0</span> / 5</div>
+        <div>Score: <span id="current-score">0</span></div>
+    </div>
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>Reverse Attack</h2>
-            <div class="speed-select">
-                <div class="speed-btns">
-                    <button class="speed-btn" onclick="setSpeed(0.4, this)">Slow</button>
-                    <button class="speed-btn active" onclick="setSpeed(0.65, this)">Normal</button>
-                    <button class="speed-btn" onclick="setSpeed(1.2, this)">Fast</button>
-                </div>
+            <p>落ちてくる2進数を10進数で答えろ</p>
+            <div class="controls-row">
+                <button class="control-btn" onclick="setSpeed(0.4, this)">Slow</button>
+                <button class="control-btn active" onclick="setSpeed(0.65, this)">Normal</button>
+                <button class="control-btn" onclick="setSpeed(1.2, this)">Fast</button>
             </div>
-            <button class="start-btn" onclick="start()">START</button>
+            <button class="btn-base start-btn" onclick="start()">START</button>
         </div>
 
-        <div id="result-screen" class="overlay" style="display:none;">
+        <div id="result-screen" class="overlay hidden">
             <h2>FINISH!</h2>
-            <div style="font-size: 24px; color: #fff;">Score: <span id="final-score">0</span> / 5</div>
-            <div id="final-time" style="font-size: 48px; color: var(--accent-cyan);">0.00</div>
-            <button class="start-btn" onclick="location.reload()">RETRY</button>
+            <div id="final-time" style="font-size: 2.5rem; color: var(--accent-cyan);">0.00</div>
+            <button class="btn-base start-btn" onclick="location.reload()">RETRY</button>
         </div>
 
-        <div id="target" class="bin-display" style="position:absolute; width:100%; top:-50px;">00000000</div>
+        <div id="target" class="bin-display" style="position:absolute; width:100%; top:-60px; font-family:monospace;">00000000</div>
         <div id="mark" class="judgment-mark">⭕️</div>
     </div>
 
-    <div class="choice-grid">
-        <button class="choice-btn" onclick="check(0)">?</button>
-        <button class="choice-btn" onclick="check(0)">?</button>
-        <button class="choice-btn" onclick="check(0)">?</button>
-        <button class="choice-btn" onclick="check(0)">?</button>
-        <button class="choice-btn" onclick="check(0)">?</button>
-    </div>
-    
-    <script> /* ...既存のロジック... */ </script>
+    <div class="choice-grid" id="choices"></div>
+
+    <a href="index.html" class="back-link">← Portalに戻る</a>
+
+    <script>
+        let targetVal = 0, qCount = 0, score = 0, speed = 0.65;
+        let isWait = false, startTime, anim, y = -60;
+
+        function setSpeed(s, btn) {
+            speed = s;
+            document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function start() {
+            document.getElementById('start-screen').classList.add('hidden');
+            startTime = Date.now();
+            next();
+        }
+
+        function next() {
+            if(qCount >= 5) return endGame();
+            qCount++;
+            document.getElementById('q-count').innerText = qCount;
+            targetVal = Math.floor(Math.random() * 255);
+            document.getElementById('target').innerText = targetVal.toString(2).padStart(8, '0');
+            
+            // 選択肢生成
+            const choices = [targetVal];
+            while(choices.length < 5) {
+                let r = Math.floor(Math.random() * 255);
+                if(!choices.includes(r)) choices.push(r);
+            }
+            choices.sort((a,b) => a - b);
+
+            const grid = document.getElementById('choices');
+            grid.innerHTML = '';
+            choices.forEach(c => {
+                const b = document.createElement('button');
+                b.className = 'btn-base choice-btn';
+                b.innerText = c;
+                b.onclick = () => check(c);
+                grid.appendChild(b);
+            });
+
+            y = -60; isWait = false; drop();
+        }
+
+        function drop() {
+            if(isWait) return;
+            y += speed;
+            document.getElementById('target').style.top = y + 'px';
+            if(y > 330) handle(false); else anim = requestAnimationFrame(drop);
+        }
+
+        function check(val) { if(!isWait) handle(val === targetVal); }
+
+        function handle(win) {
+            isWait = true; cancelAnimationFrame(anim);
+            if(win) score++;
+            document.getElementById('current-score').innerText = score;
+            const m = document.getElementById('mark');
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            setTimeout(() => { m.className = 'judgment-mark'; next(); }, 1000);
+        }
+
+        function endGame() {
+            const time = ((Date.now() - startTime)/1000).toFixed(2);
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-time').innerText = time + "s";
+        }
+    </script>
 </body>
 </html>

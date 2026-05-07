@@ -2,115 +2,81 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hex Master - Easy</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .speed-select { margin-bottom: 20px; }
-        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
-        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
-        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
-        .bin-display { font-family: 'Courier New', monospace; font-weight: bold; white-space: nowrap; }
-    </style>
 </head>
 <body>
-    <h1>Hex Master <span style="font-size: 0.6em; color: #00ffcc;">(4-bit Hex)</span></h1>
+    <h1>Hex Master <span>(4-bit Hex)</span></h1>
     <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <h2>Hex Easy</h2>
-            
-            <div class="speed-select">
-                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
-                <div class="speed-btns">
-                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.7, 's-low')">LOW</button>
-                    <button id="s-mid" class="speed-btn" onclick="setSpeed(1.2, 's-mid')">MID</button>
-                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.8, 's-high')">HIGH</button>
-                </div>
+            <h2>Hex Attack</h2>
+            <p>2進数を16進数(0-F)に変換せよ</p>
+            <div class="controls-row">
+                <button class="control-btn" onclick="setSpeed(0.5, this)">Slow</button>
+                <button class="control-btn active" onclick="setSpeed(0.8, this)">Normal</button>
+                <button class="control-btn" onclick="setSpeed(1.3, this)">Fast</button>
             </div>
+            <button class="btn-base start-btn" onclick="start()">START</button>
+        </div>
 
-            <p>2進数を16進数に変換せよ</p>
-            <button class="start-btn" onclick="start()">START</button>
-        </div>
-        <div id="result-screen" class="overlay" style="display:none;">
+        <div id="result-screen" class="overlay hidden">
             <h2>FINISH!</h2>
-            <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
-            <div class="result-time"><span id="final-time">0.00</span> sec</div>
-            <button class="start-btn" onclick="location.reload()">RETRY</button>
+            <div id="final-time" style="font-size: 2.5rem; color: var(--accent-cyan);">0.00</div>
+            <button class="btn-base start-btn" onclick="location.reload()">RETRY</button>
         </div>
-        <div id="mark" class="judgment-mark"></div>
-        <div id="target" class="bin-display">0000</div>
+
+        <div id="target" class="bin-display" style="position:absolute; width:100%; top:-60px;">0000</div>
+        <div id="mark" class="judgment-mark">⭕️</div>
     </div>
-    <div class="choices-container">
-        <div class="num-pad" id="num-pad"></div>
-        <div class="alpha-pad" id="alpha-pad"></div>
+
+    <div class="choice-grid">
+        <script>
+            const hex = "0123456789ABCDEF";
+            for(let char of hex) {
+                document.write(`<button class="btn-base choice-btn" onclick="check('${char}')">${char}</button>`);
+            }
+        </script>
     </div>
-    <a href="index.html" class="back-link">MENUへ戻る</a>
+
+    <a href="index.html" class="back-link">← Portalに戻る</a>
 
     <script>
-        let targetVal, qNum = 0, correctCount = 0, startTime, isWait = false, y = -100, anim;
-        let dropSpeed = 0.7; // LOW
-        const MAX_QUEST = 5;
+        let targetVal = 0, qCount = 0, score = 0, speed = 0.8, y = -60, isWait = false, anim, startTime;
 
-        function setSpeed(val, btnId) {
-            dropSpeed = val;
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(btnId).classList.add('active');
+        function setSpeed(s, b) {
+            speed = s;
+            document.querySelectorAll('.control-btn').forEach(el => el.classList.remove('active'));
+            b.classList.add('active');
         }
 
         function start() {
-            document.getElementById('start-screen').style.display='none';
-            startTime = Date.now();
-            createButtons();
-            next();
-        }
-
-        function createButtons() {
-            const nPad = document.getElementById('num-pad');
-            const aPad = document.getElementById('alpha-pad');
-            nPad.innerHTML = ''; aPad.innerHTML = '';
-            "0123456789".split("").forEach((c, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'hex-btn'; btn.innerText = c;
-                btn.onclick = () => check(i);
-                nPad.appendChild(btn);
-            });
-            "ABCDEF".split("").forEach((c, i) => {
-                const btn = document.createElement('button');
-                btn.className = 'hex-btn'; btn.innerText = c;
-                btn.onclick = () => check(i + 10);
-                aPad.appendChild(btn);
-            });
+            document.getElementById('start-screen').classList.add('hidden');
+            startTime = Date.now(); next();
         }
 
         function next() {
-            qNum++;
-            if (qNum > MAX_QUEST) { endGame(); return; }
-            document.getElementById('q-count').innerText = qNum;
+            if(qCount >= 5) return endGame();
+            qCount++;
+            document.getElementById('q-count').innerText = qCount;
             targetVal = Math.floor(Math.random() * 16);
             document.getElementById('target').innerText = targetVal.toString(2).padStart(4, '0');
-            y = -100; isWait = false; 
-            document.getElementById('target').style.display = 'block';
-            drop();
+            y = -60; isWait = false; drop();
         }
 
         function drop() {
             if(isWait) return;
-            y += dropSpeed;
+            y += speed;
             document.getElementById('target').style.top = y + 'px';
-            if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
+            if(y > 330) handle(false); else anim = requestAnimationFrame(drop);
         }
 
-        function check(val) {
-            if(isWait) return;
-            if(val === targetVal) handle(true); else handle(false);
-        }
+        function check(char) { if(!isWait) handle(parseInt(char, 16) === targetVal); }
 
         function handle(win) {
             isWait = true; cancelAnimationFrame(anim);
-            if(win) correctCount++;
+            if(win) score++;
             const m = document.getElementById('mark');
             m.innerText = win ? '⭕️' : '❌';
             m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
@@ -118,19 +84,10 @@
         }
 
         function endGame() {
-            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-            document.getElementById('final-time').innerText = duration;
-            document.getElementById('final-score').innerText = correctCount;
-            document.getElementById('result-screen').style.display = 'flex';
-            document.getElementById('target').style.display = 'none';
+            const time = ((Date.now() - startTime)/1000).toFixed(2);
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-time').innerText = time + "s";
         }
-        
-        window.addEventListener('keydown', (e) => {
-            if (isWait) return;
-            const key = e.key.toUpperCase();
-            const index = "0123456789ABCDEF".indexOf(key);
-            if (index !== -1) check(index);
-        });
     </script>
 </body>
 </html>

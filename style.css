@@ -1,6 +1,5 @@
-/* style.css - Final Integrated Version */
+/* style.css - 統一デザイン・完全版 */
 
-/* 1. 基本レイアウト・テーマ変数 */
 :root {
     --bg-dark: #020b14;
     --accent-cyan: #00ffcc;
@@ -9,8 +8,11 @@
     --accent-purple: #e1bee7;
     --error-red: #ff3333;
     --success-green: #00ff00;
+    --card-bg: rgba(0, 92, 153, 0.2);
+    --overlay-bg: rgba(2, 11, 20, 0.95);
 }
 
+/* 1. 基本レイアウト */
 body {
     font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
     text-align: center;
@@ -25,208 +27,160 @@ body {
     overflow-x: hidden;
 }
 
-/* 2. タイトルロゴ */
 h1 {
-    font-size: 2rem;
-    margin: 20px 0;
+    font-size: 1.8rem;
+    margin: 15px 0;
     color: var(--accent-blue);
     text-shadow: 0 0 10px rgba(77, 208, 225, 0.3);
 }
 
-h1::before {
-    content: "";
-    display: inline-block;
-    width: 1.2em; 
-    height: 1.2em;
-    background: url('favicon.svg') no-repeat center;
-    background-size: contain;
-    vertical-align: middle;
-    margin-right: 15px;
-    filter: drop-shadow(0 0 5px var(--accent-blue));
-}
+h1 span { font-size: 0.6em; margin-left: 10px; }
 
-/* 3. ポータル (index.html) 用スタイル */
-.list-container { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 15px; 
-    max-width: 650px; 
-    margin: 20px auto; 
-    padding: 0 15px; 
-}
-
-.section-label {
-    margin-top: 30px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    color: var(--accent-blue);
-    font-weight: bold;
-    font-size: 0.9rem;
-    text-align: left;
-    letter-spacing: 1px;
-}
-
-.card { 
-    background: rgba(0, 92, 153, 0.1); 
-    padding: 18px 25px; 
-    border-radius: 12px; 
-    border: 1px solid rgba(0, 188, 212, 0.3); 
-    text-decoration: none; 
-    color: #fff; 
-    transition: all 0.3s ease; 
-    display: flex; 
-    flex-direction: column; 
-    text-align: left; 
-}
-
-.card:hover { 
-    transform: translateX(8px); 
-    background: rgba(0, 92, 153, 0.2); 
-}
-
-.card h3 { margin: 0 0 6px 0; font-size: 1.2rem; }
+/* 2. インデックス(ポータル)用 */
+.list-container { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin: 20px auto; padding: 0 15px; }
+.card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #005c99; text-decoration: none; color: #fff; transition: 0.3s; display: flex; flex-direction: column; text-align: left; }
+.card:hover { border-color: var(--accent-cyan); transform: translateX(10px); background: rgba(0, 92, 153, 0.4); }
+.card h3 { margin: 0 0 8px 0; color: var(--accent-cyan); font-size: 1.2rem; }
 .card p { margin: 0; font-size: 0.9rem; color: #b2ebf2; line-height: 1.4; }
+.section-label { text-align: left; margin-top: 15px; font-weight: bold; color: var(--accent-blue); border-bottom: 1px solid #005c99; padding-bottom: 5px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
-/* カテゴリ別カード色分け */
-.card-binary { border-color: #00bcd4; }
-.card-binary h3 { color: #4dd0e1; }
+/* カードアクセント */
+.card-binary { border-left: 5px solid var(--accent-cyan); }
+.card-hex { border-left: 5px solid var(--accent-yellow); }
+.card-shift { border-left: 5px solid var(--accent-purple); }
+.card-network { border-left: 5px solid var(--accent-blue); }
+.card-sql { border-left: 5px solid var(--success-green); }
+.card-hard { border-left: 5px solid var(--error-red); }
 
-.card-hex { border-color: #9c27b0; }
-.card-hex h3 { color: #e1bee7; }
-
-.card-shift { border-color: #4caf50; }
-.card-shift h3 { color: #81c784; }
-
-.card-network { border-color: #2196f3; }
-.card-network h3 { color: #64b5f6; }
-
-.card-sql { border-color: #ffc107; }
-.card-sql h3 { color: #ffd54f; }
-
-.card-hard { 
-    border-color: #f44336; 
-    background: rgba(244, 67, 54, 0.1); 
-}
-.card-hard h3 { color: #ffeb3b; text-shadow: 0 0 8px rgba(255, 235, 59, 0.4); }
-
-/* 4. ゲームメインコンテナ */
+/* 3. ゲームコンテナ & オーバーレイ */
 .game-container {
     width: 100%;
     max-width: 750px;
-    height: 400px;
+    height: 420px;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.03);
-    border: 2px solid #333;
+    background: rgba(2, 20, 40, 0.5);
+    border: 2px solid #005c99;
     border-radius: 15px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
 }
 
-/* 5. 落ちてくる要素 (Binary/IP/Hex) */
-.bin-display, #ip-display, #mask-display {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Courier New', monospace;
+.overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--overlay-bg);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 100;
+}
+
+.hidden { display: none !important; }
+
+/* 4. ボタン標準化 */
+.btn-base {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
     font-weight: bold;
-    color: var(--accent-cyan);
-    background: rgba(0, 20, 40, 0.9);
-    padding: 10px 30px;
-    border-radius: 10px;
-    border: 2px solid var(--accent-cyan);
-    white-space: nowrap;
-    z-index: 10;
+    transition: 0.2s;
+    font-family: inherit;
 }
-.bin-display { font-size: 42px; }
-#ip-display { font-size: 48px; }
 
-/* 6. ボタン・グリッド系 */
+/* 開始・リトライボタン */
+.start-btn {
+    padding: 15px 40px;
+    font-size: 20px;
+    background: var(--accent-blue);
+    color: #020b14;
+    margin-top: 20px;
+}
+.start-btn:hover { background: var(--accent-cyan); transform: scale(1.05); }
+
+/* 選択ボタン (4択やグリッド) */
 .choice-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 12px;
     max-width: 750px;
-    margin: 25px auto;
+    margin: 20px auto;
 }
 
 .choice-btn {
-    padding: 20px 10px;
-    font-size: 22px;
-    font-weight: bold;
+    padding: 15px 10px;
+    font-size: 1.1rem;
     background: rgba(255, 255, 255, 0.05);
-    border: 2px solid #444;
+    border: 2px solid var(--accent-blue);
     color: #fff;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.2s;
+    border-radius: 8px;
+}
+.choice-btn:hover:not(:disabled) { background: rgba(77, 208, 225, 0.2); border-color: var(--accent-cyan); }
+.choice-btn:disabled { opacity: 0.8; cursor: default; }
+
+/* 補助ボタン (スピード, シフト操作等) */
+.controls-row {
+    display: flex; justify-content: center; gap: 8px; margin: 15px 0; flex-wrap: wrap;
 }
 
-.choice-btn:hover {
-    background: rgba(77, 208, 225, 0.2);
-    border-color: var(--accent-blue);
+.control-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    background: transparent;
+    border: 1px solid var(--accent-blue);
+    color: var(--accent-blue);
 }
+.control-btn:hover { background: rgba(77, 208, 225, 0.1); }
+.control-btn.active { background: var(--accent-blue); color: #020b14; }
 
-/* 7. オーバーレイ (Start/Result) */
-.overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(2, 11, 20, 0.95);
+/* 特殊カラーボタン */
+.btn-danger { border-color: var(--error-red); color: var(--error-red); }
+.btn-warning { border-color: var(--accent-yellow); color: var(--accent-yellow); }
+
+/* 5. 統計・ステータスバー */
+#stats-bar {
+    max-width: 750px;
+    margin: 0 auto 10px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 20;
+    justify-content: space-between;
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+    padding: 0 10px;
 }
 
-.start-btn { 
-    padding: 15px 40px; font-size: 20px; font-weight: bold; 
-    background: var(--accent-blue); border: none; border-radius: 8px; 
-    cursor: pointer; color: #020b14; transition: 0.3s;
-}
-.start-btn:hover { transform: scale(1.05); background: var(--accent-cyan); }
-
-/* 8. シフト演算用 */
-.shift-controls { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
-.shift-btn { 
-    padding: 10px 20px; background: transparent; border: 1px solid var(--accent-blue); 
-    color: #fff; border-radius: 5px; cursor: pointer; 
+/* 6. ビット表示用 */
+.bin-display {
+    font-family: 'Courier New', monospace;
+    font-size: 48px;
+    font-weight: bold;
+    color: var(--accent-cyan);
+    text-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
 }
 
-/* 9. 判定マーク */
-.judgment-mark { 
-    position: absolute; top: 50%; left: 50%; 
-    transform: translate(-50%, -50%) scale(0.5); 
-    font-size: 120px; opacity: 0; pointer-events: none; 
-    transition: 0.2s; z-index: 100; 
+.bit-box {
+    width: 45px; height: 60px;
+    display: flex; align-items: center; justify-content: center;
+    background: #002244; border: 2px solid var(--accent-blue);
+    font-size: 28px; border-radius: 4px; cursor: pointer;
+}
+.bit-box.on { background: var(--accent-blue); color: #020b14; }
+
+/* 7. 判定マーク */
+.judgment-mark {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5);
+    font-size: 120px; opacity: 0; pointer-events: none; transition: 0.2s; z-index: 200;
 }
 .show-mark { opacity: 1 !important; transform: translate(-50%, -50%) scale(1) !important; }
-.mark-o { color: var(--success-green); } 
+.mark-o { color: var(--success-green); }
 .mark-x { color: var(--error-red); }
 
-/* 10. SQLトレーニング用 */
-.sql-chip {
-    padding: 8px 15px;
-    background: #1e293b;
-    border: 1px solid var(--accent-blue);
-    color: #fff;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: monospace;
-}
-.drop-zone {
-    min-height: 50px;
-    border: 2px dashed #444;
-    background: rgba(255,255,255,0.02);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px;
-}
+/* 8. 戻るリンク */
+.back-link { display: block; margin: 30px auto; color: var(--accent-blue); text-decoration: none; font-size: 0.9rem; }
+.back-link:hover { color: var(--accent-cyan); text-decoration: underline; }
 
-/* 11. レスポンシブ */
-@media (max-width: 600px) {
-    h1 { font-size: 1.5rem; }
-    .game-container { height: 320px; }
-    .choice-btn { padding: 15px 5px; font-size: 18px; }
+/* 9. SQL用特殊スタイル */
+.sql-chip {
+    padding: 8px 15px; background: #1a2634; border: 1px solid var(--accent-blue);
+    border-radius: 4px; cursor: pointer; color: #fff; font-family: monospace;
+}
+.sql-chip:hover { background: var(--accent-blue); color: #020b14; }
+.drop-zone {
+    min-height: 50px; padding: 10px; border: 2px dashed #005c99; border-radius: 8px;
+    background: rgba(0,0,0,0.3); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
 }

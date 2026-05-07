@@ -2,34 +2,80 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL BASIC - Normal</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>SQL Training - Normal</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .drop-zone { min-height: 60px; border: 2px dashed #005c99; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; padding: 10px; margin: 20px 0; }
+        .sql-chip { padding: 8px 15px; background: #1a2634; border: 1px solid var(--accent-blue); border-radius: 4px; cursor: pointer; font-family: monospace; }
+        .sql-chip:hover { background: var(--accent-blue); color: #000; }
+        .mission-box { background: rgba(0, 0, 0, 0.4); border-left: 4px solid var(--accent-yellow); text-align: left; padding: 15px; margin: 20px auto; max-width: 700px; }
+    </style>
 </head>
 <body>
-    <h1>SQL Training <span style="font-size: 0.6em; color: var(--accent-yellow);">(Normal)</span></h1>
-
-    <div class="source-section" id="tables-area"></div>
+    <h1>SQL Training <span>(Normal)</span></h1>
 
     <div class="mission-box">
         <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
-        <div id="mission-text">読み込み中...</div>
+        <p id="mission">読み込み中...</p>
     </div>
 
-    <div class="sql-display">
-        <div id="drop-zone" class="drop-zone"></div>
-    </div>
+    <div class="drop-zone" id="drop-zone"></div>
+    <div id="chip-pool" class="controls-row"></div>
 
-    <div id="chip-pool" style="display:flex; flex-wrap:wrap; gap:10px; margin:20px 0; justify-content:center;"></div>
-
-    <div style="margin-top:20px;">
-        <button class="start-btn" id="run-btn" onclick="checkAnswer()">RUN SQL</button>
-        <button class="start-btn" style="background:#444; color:#fff;" onclick="clearLastChip()">UNDO</button>
+    <div class="controls-row">
+        <button class="btn-base start-btn" style="margin:0" onclick="check()">RUN SQL</button>
+        <button class="btn-base control-btn" onclick="undo()">UNDO</button>
     </div>
 
     <div id="mark" class="judgment-mark">⭕️</div>
 
-    <script> /* ...既存のロジック... */ </script>
+    <a href="index.html" class="back-link">← Portalに戻る</a>
+
+    <script>
+        const questions = [
+            { q: "usersからageが20以上の人を全て取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "age", ">=", "20"] },
+            { q: "productsからpriceが高い順に取得せよ", ans: ["SELECT", "*", "FROM", "products", "ORDER BY", "price", "DESC"] },
+            { q: "itemsからnameが 'PC' のものを取得せよ", ans: ["SELECT", "*", "FROM", "items", "WHERE", "name", "=", "'PC'"] }
+        ];
+        let current = 0, userAns = [];
+
+        function next() {
+            if(current >= questions.length) { alert("Excellent!"); return location.reload(); }
+            userAns = [];
+            document.getElementById('mission').innerText = questions[current].q;
+            const pool = document.getElementById('chip-pool');
+            pool.innerHTML = '';
+            const chips = [...questions[current].ans, "GROUP BY", "id", "ASC", "LIMIT"].sort(() => Math.random() - 0.5);
+            chips.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'sql-chip'; div.innerText = text;
+                div.onclick = () => { userAns.push(text); updateUI(); };
+                pool.appendChild(div);
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = '';
+            userAns.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'sql-chip'; div.innerText = text;
+                zone.appendChild(div);
+            });
+        }
+
+        function undo() { userAns.pop(); updateUI(); }
+
+        function check() {
+            const win = userAns.join(' ') === questions[current].ans.join(' ');
+            const m = document.getElementById('mark');
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            if(win) { current++; setTimeout(() => { m.className='judgment-mark'; next(); }, 1200); }
+            else { setTimeout(() => m.className='judgment-mark', 800); }
+        }
+        window.onload = next;
+    </script>
 </body>
 </html>

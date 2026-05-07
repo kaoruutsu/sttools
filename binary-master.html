@@ -9,110 +9,155 @@
     <style>
         .speed-select { margin-bottom: 20px; }
         .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
-        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #4dd0e1; color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
-        .speed-btn.active { background: #4dd0e1; color: #000; font-weight: bold; }
+        .speed-btn { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid var(--accent-blue); color: #fff; border-radius: 4px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .speed-btn.active { background: var(--accent-blue); color: #000; font-weight: bold; }
+        
+        .hint-control { margin: 15px 0; font-size: 14px; color: var(--accent-cyan); }
+        .bit-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .weight-label { font-size: 10px; color: var(--accent-blue); height: 15px; transition: opacity 0.3s; }
+        .weight-hidden { opacity: 0; }
+        .spacer { width: 15px; }
+        
+        .bit-btn {
+            width: 42px; height: 50px;
+            font-size: 20px; font-weight: bold;
+            background: rgba(0, 50, 80, 0.6);
+            border: 2px solid var(--accent-blue);
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .bit-btn.on { background: var(--accent-cyan); color: #000; border-color: #fff; box-shadow: 0 0 10px var(--accent-cyan); }
+
+        .decimal-monitor {
+            margin-left: 20px;
+            padding: 8px 12px;
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 70px;
+            box-shadow: inset 0 0 8px rgba(0,255,204,0.2);
+        }
+        .monitor-label { font-size: 8px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .monitor-val {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            color: var(--accent-yellow);
+        }
+
+        .nav-controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .nav-btn {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 7px 18px;
+            border-radius: 20px;
+            background: transparent;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: rgba(0, 255, 204, 0.1); border-color: var(--accent-cyan); }
     </style>
 </head>
 <body>
-    <h1>Binary Master <span style="font-size: 0.6em; color: #4dd0e1;">(8-bit Normal)</span></h1>
+    <h1>Binary Master <span style="font-size: 0.6em; color: var(--accent-blue);">(8-bit Normal)</span></h1>
     <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
             <h2>8-bit Attack</h2>
-            
             <div class="speed-select">
-                <p style="margin: 0; font-size: 14px; color: #4dd0e1;">SPEED</p>
+                <p>速度</p>
                 <div class="speed-btns">
-                    <button id="s-low" class="speed-btn active" onclick="setSpeed(0.75, 's-low')">LOW</button>
-                    <button id="s-mid" class="speed-btn" onclick="setSpeed(1.2, 's-mid')">MID</button>
-                    <button id="s-high" class="speed-btn" onclick="setSpeed(1.8, 's-high')">HIGH</button>
+                    <button class="speed-btn" onclick="setSpeed(0.8, this)">Slow</button>
+                    <button class="speed-btn active" onclick="setSpeed(1.5, this)">Normal</button>
+                    <button class="speed-btn" onclick="setSpeed(2.5, this)">Fast</button>
                 </div>
             </div>
+            <div class="hint-control"><label><input type="checkbox" id="hint-checkbox" checked onchange="toggleHints()"> ヒント表示</label></div>
+            <button class="start-btn" onclick="start()">START</button>
+        </div>
 
-            <p>ヒント（128, 64...）を表示しますか？</p>
-            <div class="start-btns">
-                <button class="start-btn btn-hint" onclick="start(true)">HINT ON</button>
-                <button class="start-btn" onclick="start(false)">HINT OFF</button>
-            </div>
-        </div>
         <div id="result-screen" class="overlay" style="display:none;">
-            <h2>MISSION COMPLETE</h2>
-            <div style="font-size: 24px; color: #fff; margin-bottom: 10px;">Score: <span id="final-score">0</span> / 5</div>
-            <div class="result-time"><span id="final-time">0.00</span> sec</div>
-            <button class="start-btn" onclick="location.reload()">RETRY</button>
+            <h2>FINISH!</h2>
+            <div id="final-time" style="font-size: 48px; color: var(--accent-cyan);">0.00</div>
+            <button class="start-btn" onclick="resetGame()">RETRY</button>
         </div>
-        <div id="mark" class="judgment-mark"></div>
-        <div id="target">0</div>
+
+        <div id="target" class="target-val" style="position:absolute; width:100%; top:-50px; font-size:50px; font-weight:bold; color:var(--accent-yellow);">0</div>
+        <div id="mark" class="judgment-mark">⭕️</div>
     </div>
-    <div id="sum-text" style="font-size: 28px; margin: 15px; font-weight: bold;">Current: 0</div>
-    <div class="bit-row" id="bits-ui"></div>
-    <a href="index.html" class="back-link">MENUへ戻る</a>
+
+    <div style="display:flex; justify-content:center; align-items:flex-end; margin-top:20px;">
+        <div id="bit-area" style="display:flex; gap:6px;">
+            <div class="bit-box"><div id="w-7" class="weight-label">128</div><button id="b-7" class="bit-btn" onclick="toggleBit(7)">0</button></div>
+            <div class="bit-box"><div id="w-6" class="weight-label">64</div><button id="b-6" class="bit-btn" onclick="toggleBit(6)">0</button></div>
+            <div class="bit-box"><div id="w-5" class="weight-label">32</div><button id="b-5" class="bit-btn" onclick="toggleBit(5)">0</button></div>
+            <div class="bit-box"><div id="w-4" class="weight-label">16</div><button id="b-4" class="bit-btn" onclick="toggleBit(4)">0</button></div>
+            <div class="spacer"></div>
+            <div class="bit-box"><div id="w-3" class="weight-label">8</div><button id="b-3" class="bit-btn" onclick="toggleBit(3)">0</button></div>
+            <div class="bit-box"><div id="w-2" class="weight-label">4</div><button id="b-2" class="bit-btn" onclick="toggleBit(2)">0</button></div>
+            <div class="bit-box"><div id="w-1" class="weight-label">2</div><button id="b-1" class="bit-btn" onclick="toggleBit(1)">0</button></div>
+            <div class="bit-box"><div id="w-0" class="weight-label">1</div><button id="b-0" class="bit-btn" onclick="toggleBit(0)">0</button></div>
+        </div>
+        <div id="monitor-ui" class="decimal-monitor">
+            <span class="monitor-label">DEC</span>
+            <span id="current-sum-val" class="monitor-val">0</span>
+        </div>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="resetGame()">↺ RESET</button>
+        <a href="index.html" class="nav-btn">← Portalに戻る</a>
+    </div>
 
     <script>
-        let targetVal, currentBits = Array(8).fill(0), y = -100, isWait = false, anim;
-        let qNum = 0, correctCount = 0, startTime, useHint = false;
-        let dropSpeed = 0.75; // LOW
-        const MAX_QUEST = 5;
+        let targetVal = 0, currentBits = Array(8).fill(0), qCount = 0, correctCount = 0;
+        let startTime, y = -50, anim, isWait = false, dropSpeed = 1.5, showHints = true;
 
-        function setSpeed(val, btnId) {
-            dropSpeed = val;
-            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(btnId).classList.add('active');
+        function setSpeed(s, btn) {
+            dropSpeed = s;
+            document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove( 'active'));
+            btn.classList.add('active');
         }
 
-        function start(hint) { 
-            useHint = hint;
-            document.getElementById('start-screen').style.display='none'; 
-            startTime = Date.now();
-            next(); 
+        function toggleHints() {
+            showHints = document.getElementById('hint-checkbox').checked;
+            for(let i=0; i<8; i++) document.getElementById(`w-${i}`).className = showHints ? 'weight-label' : 'weight-label weight-hidden';
+            document.getElementById('monitor-ui').style.opacity = showHints ? '1' : '0.1';
         }
+
+        function start() { document.getElementById('start-screen').style.display = 'none'; startTime = Date.now(); next(); }
 
         function next() {
-            qNum++;
-            if (qNum > MAX_QUEST) { endGame(); return; }
-            document.getElementById('q-count').innerText = qNum;
-            targetVal = Math.floor(Math.random() * 254) + 1;
-            let targetBits = targetVal.toString(2).padStart(8, '0').split('').reverse().map(Number);
-            currentBits = [...targetBits];
-            let diff = Math.floor(Math.random() * 3) + 1;
-            let changed = [];
-            while(changed.length < diff) {
-                let r = Math.floor(Math.random() * 8);
-                if(!changed.includes(r)) { currentBits[r] = currentBits[r]?0:1; changed.push(r); }
-            }
+            if(qCount >= 5) { endGame(); return; }
+            qCount++;
+            targetVal = Math.floor(Math.random() * 255) + 1;
             document.getElementById('target').innerText = targetVal;
-            document.getElementById('target').style.display = 'block';
-            render(); y = -100; isWait = false; drop();
+            y = -50; currentBits.fill(0); isWait = false; render(); drop();
         }
 
         function render() {
-            const container = document.getElementById('bits-ui');
-            container.innerHTML = '';
-            currentBits.slice().reverse().forEach((bit, i) => {
-                const realIdx = 7 - i;
-                const column = document.createElement('div');
-                column.className = 'bit-column';
-                const hintDiv = document.createElement('div');
-                hintDiv.className = 'hint-text';
-                hintDiv.innerText = useHint ? Math.pow(2, realIdx) : '';
-                column.appendChild(hintDiv);
-                const btn = document.createElement('button');
-                btn.className = `bit-btn ${bit ? 'on' : ''}`;
-                btn.innerText = bit;
-                btn.onclick = () => { if(!isWait) { toggleBit(realIdx); }};
-                column.appendChild(btn);
-                container.appendChild(column);
+            currentBits.forEach((bit, i) => {
+                const btn = document.getElementById(`b-${i}`);
+                btn.innerText = bit; btn.className = bit ? 'bit-btn on' : 'bit-btn';
             });
-            document.getElementById('sum-text').innerText = `Current: ${calculateSum()}`;
-        }
-
-        function toggleBit(idx) {
-            currentBits[idx] = currentBits[idx] ? 0 : 1;
-            render();
+            document.getElementById('current-sum-val').innerText = calculateSum();
             check();
         }
 
+        function toggleBit(i) { if(!isWait) { currentBits[i] = currentBits[i] ? 0 : 1; render(); } }
         function calculateSum() { return currentBits.reduce((s, b, i) => s + b * Math.pow(2, i), 0); }
 
         function drop() {
@@ -128,24 +173,34 @@
             isWait = true; cancelAnimationFrame(anim);
             if(win) correctCount++;
             const m = document.getElementById('mark');
-            m.innerText = win ? '⭕️' : '❌'; 
+            m.innerText = win ? '⭕️' : '❌';
             m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
             setTimeout(() => { m.className = 'judgment-mark'; next(); }, 800);
+        }
+
+        function resetGame() {
+            cancelAnimationFrame(anim);
+            qCount = 0;
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'block';
+            document.getElementById('target').style.top = '-50px';
         }
 
         function endGame() {
             const duration = ((Date.now() - startTime) / 1000).toFixed(2);
             document.getElementById('final-time').innerText = duration;
-            document.getElementById('final-score').innerText = correctCount;
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
         }
 
         window.addEventListener('keydown', (e) => {
             if (isWait) return;
-            const keyMap = { '8':7, '7':6, '6':5, '5':4, '4':3, '3':2, '2':1, '1':0 };
+            // 1=128, 2=64 ... 8=1 に対応
+            const keyMap = { '1':7, '2':6, '3':5, '4':4, '5':3, '6':2, '7':1, '8':0 };
             if (keyMap[e.key] !== undefined) toggleBit(keyMap[e.key]);
         });
+        toggleHints();
     </script>
 </body>
 </html>

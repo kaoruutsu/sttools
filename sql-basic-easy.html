@@ -2,192 +2,80 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL BASIC - Easy</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>SQL Training - Easy</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { max-width: 1200px; margin: 0 auto; padding: 10px; }
-        .source-section { display: flex; flex-wrap: nowrap; gap: 15px; overflow-x: auto; margin-bottom: 15px; background: rgba(0, 30, 60, 0.4); padding: 10px; border-radius: 8px; border: 1px solid #005c99; }
-        .table-wrapper { flex: 0 0 auto; min-width: 250px; }
-        .mission-box { background: rgba(0, 0, 0, 0.6); border-left: 4px solid #00ffcc; padding: 15px; margin-bottom: 15px; text-align: left; }
-        .bottom-container { display: flex; gap: 20px; align-items: flex-start; }
-        .puzzle-side { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        .goal-side { width: 320px; background: rgba(0, 30, 60, 0.7); border: 1px solid #005c99; border-radius: 8px; padding: 10px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; background: rgba(0, 0, 0, 0.3); white-space: nowrap; }
-        th, td { border: 1px solid #005c99; padding: 6px; text-align: center; }
-        th { background: rgba(0, 123, 255, 0.3); color: #00ffcc; }
-        .puzzle-area { background: #111; border: 2px dashed #005c99; min-height: 80px; display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; border-radius: 8px; }
-        .chip { padding: 8px 14px; background: #007bff; color: white; border-radius: 4px; cursor: pointer; font-family: monospace; font-size: 14px; }
-        .chip.keyword { background: #c2185b; }
-        .chip.operator { background: #6c757d; }
-        .chip-pool { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
-        #feedback-area { display: none; background: rgba(255, 82, 82, 0.2); border: 1px solid #ff5252; padding: 15px; margin-top: 10px; border-radius: 8px; text-align: left; }
-        .correct-ans { color: #ffeb3b; font-family: monospace; display: block; margin: 10px 0; background: #000; padding: 10px; }
-        .timer-badge { position: fixed; top: 10px; right: 20px; color: #00ffcc; font-size: 1.2rem; z-index: 100; }
-        .next-btn { background: #00ffcc; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .small-title { font-size: 0.8em; color: #00ffcc; margin-bottom: 5px; font-weight: bold; text-align: left;}
-        @media (max-width: 900px) { .bottom-container { flex-direction: column; } .goal-side { width: 100%; } }
+        .drop-zone { min-height: 60px; border: 2px dashed #005c99; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; padding: 10px; margin: 20px 0; }
+        .sql-chip { padding: 8px 15px; background: #1a2634; border: 1px solid var(--accent-blue); border-radius: 4px; cursor: pointer; font-family: monospace; }
+        .sql-chip:hover { background: var(--accent-blue); color: #000; }
+        .mission-box { background: rgba(0, 0, 0, 0.4); border-left: 4px solid var(--accent-cyan); text-align: left; padding: 15px; margin: 20px auto; max-width: 700px; }
     </style>
 </head>
 <body>
-    <h1>SQL BASIC <span style="font-size: 0.6em; color: #00ffcc;">(Easy)</span></h1>
-    <div class="timer-badge">TIME: <span id="timer">0.0</span>s</div>
-    <div id="stats-bar">Quest: <span id="q-count">0</span> / 3</div>
-
-    <div id="start-screen" class="overlay">
-        <h2>SQL BASIC: Easy</h2>
-        <p>選択と射影の基礎トレーニング</p>
-        <button class="start-btn" onclick="start()">START GAME</button>
-    </div>
-
-    <div id="result-screen" class="overlay" style="display:none;">
-        <h2>FINISH!</h2>
-        <div id="score-info" style="font-size: 20px; color: #fff; margin-bottom: 10px;"></div>
-        <div class="result-time"><span id="final-time">0.00</span> sec</div>
-        <button class="start-btn" onclick="location.reload()">RETRY</button>
-    </div>
-
-    <div id="mark" class="judgment-mark"></div>
-    <div class="source-section" id="source-tables"></div>
+    <h1>SQL Training <span>(Easy)</span></h1>
 
     <div class="mission-box">
-        <span style="color:#00ffcc; font-weight:bold;">MISSION:</span> 
-        <span id="question-text">読み込み中...</span>
+        <div style="color:var(--accent-cyan); font-weight:bold;">MISSION:</div>
+        <p id="mission">読み込み中...</p>
     </div>
 
-    <div class="bottom-container">
-        <div class="puzzle-side">
-            <div class="small-title">▼ SQL PUZZLE</div>
-            <div class="puzzle-area" id="drop-zone" onclick="clearLastChip()"></div>
-            <div style="font-size: 10px; color: #888;">※チップクリックで追加、枠内クリックで1つ削除</div>
-            <div class="chip-pool" id="chip-pool"></div>
-            <div id="action-bar">
-                <button id="run-btn" class="start-btn" style="background:#00c853; width:200px;" onclick="checkAnswer()">回答実行 (RUN)</button>
-            </div>
-            <div id="feedback-area">
-                <div style="color:#ff5252; font-weight:bold;">MISS! 正解のSQL:</div>
-                <code class="correct-ans" id="correct-sql"></code>
-                <button class="next-btn" onclick="nextQuestion()">NEXT QUESTION</button>
-            </div>
-        </div>
+    <div class="drop-zone" id="drop-zone"></div>
+    <div id="chip-pool" class="controls-row"></div>
 
-        <div class="goal-side">
-            <div class="small-title">▼ 期待される結果 (GOAL)</div>
-            <div id="goal-table"></div>
-        </div>
+    <div class="controls-row">
+        <button class="btn-base start-btn" style="margin:0" onclick="check()">RUN SQL</button>
+        <button class="btn-base control-btn" onclick="undo()">UNDO</button>
     </div>
 
-    <a href="index.html" class="back-link">MENUへ戻る</a>
+    <div id="mark" class="judgment-mark">⭕️</div>
+
+    <a href="index.html" class="back-link">← Portalに戻る</a>
 
     <script>
-        const DB = {
-            生徒名簿: [
-                { id: 1, 氏名: "佐藤", 年齢: 15, クラスID: "A" },
-                { id: 2, 氏名: "鈴木", 年齢: 16, クラスID: "A" },
-                { id: 3, 氏名: "高橋", 年齢: 14, クラスID: "B" },
-                { id: 4, 氏名: "田中", 年齢: 15, クラスID: "B" },
-                { id: 5, 氏名: "伊藤", 年齢: 16, クラスID: "C" }
-            ],
-            クラス一覧: [{ クラスID: "A", クラス名: "1組" }, { クラスID: "B", クラス名: "2組" }, { クラスID: "C", クラス名: "3組" }]
-        };
-
-        const QUESTIONS = [
-            { q: "生徒名簿の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿"], goal: DB.生徒名簿 },
-            { q: "生徒の「氏名」のみを表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿"], goal: DB.生徒名簿.map(r=>({氏名:r.氏名})) },
-            { q: "16歳の生徒の全情報を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", "=", "16"], goal: DB.生徒名簿.filter(r=>r.年齢==16) },
-            { q: "クラスIDが 'A' の生徒の「氏名」を表示せよ", ans: ["SELECT", "氏名", "FROM", "生徒名簿", "WHERE", "クラスID", "=", "'A'"], goal: DB.生徒名簿.filter(r=>r.クラスID=='A').map(r=>({氏名:r.氏名})) },
-            { q: "15歳未満の全生徒を表示せよ", ans: ["SELECT", "*", "FROM", "生徒名簿", "WHERE", "年齢", "<", "15"], goal: DB.生徒名簿.filter(r=>r.年齢<15) }
+        const questions = [
+            { q: "usersテーブルから全てのカラムを取得せよ", ans: ["SELECT", "*", "FROM", "users"] },
+            { q: "productsテーブルからnameカラムのみ取得せよ", ans: ["SELECT", "name", "FROM", "products"] },
+            { q: "usersテーブルのレコード数を数えよ", ans: ["SELECT", "COUNT(*)", "FROM", "users"] }
         ];
+        let current = 0, userAns = [];
 
-        let currentQ, qIdx = 0, correctCount = 0, startTime, timerInt, userPuzzle = [], isWait = false, selectedQuestions = [];
-
-        function start() {
-            selectedQuestions = QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 3);
-            document.getElementById('start-screen').style.display = 'none';
-            startTime = Date.now();
-            timerInt = setInterval(() => { document.getElementById('timer').innerText = ((Date.now() - startTime)/1000).toFixed(1); }, 100);
-            renderSource(); nextQuestion();
-        }
-
-        function renderSource() {
-            const container = document.getElementById('source-tables');
-            container.innerHTML = '';
-            Object.keys(DB).forEach(key => {
-                const wrap = document.createElement('div'); wrap.className = 'table-wrapper';
-                wrap.innerHTML = `<div class="small-title">■ ${key}</div>` + createTableHTML(DB[key]);
-                container.appendChild(wrap);
+        function next() {
+            if(current >= questions.length) { alert("All Cleared!"); return location.reload(); }
+            userAns = [];
+            document.getElementById('mission').innerText = questions[current].q;
+            const pool = document.getElementById('chip-pool');
+            pool.innerHTML = '';
+            const chips = [...questions[current].ans, "WHERE", "id", "ORDER BY"].sort(() => Math.random() - 0.5);
+            chips.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'sql-chip'; div.innerText = text;
+                div.onclick = () => { userAns.push(text); updateUI(); };
+                pool.appendChild(div);
             });
-        }
-
-        function createTableHTML(data) {
-            let html = "<table><thead><tr>";
-            Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
-            html += "</tr></thead><tbody>";
-            data.forEach(row => { html += "<tr>"; Object.values(row).forEach(v => html += `<td>${v}</td>`); html += "</tr>"; });
-            return html + "</tbody></table>";
-        }
-
-        function nextQuestion() {
-            if (qIdx >= 3) { endGame(); return; }
-            qIdx++; isWait = false; userPuzzle = [];
-            currentQ = selectedQuestions[qIdx - 1];
-            document.getElementById('feedback-area').style.display = 'none';
-            document.getElementById('run-btn').style.display = 'inline-block';
-            document.getElementById('q-count').innerText = qIdx;
-            document.getElementById('question-text').innerText = currentQ.q;
-            document.getElementById('drop-zone').innerHTML = '';
-            document.getElementById('goal-table').innerHTML = createTableHTML(currentQ.goal);
-            renderChips();
-        }
-
-        function renderChips() {
-            const pool = document.getElementById('chip-pool'); pool.innerHTML = '';
-            let pieces = Array.from(new Set([...currentQ.ans, "クラスID", "氏名", "15", "'B'"]));
-            pieces.sort(() => 0.5 - Math.random()).forEach(txt => {
-                const chip = document.createElement('div'); chip.className = "chip";
-                if (["SELECT","FROM","WHERE"].includes(txt)) chip.classList.add('keyword');
-                if (["=","<",">"].includes(txt)) chip.classList.add('operator');
-                chip.innerText = txt;
-                chip.onclick = () => { if(!isWait){userPuzzle.push(txt); updateUI();} };
-                pool.appendChild(chip);
-            });
+            updateUI();
         }
 
         function updateUI() {
-            const zone = document.getElementById('drop-zone'); zone.innerHTML = '';
-            userPuzzle.forEach(txt => { const c = document.createElement('div'); c.className = "chip"; c.innerText = txt; zone.appendChild(c); });
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = '';
+            userAns.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'sql-chip'; div.innerText = text;
+                zone.appendChild(div);
+            });
         }
-        function clearLastChip() { if(!isWait){userPuzzle.pop(); updateUI();} }
 
-        function checkAnswer() {
-            if (isWait || userPuzzle.length === 0) return;
-            isWait = true;
-            const ansStr = currentQ.ans.join(" ");
-            const isCorrect = (userPuzzle.join(" ") === ansStr);
+        function undo() { userAns.pop(); updateUI(); }
+
+        function check() {
+            const win = userAns.join(' ') === questions[current].ans.join(' ');
             const m = document.getElementById('mark');
-            m.innerText = isCorrect ? '⭕️' : '❌';
-            m.className = `judgment-mark show-mark ${isCorrect ? 'mark-o' : 'mark-x'}`;
-            if (isCorrect) {
-                correctCount++;
-                setTimeout(() => { m.className = 'judgment-mark'; nextQuestion(); }, 1200);
-            } else {
-                setTimeout(() => { m.className = 'judgment-mark'; showFeedback(ansStr); }, 800);
-            }
+            m.innerText = win ? '⭕️' : '❌';
+            m.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            if(win) { current++; setTimeout(() => { m.className='judgment-mark'; next(); }, 1200); }
+            else { setTimeout(() => m.className='judgment-mark', 800); }
         }
-
-        function showFeedback(correctSql) {
-            document.getElementById('run-btn').style.display = 'none';
-            document.getElementById('correct-sql').innerText = correctSql;
-            document.getElementById('feedback-area').style.display = 'block';
-        }
-
-        function endGame() {
-            clearInterval(timerInt);
-            document.getElementById('final-time').innerText = ((Date.now() - startTime) / 1000).toFixed(2);
-            document.getElementById('score-info').innerText = `正解数: ${correctCount} / 3`;
-            document.getElementById('result-screen').style.display = 'flex';
-        }
+        window.onload = next;
     </script>
 </body>
 </html>
