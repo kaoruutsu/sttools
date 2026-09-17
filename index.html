@@ -11,67 +11,83 @@
     <h1>Training Portal</h1>
     
     <div class="list-container">
-        <div class="section-label">Binary Training</div>
-        <a href="binary-easy.html" class="card card-binary">
-            <h3>Binary Master (Easy)</h3>
-            <p>4ビット計算：2進数の基礎をマスター</p>
-        </a>
-        <a href="binary-master.html" class="card card-binary">
-            <h3>Binary Master (Normal)</h3>
-            <p>8ビット計算：実践的な8桁の2進数変換トレーニング</p>
-        </a>
-        <a href="binary-hard.html" class="card card-hard">
-            <h3>Binary Master (Hard)</h3>
-            <p>逆引きトレーニング：落ちてくる値を2進数に変換</p>
-        </a>
+        <details class="training-group">
+            <summary class="card training-card training-year-one">
+                <h3>1年用トレーニング</h3>
+                <p>Binary・Hexadecimal・Binary Shiftの基礎</p>
+            </summary>
+            <div class="training-menu">
+                <div class="section-label">Binary Training</div>
+                <a href="binary-easy.html" class="card card-binary">
+                    <h3>Binary Master (Easy)</h3>
+                    <p>4ビット計算：2進数の基礎をマスター</p>
+                </a>
+                <a href="binary-master.html" class="card card-binary">
+                    <h3>Binary Master (Normal)</h3>
+                    <p>8ビット計算：実践的な8桁の2進数変換トレーニング</p>
+                </a>
+                <a href="binary-hard.html" class="card card-hard">
+                    <h3>Binary Master (Hard)</h3>
+                    <p>逆引きトレーニング：落ちてくる値を2進数に変換</p>
+                </a>
 
-        <div class="section-label">Hexadecimal Training</div>
-        <a href="hex-easy.html" class="card card-hex">
-            <h3>Hex Master (Easy)</h3>
-            <p>4ビット 2進数 → 16進数(0-F)への変換</p>
-        </a>
-        <a href="hex-master.html" class="card card-hex">
-            <h3>Hex Master (Normal)</h3>
-            <p>8ビット 2進数 → 2桁の16進数への変換</p>
-        </a>
+                <div class="section-label">Hexadecimal Training</div>
+                <a href="hex-easy.html" class="card card-hex">
+                    <h3>Hex Master (Easy)</h3>
+                    <p>4ビット 2進数 → 16進数(0-F)への変換</p>
+                </a>
+                <a href="hex-master.html" class="card card-hex">
+                    <h3>Hex Master (Normal)</h3>
+                    <p>8ビット 2進数 → 2桁の16進数への変換</p>
+                </a>
 
-        <div class="section-label">Binary Shift Training</div>
-        <a href="binary-shift-left.html" class="card card-shift">
-            <h3>Binary Shift (Basic)</h3>
-            <p>整数版：シフト演算による2倍・1/2倍の挙動を確認</p>
-        </a>
-        <a href="binary-shift-both.html" class="card card-shift">
-            <h3>Binary Shift (Fixed Point)</h3>
-            <p>固定小数点版：小数点の位置を固定したシフト演算</p>
-        </a>
+                <div class="section-label">Binary Shift Training</div>
+                <a href="binary-shift-left.html" class="card card-shift">
+                    <h3>Binary Shift (Basic)</h3>
+                    <p>整数版：シフト演算による2倍・1/2倍の挙動を確認</p>
+                </a>
+                <a href="binary-shift-both.html" class="card card-shift">
+                    <h3>Binary Shift (Fixed Point)</h3>
+                    <p>固定小数点版：小数点の位置を固定したシフト演算</p>
+                </a>
+            </div>
+        </details>
 
-        <div class="section-label">Network Training</div>
-        <a href="packet-cs.html" class="card card-network">
-            <h3>Network Switching</h3>
-            <p>パケット交換方式と回線交換方式のシミュレーター</p>
-        </a>
-        <a href="ip-class.html" class="card card-network">
-            <h3>IP Class Checker</h3>
-            <p>第1オクテットからクラス(A/B/C)を判別</p>
-        </a>
-        <a href="subnet-master.html" class="card card-network">
-            <h3>Subnet Master</h3>
-            <p>サブネットマスクからCIDR表記を導き出す</p>
-        </a>
-        <a href="pingtool.html" class="card card-network">
-            <h3>Network Connection Simulator</h3>
-            <p>ネットワーク構成を設定してPing通信をシミュレーション</p>
-        </a>
+        <details class="training-group">
+            <summary class="card training-card training-year-two">
+                <h3>2年用トレーニング</h3>
+                <p>Network・SQLを使った実践的なトレーニング</p>
+            </summary>
+            <div class="training-menu">
+                <div class="section-label">Network Training</div>
+                <a href="packet-cs.html" class="card card-network">
+                    <h3>Network Switching</h3>
+                    <p>パケット交換方式と回線交換方式のシミュレーター</p>
+                </a>
+                <a href="ip-class.html" class="card card-network">
+                    <h3>IP Class Checker</h3>
+                    <p>第1オクテットからクラス(A/B/C)を判別</p>
+                </a>
+                <a href="subnet-master.html" class="card card-network">
+                    <h3>Subnet Master</h3>
+                    <p>サブネットマスクからCIDR表記を導き出す</p>
+                </a>
+                <a href="pingtool.html" class="card card-network">
+                    <h3>Network Connection Simulator</h3>
+                    <p>ネットワーク構成を設定してPing通信をシミュレーション</p>
+                </a>
 
-        <div class="section-label">SQL Training</div>
-        <a href="sql-basic-easy.html" class="card card-sql">
-            <h3>SQL Basic (Easy)</h3>
-            <p>基礎的なSELECT文の構築パズル</p>
-        </a>
-        <a href="sql-basic-normal.html" class="card card-sql">
-            <h3>SQL Basic (Normal)</h3>
-            <p>WHERE句やORDER BYを含むクエリ作成</p>
-        </a>
+                <div class="section-label">SQL Training</div>
+                <a href="sql-basic-easy.html" class="card card-sql">
+                    <h3>SQL Basic (Easy)</h3>
+                    <p>基礎的なSELECT文の構築パズル</p>
+                </a>
+                <a href="sql-basic-normal.html" class="card card-sql">
+                    <h3>SQL Basic (Normal)</h3>
+                    <p>WHERE句やORDER BYを含むクエリ作成</p>
+                </a>
+            </div>
+        </details>
     </div>
 </body>
 </html>
