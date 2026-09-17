@@ -4,19 +4,24 @@
     <meta charset="UTF-8">
     <title>SQL Training - Easy</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .drop-zone { min-height: 60px; border: 2px dashed #005c99; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; padding: 10px; margin: 20px 0; }
-        .sql-chip { padding: 8px 15px; background: #1a2634; border: 1px solid var(--accent-blue); border-radius: 4px; cursor: pointer; font-family: monospace; }
-        .sql-chip:hover { background: var(--accent-blue); color: #000; }
-        .mission-box { background: rgba(0, 0, 0, 0.4); border-left: 4px solid var(--accent-cyan); text-align: left; padding: 15px; margin: 20px auto; max-width: 700px; }
-    </style>
 </head>
 <body>
     <h1>SQL Training <span>(Easy)</span></h1>
 
-    <div class="mission-box">
-        <div style="color:var(--accent-cyan); font-weight:bold;">MISSION:</div>
-        <p id="mission">読み込み中...</p>
+    <div class="sql-question-layout">
+        <div class="mission-box">
+            <div style="color:var(--accent-cyan); font-weight:bold;">MISSION:</div>
+            <p id="mission">読み込み中...</p>
+        </div>
+        <div class="sql-table-panel">
+            <h2>サンプルデータ</h2>
+            <div id="sample-tables"></div>
+        </div>
+    </div>
+
+    <div class="result-hint">
+        <button id="result-toggle" class="btn-base control-btn" type="button" onclick="toggleResult()">実行結果ヒント: OFF</button>
+        <div id="result-table" class="sql-table-panel result-table-container" hidden></div>
     </div>
 
     <div class="drop-zone" id="drop-zone"></div>
@@ -33,16 +38,52 @@
 
     <script>
         const questions = [
-            { q: "usersテーブルから全てのカラムを取得せよ", ans: ["SELECT", "*", "FROM", "users"] },
-            { q: "productsテーブルからnameカラムのみ取得せよ", ans: ["SELECT", "name", "FROM", "products"] },
-            { q: "usersテーブルのレコード数を数えよ", ans: ["SELECT", "COUNT(*)", "FROM", "users"] }
+            {
+                q: "usersテーブルから全てのカラムを取得せよ",
+                ans: ["SELECT", "*", "FROM", "users"],
+                tables: [{ name: "users", columns: ["id", "name", "age"], rows: [[1, "Alice", 22], [2, "Bob", 19], [3, "Carol", 25]] }],
+                result: { columns: ["id", "name", "age"], rows: [[1, "Alice", 22], [2, "Bob", 19], [3, "Carol", 25]] }
+            },
+            {
+                q: "productsテーブルからnameカラムのみ取得せよ",
+                ans: ["SELECT", "name", "FROM", "products"],
+                tables: [{ name: "products", columns: ["id", "name", "price"], rows: [[1, "PC", 120000], [2, "Mouse", 3000], [3, "Keyboard", 8000]] }],
+                result: { columns: ["name"], rows: [["PC"], ["Mouse"], ["Keyboard"]] }
+            },
+            {
+                q: "usersテーブルのレコード数を数えよ",
+                ans: ["SELECT", "COUNT(*)", "FROM", "users"],
+                tables: [{ name: "users", columns: ["id", "name", "age"], rows: [[1, "Alice", 22], [2, "Bob", 19], [3, "Carol", 25]] }],
+                result: { columns: ["COUNT(*)"], rows: [[3]] }
+            }
         ];
         let current = 0, userAns = [];
+
+        function tableMarkup(table) {
+            const title = table.name ? `<h2>${table.name}</h2>` : '';
+            return `${title}<table class="sql-table"><thead><tr>${table.columns.map(column => `<th>${column}</th>`).join('')}</tr></thead><tbody>${table.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderTables() {
+            const question = questions[current];
+            document.getElementById('sample-tables').innerHTML = question.tables.map(tableMarkup).join('');
+            document.getElementById('result-table').innerHTML = `<h2>実行結果</h2>${tableMarkup({ name: "", ...question.result })}`;
+        }
+
+        function toggleResult() {
+            const result = document.getElementById('result-table');
+            const toggle = document.getElementById('result-toggle');
+            result.hidden = !result.hidden;
+            toggle.innerText = `実行結果ヒント: ${result.hidden ? 'OFF' : 'ON'}`;
+        }
 
         function next() {
             if(current >= questions.length) { alert("All Cleared!"); return location.reload(); }
             userAns = [];
             document.getElementById('mission').innerText = questions[current].q;
+            renderTables();
+            document.getElementById('result-table').hidden = true;
+            document.getElementById('result-toggle').innerText = '実行結果ヒント: OFF';
             const pool = document.getElementById('chip-pool');
             pool.innerHTML = '';
             const chips = [...questions[current].ans, "WHERE", "id", "ORDER BY"].sort(() => Math.random() - 0.5);

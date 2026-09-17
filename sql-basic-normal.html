@@ -4,19 +4,24 @@
     <meta charset="UTF-8">
     <title>SQL Training - Normal</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .drop-zone { min-height: 60px; border: 2px dashed #005c99; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; padding: 10px; margin: 20px 0; }
-        .sql-chip { padding: 8px 15px; background: #1a2634; border: 1px solid var(--accent-blue); border-radius: 4px; cursor: pointer; font-family: monospace; }
-        .sql-chip:hover { background: var(--accent-blue); color: #000; }
-        .mission-box { background: rgba(0, 0, 0, 0.4); border-left: 4px solid var(--accent-yellow); text-align: left; padding: 15px; margin: 20px auto; max-width: 700px; }
-    </style>
 </head>
 <body>
     <h1>SQL Training <span>(Normal)</span></h1>
 
-    <div class="mission-box">
-        <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
-        <p id="mission">読み込み中...</p>
+    <div class="sql-question-layout">
+        <div class="mission-box">
+            <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
+            <p id="mission">読み込み中...</p>
+        </div>
+        <div class="sql-table-panel">
+            <h2>サンプルデータ</h2>
+            <div id="sample-tables"></div>
+        </div>
+    </div>
+
+    <div class="result-hint">
+        <button id="result-toggle" class="btn-base control-btn" type="button" onclick="toggleResult()">実行結果ヒント: OFF</button>
+        <div id="result-table" class="sql-table-panel result-table-container" hidden></div>
     </div>
 
     <div class="drop-zone" id="drop-zone"></div>
@@ -33,16 +38,52 @@
 
     <script>
         const questions = [
-            { q: "usersからageが20以上の人を全て取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "age", ">=", "20"] },
-            { q: "productsからpriceが高い順に取得せよ", ans: ["SELECT", "*", "FROM", "products", "ORDER BY", "price", "DESC"] },
-            { q: "itemsからnameが 'PC' のものを取得せよ", ans: ["SELECT", "*", "FROM", "items", "WHERE", "name", "=", "'PC'"] }
+            {
+                q: "usersからageが20以上の人を全て取得せよ",
+                ans: ["SELECT", "*", "FROM", "users", "WHERE", "age", ">=", "20"],
+                tables: [{ name: "users", columns: ["id", "name", "age"], rows: [[1, "Alice", 22], [2, "Bob", 19], [3, "Carol", 25]] }],
+                result: { columns: ["id", "name", "age"], rows: [[1, "Alice", 22], [3, "Carol", 25]] }
+            },
+            {
+                q: "productsからpriceが高い順に取得せよ",
+                ans: ["SELECT", "*", "FROM", "products", "ORDER BY", "price", "DESC"],
+                tables: [{ name: "products", columns: ["id", "name", "price"], rows: [[1, "PC", 120000], [2, "Mouse", 3000], [3, "Keyboard", 8000]] }],
+                result: { columns: ["id", "name", "price"], rows: [[1, "PC", 120000], [3, "Keyboard", 8000], [2, "Mouse", 3000]] }
+            },
+            {
+                q: "itemsからnameが 'PC' のものを取得せよ",
+                ans: ["SELECT", "*", "FROM", "items", "WHERE", "name", "=", "'PC'"],
+                tables: [{ name: "items", columns: ["id", "name", "category"], rows: [[1, "PC", "device"], [2, "Desk", "furniture"], [3, "PC", "device"]] }],
+                result: { columns: ["id", "name", "category"], rows: [[1, "PC", "device"], [3, "PC", "device"]] }
+            }
         ];
         let current = 0, userAns = [];
+
+        function tableMarkup(table) {
+            const title = table.name ? `<h2>${table.name}</h2>` : '';
+            return `${title}<table class="sql-table"><thead><tr>${table.columns.map(column => `<th>${column}</th>`).join('')}</tr></thead><tbody>${table.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderTables() {
+            const question = questions[current];
+            document.getElementById('sample-tables').innerHTML = question.tables.map(tableMarkup).join('');
+            document.getElementById('result-table').innerHTML = `<h2>実行結果</h2>${tableMarkup({ name: "", ...question.result })}`;
+        }
+
+        function toggleResult() {
+            const result = document.getElementById('result-table');
+            const toggle = document.getElementById('result-toggle');
+            result.hidden = !result.hidden;
+            toggle.innerText = `実行結果ヒント: ${result.hidden ? 'OFF' : 'ON'}`;
+        }
 
         function next() {
             if(current >= questions.length) { alert("Excellent!"); return location.reload(); }
             userAns = [];
             document.getElementById('mission').innerText = questions[current].q;
+            renderTables();
+            document.getElementById('result-table').hidden = true;
+            document.getElementById('result-toggle').innerText = '実行結果ヒント: OFF';
             const pool = document.getElementById('chip-pool');
             pool.innerHTML = '';
             const chips = [...questions[current].ans, "GROUP BY", "id", "ASC", "LIMIT"].sort(() => Math.random() - 0.5);
