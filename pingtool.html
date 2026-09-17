@@ -1,0 +1,409 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ping simulator</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    header { margin-bottom: 15px; }
+    header h1 { font-size: 1.8rem; color: var(--accent-blue); text-shadow: 0 0 10px rgba(77, 208, 225, 0.3); }
+    header p { color: #b2ebf2; font-size: 0.9rem; }
+    .container { max-width: 1100px; margin: 0 auto; display: grid; gap: 15px; }
+
+    .topology-container {
+      background: rgba(0, 20, 40, 0.6);
+      border: 1px solid rgba(77, 208, 225, 0.3);
+      border-radius: 15px;
+      padding: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+    svg { width: 100%; height: auto; display: block; }
+
+    .link { stroke: rgba(255, 255, 255, 0.2); stroke-width: 2.5; }
+    .lan-group-bg { fill: rgba(0, 92, 153, 0.12); stroke: rgba(77, 208, 225, 0.35); stroke-width: 1.5; stroke-dasharray: 4 4; rx: 8; }
+    .node { cursor: pointer; transition: transform 0.2s; }
+    .node:hover { transform: scale(1.05); }
+    .node-bg { fill: #102536; stroke: var(--accent-blue); stroke-width: 2; rx: 6; }
+    .node.active .node-bg { stroke: var(--accent-cyan); fill: rgba(0, 255, 204, 0.12); stroke-width: 3; }
+    .node-title { font-size: 12px; font-weight: bold; fill: #fff; text-anchor: middle; }
+    .node-ip { font-size: 10.5px; fill: var(--accent-cyan); text-anchor: middle; font-family: monospace; font-weight: bold; }
+    .node-mask { font-size: 10.5px; fill: #b2ebf2; text-anchor: middle; font-family: monospace; }
+    .router-ip { font-size: 10.5px; fill: var(--accent-cyan); font-family: monospace; font-weight: bold; }
+    .router-mask { font-size: 10.5px; fill: #b2ebf2; font-family: monospace; }
+    .node-icon { font-size: 18px; text-anchor: middle; dominant-baseline: middle; }
+
+    .main-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    @media (max-width: 768px) { .main-panel { grid-template-columns: 1fr; } }
+
+    .main-panel .card { background: var(--card-bg); border: 1px solid #005c99; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 20px; }
+    .main-panel .card h2 { font-size: 1.05rem; margin-bottom: 10px; color: var(--accent-cyan); border-bottom: 1px solid #005c99; padding-bottom: 4px; }
+
+    .form-group { margin-bottom: 8px; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; color: #b2ebf2; margin-bottom: 2px; }
+    input[type="text"], select {
+      width: 100%; padding: 8px; background: rgba(2, 11, 20, 0.8); color: #fff; border: 1px solid var(--accent-blue); border-radius: 4px; font-family: monospace; font-size: 0.85rem;
+    }
+    button {
+      width: 100%; padding: 10px; background: var(--accent-blue); color: #020b14; border: none; border-radius: 6px;
+      font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.9rem;
+    }
+    button:hover { background: var(--accent-cyan); }
+
+    .result-box { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 0.8rem; display: none; }
+    .result-box.success { background: rgba(0, 255, 0, 0.12); border: 1px solid var(--success-green); color: #b9ffb9; display: block; }
+    .result-box.error { background: rgba(255, 51, 51, 0.12); border: 1px solid var(--error-red); color: #ffb3b3; display: block; }
+    .log-detail { margin-top: 4px; font-family: monospace; white-space: pre-line; line-height: 1.4; }
+    .back-link { margin: 20px 0 40px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>ネットワーク接続シミュレータ</h1>
+  <p>図の機器をクリックして設定を変更し、Pingテストで通信を確認してみよう</p>
+</header>
+
+<div class="container">
+  <!-- 結線トポロジ図 (SVG) -->
+  <div class="topology-container">
+    <svg viewBox="0 0 800 300" id="topology-svg">
+      <!-- LAN グループ背景 -->
+      <rect class="lan-group-bg" x="10" y="10" width="310" height="280" />
+      <text x="20" y="30" font-size="12" font-weight="bold" fill="#64748b">LAN 1 (スイッチHub 1)</text>
+
+      <rect class="lan-group-bg" x="480" y="10" width="310" height="280" />
+      <text x="490" y="30" font-size="12" font-weight="bold" fill="#64748b">LAN 2 (スイッチHub 2)</text>
+
+      <!-- 接続線 (Links) -->
+      <!-- LAN 1 内の線 -->
+      <line class="link" x1="80" y1="67.5" x2="240" y2="150" />
+      <line class="link" x1="80" y1="150" x2="240" y2="150" />
+      <line class="link" x1="80" y1="232.5" x2="240" y2="150" />
+
+      <!-- ルータ間の接続線 -->
+      <line class="link" x1="240" y1="150" x2="330" y2="150" />
+      <line class="link" x1="470" y1="150" x2="560" y2="150" />
+
+      <!-- LAN 2 内の線 -->
+      <line class="link" x1="560" y1="150" x2="720" y2="67.5" />
+      <line class="link" x1="560" y1="150" x2="720" y2="150" />
+      <line class="link" x1="560" y1="150" x2="720" y2="232.5" />
+
+      <!-- デバイスノード -->
+      <!-- PC1 -->
+      <g class="node" id="node-pc1" onclick="selectDevice('pc1')">
+        <rect class="node-bg" x="30" y="35" width="100" height="65" />
+        <text class="node-icon" x="52" y="55">💻</text>
+        <text class="node-title" x="88" y="56">PC 1</text>
+        <text class="node-ip" id="label-pc1" x="80" y="75">192.168.1.10</text>
+        <text class="node-mask" id="label-pc1-mask" x="80" y="89">255.255.255.0</text>
+      </g>
+      <!-- PC2 -->
+      <g class="node" id="node-pc2" onclick="selectDevice('pc2')">
+        <rect class="node-bg" x="30" y="117.5" width="100" height="65" />
+        <text class="node-icon" x="52" y="137.5">💻</text>
+        <text class="node-title" x="88" y="138.5">PC 2</text>
+        <text class="node-ip" id="label-pc2" x="80" y="157.5">192.168.1.11</text>
+        <text class="node-mask" id="label-pc2-mask" x="80" y="171.5">255.255.255.0</text>
+      </g>
+      <!-- Printer1 -->
+      <g class="node" id="node-pr1" onclick="selectDevice('pr1')">
+        <rect class="node-bg" x="30" y="200" width="100" height="65" />
+        <text class="node-icon" x="48" y="220">🖨️</text>
+        <text class="node-title" x="88" y="221">プリンタ1</text>
+        <text class="node-ip" id="label-pr1" x="80" y="240">192.168.1.20</text>
+        <text class="node-mask" id="label-pr1-mask" x="80" y="254">255.255.255.0</text>
+      </g>
+
+      <!-- Switch1 -->
+      <g class="node" id="node-sw1">
+        <rect class="node-bg" x="205" y="125" width="70" height="50" />
+        <text class="node-icon" x="240" y="145">🔀</text>
+        <text class="node-title" x="240" y="165">スイッチ1</text>
+      </g>
+
+      <!-- Router1 -->
+      <g class="node" id="node-router" onclick="selectDevice('router')">
+        <!-- 枠の高さを 85 -> 90 に変更 (下に5px拡大) -->
+        <rect class="node-bg" x="330" y="107.5" width="140" height="90" />
+        
+        <!-- LAN1ポート用 IP & Mask (左上) -->
+        <text class="router-ip" id="label-router-lan1" x="335" y="122" text-anchor="start">L1: 192.168.1.254</text>
+        <text class="router-mask" id="label-router-lan1-mask" x="360" y="134" text-anchor="start">255.255.255.0</text>
+        
+        <text class="node-icon" x="400" y="148">🌐</text>
+        <text class="node-title" x="400" y="166">ルータ 1</text>
+        
+        <!-- LAN2ポート用 IP & Mask (右下) -->
+        <text class="router-ip" id="label-router-lan2" x="465" y="179" text-anchor="end">L2: 192.168.2.254</text>
+        <text class="router-mask" id="label-router-lan2-mask" x="465" y="191" text-anchor="end">255.255.255.0</text>
+      </g>
+
+      <!-- Switch2 -->
+      <g class="node" id="node-sw2">
+        <rect class="node-bg" x="525" y="125" width="70" height="50" />
+        <text class="node-icon" x="560" y="145">🔀</text>
+        <text class="node-title" x="560" y="165">スイッチ2</text>
+      </g>
+
+      <!-- PC3 -->
+      <g class="node" id="node-pc3" onclick="selectDevice('pc3')">
+        <rect class="node-bg" x="670" y="35" width="100" height="65" />
+        <text class="node-icon" x="692" y="55">💻</text>
+        <text class="node-title" x="728" y="56">PC 3</text>
+        <text class="node-ip" id="label-pc3" x="720" y="75">192.168.2.10</text>
+        <text class="node-mask" id="label-pc3-mask" x="720" y="89">255.255.255.0</text>
+      </g>
+      <!-- PC4 -->
+      <g class="node" id="node-pc4" onclick="selectDevice('pc4')">
+        <rect class="node-bg" x="670" y="117.5" width="100" height="65" />
+        <text class="node-icon" x="692" y="137.5">💻</text>
+        <text class="node-title" x="728" y="138.5">PC 4</text>
+        <text class="node-ip" id="label-pc4" x="720" y="157.5">192.168.2.11</text>
+        <text class="node-mask" id="label-pc4-mask" x="720" y="171.5">255.255.255.0</text>
+      </g>
+      <!-- Printer2 -->
+      <g class="node" id="node-pr2" onclick="selectDevice('pr2')">
+        <rect class="node-bg" x="670" y="200" width="100" height="65" />
+        <text class="node-icon" x="688" y="220">🖨️</text>
+        <text class="node-title" x="728" y="221">プリンタ2</text>
+        <text class="node-ip" id="label-pr2" x="720" y="240">192.168.2.20</text>
+        <text class="node-mask" id="label-pr2-mask" x="720" y="254">255.255.255.0</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="main-panel">
+    <!-- 機器設定パネル -->
+    <div class="card">
+      <h2 id="config-title">機器設定</h2>
+      <form id="config-form" onsubmit="saveConfig(event)">
+        <div class="form-group" id="iface-group" style="display:none;">
+          <label for="iface-select">設定対象ポート</label>
+          <select id="iface-select" onchange="loadDeviceConfig()">
+            <option value="lan1">LAN1 ポート (左側 LAN 1 接続)</option>
+            <option value="lan2">LAN2 ポート (右側 LAN 2 接続)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ip-input">IPアドレス</label>
+          <input type="text" id="ip-input" required pattern="^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)$">
+        </div>
+        <div class="form-group">
+          <label for="mask-input">サブネットマスク</label>
+          <input type="text" id="mask-input" required pattern="^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.){3}(25[0-5]|(2[0-4]|1\d|[1-9]|)\d)$">
+        </div>
+        <div class="form-group" id="gw-group">
+          <label for="gw-input">デフォルトゲートウェイ</label>
+          <input type="text" id="gw-input">
+        </div>
+        <button type="submit">設定保存</button>
+      </form>
+    </div>
+
+    <!-- 通信テスト（Ping）パネル -->
+    <div class="card">
+      <h2>通信確認 (Ping テスト)</h2>
+      <div class="form-group">
+        <label for="src-select">送信元デバイス</label>
+        <select id="src-select"></select>
+      </div>
+      <div class="form-group">
+        <label for="dst-select">宛先デバイス</label>
+        <select id="dst-select"></select>
+      </div>
+      <button onclick="runPing()">Ping パケット送信</button>
+
+      <div id="result-box" class="result-box">
+        <strong id="result-title"></strong>
+        <div id="result-log" class="log-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="index.html" class="back-link">← Portalに戻る</a>
+
+<script>
+  // データ状態管理
+  const devices = {
+    pc1: { name: "PC 1", type: "end", ip: "192.168.1.10", mask: "255.255.255.0", gw: "192.168.1.254" },
+    pc2: { name: "PC 2", type: "end", ip: "192.168.1.11", mask: "255.255.255.0", gw: "192.168.1.254" },
+    pr1: { name: "プリンタ 1", type: "end", ip: "192.168.1.20", mask: "255.255.255.0", gw: "192.168.1.254" },
+    pc3: { name: "PC 3", type: "end", ip: "192.168.2.10", mask: "255.255.255.0", gw: "192.168.2.254" },
+    pc4: { name: "PC 4", type: "end", ip: "192.168.2.11", mask: "255.255.255.0", gw: "192.168.2.254" },
+    pr2: { name: "プリンタ 2", type: "end", ip: "192.168.2.20", mask: "255.255.255.0", gw: "192.168.2.254" },
+    router: {
+      name: "ルータ 1", type: "router",
+      lan1: { ip: "192.168.1.254", mask: "255.255.255.0" },
+      lan2: { ip: "192.168.2.254", mask: "255.255.255.0" }
+    }
+  };
+
+  let currentDeviceId = 'pc1';
+
+  window.onload = () => {
+    populateSelects();
+    selectDevice('pc1');
+  };
+
+  function populateSelects() {
+    const src = document.getElementById('src-select');
+    const dst = document.getElementById('dst-select');
+    src.innerHTML = ''; dst.innerHTML = '';
+
+    Object.keys(devices).forEach(id => {
+      if (id === 'router') return;
+      src.add(new Option(devices[id].name, id));
+      dst.add(new Option(devices[id].name, id));
+    });
+    dst.value = 'pc3';
+  }
+
+  function selectDevice(id) {
+    currentDeviceId = id;
+    document.querySelectorAll('.node').forEach(el => el.classList.remove('active'));
+    const activeNode = document.getElementById(`node-${id}`);
+    if (activeNode) activeNode.classList.add('active');
+
+    document.getElementById('config-title').textContent = `${devices[id].name} の設定`;
+
+    const isRouter = id === 'router';
+    document.getElementById('gw-group').style.display = isRouter ? 'none' : 'block';
+    document.getElementById('iface-group').style.display = isRouter ? 'block' : 'none';
+
+    loadDeviceConfig();
+  }
+
+  function loadDeviceConfig() {
+    const dev = devices[currentDeviceId];
+    if (dev.type === 'router') {
+      const iface = document.getElementById('iface-select').value;
+      document.getElementById('ip-input').value = dev[iface].ip;
+      document.getElementById('mask-input').value = dev[iface].mask;
+    } else {
+      document.getElementById('ip-input').value = dev.ip;
+      document.getElementById('mask-input').value = dev.mask;
+      document.getElementById('gw-input').value = dev.gw;
+    }
+  }
+
+  function saveConfig(e) {
+    e.preventDefault();
+    const dev = devices[currentDeviceId];
+    const ip = document.getElementById('ip-input').value;
+    const mask = document.getElementById('mask-input').value;
+
+    if (dev.type === 'router') {
+      const iface = document.getElementById('iface-select').value;
+      dev[iface].ip = ip;
+      dev[iface].mask = mask;
+
+      const routerLabel = document.getElementById(`label-router-${iface}`);
+      if (routerLabel) {
+        routerLabel.textContent = `${iface === 'lan1' ? 'L1' : 'L2'}: ${ip}`;
+      }
+
+      const routerMaskLabel = document.getElementById(`label-router-${iface}-mask`);
+      if (routerMaskLabel) {
+        routerMaskLabel.textContent = mask;
+      }
+    } else {
+      dev.ip = ip;
+      dev.mask = mask;
+      dev.gw = document.getElementById('gw-input').value;
+      
+      const label = document.getElementById(`label-${currentDeviceId}`);
+      if (label) label.textContent = ip;
+
+      const maskLabel = document.getElementById(`label-${currentDeviceId}-mask`);
+      if (maskLabel) maskLabel.textContent = mask;
+    }
+    alert(`${dev.name} の設定を更新しました。`);
+  }
+
+  function ipToNum(ip) {
+    return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+  }
+
+  function isSameSubnet(ip1, ip2, mask) {
+    const n1 = ipToNum(ip1);
+    const n2 = ipToNum(ip2);
+    const m = ipToNum(mask);
+    return (n1 & m) === (n2 & m);
+  }
+
+  function runPing() {
+    const srcId = document.getElementById('src-select').value;
+    const dstId = document.getElementById('dst-select').value;
+    const src = devices[srcId];
+    const dst = devices[dstId];
+
+    const resultBox = document.getElementById('result-box');
+    const resultTitle = document.getElementById('result-title');
+    const resultLog = document.getElementById('result-log');
+
+    let logs = [];
+    let success = false;
+
+    logs.push(`[送信元] ${src.name} (${src.ip})`);
+    logs.push(`[送信先] ${dst.name} (${dst.ip})`);
+    logs.push('----------------------------------------');
+
+    if (srcId === dstId) {
+      logs.push('同一端末への通信です。');
+      success = true;
+    } else if (isSameSubnet(src.ip, dst.ip, src.mask)) {
+      logs.push('① 送信元は宛先を「同一サブネット内」と判定。');
+      if (src.mask !== dst.mask) {
+        logs.push('⚠️ 警告: サブネットマスク設定が送信元と宛先で一致していません。');
+      }
+      logs.push('② スイッチHub経由で直接パケットを送信します...');
+      logs.push('✅ 応答を受信しました。通信成功！');
+      success = true;
+    } else {
+      logs.push('① 送信元は宛先を「異なるサブネット」と判定。');
+      logs.push(`② デフォルトゲートウェイ (${src.gw}) へ転送を試みます...`);
+
+      if (!src.gw) {
+        logs.push('❌ エラー: 送信元端末にデフォルトゲートウェイが設定されていません。');
+      } else {
+        const router = devices.router;
+        let inIface = null;
+        let outIface = null;
+
+        if (isSameSubnet(src.ip, router.lan1.ip, src.mask) && src.gw === router.lan1.ip) {
+          inIface = router.lan1; outIface = router.lan2;
+        } else if (isSameSubnet(src.ip, router.lan2.ip, src.mask) && src.gw === router.lan2.ip) {
+          inIface = router.lan2; outIface = router.lan1;
+        }
+
+        if (!inIface) {
+          logs.push(`❌ エラー: ゲートウェイ ${src.gw} に到達できないか、ルータの設定と一致しません。`);
+        } else {
+          logs.push('③ ルータがパケットを受信し、別ポートへルーティングします。');
+          
+          if (!isSameSubnet(outIface.ip, dst.ip, outIface.mask)) {
+            logs.push(`❌ エラー: ルータの出力ポート (${outIface.ip}) と宛先IP (${dst.ip}) のサブネットが一致しません。`);
+          } else if (!dst.gw || !isSameSubnet(dst.ip, dst.gw, dst.mask)) {
+            logs.push('❌ エラー: 宛先機器のデフォルトゲートウェイ設定が不正なため、応答が送信元へ返信できません。');
+          } else {
+            logs.push('④ 宛先機器が受取り、ルータ経由で返信を送信。');
+            logs.push('✅ 応答を受信しました。通信成功！');
+            success = true;
+          }
+        }
+      }
+    }
+
+    resultBox.className = `result-box ${success ? 'success' : 'error'}`;
+    resultTitle.textContent = success ? '通信成功 (Ping Success)' : '通信失敗 (Ping Failed)';
+    resultLog.textContent = logs.join('\n');
+  }
+</script>
+</body>
+</html>
