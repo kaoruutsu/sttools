@@ -11,6 +11,15 @@
         .sql-ex .answer-blank { min-width: 72px; min-height: 38px; padding: 5px 10px; border: 1px dashed var(--accent-yellow); border-radius: 4px; color: var(--accent-yellow); background: rgba(255, 235, 59, 0.08); font: inherit; }
         .sql-ex .answer-blank.filled { border-style: solid; color: #fff; background: #1a2634; }
         .sql-ex #model-answer { white-space: pre-wrap; overflow-wrap: anywhere; font: 1rem/1.6 monospace; color: #fff; margin: 0 0 12px; }
+        .sql-ex .sql-question-layout { grid-template-columns: minmax(190px, 0.65fr) minmax(0, 1.35fr); }
+        .sql-ex #sample-tables { display: grid; gap: 12px; align-items: start; min-width: 0; }
+        .sql-ex #sample-tables.table-count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .sql-ex .sample-table { min-width: 0; max-width: 100%; overflow-x: auto; }
+        .sql-ex .sample-table .sql-table { min-width: 0; }
+        .sql-ex .sample-table h2 { margin-bottom: 8px; }
+        @media (max-width: 700px) {
+            .sql-ex #sample-tables.table-count-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body class="sql-training sql-ex">
@@ -37,8 +46,8 @@
 
     <div class="controls-row">
         <button class="btn-base start-btn" style="margin:0" onclick="check()">RUN SQL</button>
-        <button class="btn-base control-btn" onclick="showAnswer()">解答を表示</button>
         <button class="btn-base control-btn" onclick="undo()">UNDO</button>
+        <button class="btn-base control-btn" onclick="showAnswer()">解答を表示</button>
     </div>
 
     <div id="answer-panel" class="sql-table-panel" hidden>
@@ -104,15 +113,18 @@
 
         let current = 0;
         let userAns = [];
+        let draggedText = '';
 
         function tableMarkup(table) {
             const title = table.name ? `<h2>${table.name}</h2>` : '';
-            return `${title}<table class="sql-table"><thead><tr>${table.columns.map(column => `<th>${column}</th>`).join('')}</tr></thead><tbody>${table.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+            return `<div class="sample-table">${title}<table class="sql-table"><thead><tr>${table.columns.map(column => `<th>${column}</th>`).join('')}</tr></thead><tbody>${table.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
         }
 
         function renderTables() {
             const question = questions[current];
-            document.getElementById('sample-tables').innerHTML = question.tables.map(tableMarkup).join('');
+            const sampleTables = document.getElementById('sample-tables');
+            sampleTables.className = `table-count-${question.tables.length}`;
+            sampleTables.innerHTML = question.tables.map(tableMarkup).join('');
             document.getElementById('result-table').innerHTML = `<h2>実行結果</h2>${tableMarkup({ name: "", ...question.result })}`;
         }
 
@@ -124,7 +136,7 @@
 
         function renderAnswer() {
             const lines = [];
-            const lineSize = Math.ceil(questions[current].ans.length / 3);
+            const lineSize = Math.ceil(questions[current].ans.length / 2);
             for (let i = 0; i < questions[current].ans.length; i += lineSize) lines.push(questions[current].ans.slice(i, i + lineSize).join(' '));
             return lines.join('\n');
         }
@@ -150,27 +162,47 @@
             document.getElementById('result-toggle').innerText = '実行結果(ヒント): OFF';
             document.getElementById('answer-panel').hidden = true;
             const pool = document.getElementById('chip-pool');
-            pool.innerHTML = '';
             userAns = questions[current].ans.map((token, index) => getBlankIndices().includes(index) ? null : token);
+            renderPool();
+            updateUI();
+        }
+
+        function renderPool() {
+            const pool = document.getElementById('chip-pool');
+            pool.innerHTML = '';
             const missing = getBlankIndices().map(index => questions[current].ans[index]);
             const distractors = ["WHERE", "ORDER", "BY", "AND", "OR", "IN", "NOT", "EXISTS", "AS", "BETWEEN", "LIKE", "GROUP", "HAVING", "ASC", "DESC"];
             [...missing, ...distractors.filter(token => !missing.includes(token)).slice(0, Math.max(0, 5 - missing.length))].sort(() => Math.random() - 0.5).forEach(text => {
                 const chip = document.createElement('div');
                 chip.className = 'sql-chip';
                 chip.innerText = text;
-                chip.onclick = () => {
-                    const index = userAns.findIndex((token, position) => token === null && questions[current].ans[position] === text);
-                    if (index !== -1) { userAns[index] = text; chip.remove(); updateUI(); }
-                };
+                chip.draggable = true;
+                chip.addEventListener('click', () => {
+                    const index = userAns.indexOf(null);
+                    if (index !== -1) placeToken(text, index, chip);
+                });
+                chip.addEventListener('dragstart', event => {
+                    draggedText = text;
+                    event.dataTransfer.setData('text/plain', text);
+                    event.dataTransfer.effectAllowed = 'move';
+                });
+                chip.addEventListener('pointerdown', () => { draggedText = text; });
+                chip.addEventListener('dragend', () => { draggedText = ''; });
                 pool.appendChild(chip);
             });
+        }
+
+        function placeToken(text, position, chip) {
+            if (userAns[position] !== null) return;
+            userAns[position] = text;
+            chip.remove();
             updateUI();
         }
 
         function updateUI() {
             const zone = document.getElementById('drop-zone');
             zone.innerHTML = '';
-            const lineSize = Math.ceil(questions[current].ans.length / 3);
+            const lineSize = Math.ceil(questions[current].ans.length / 2);
             for (let i = 0; i < userAns.length; i += lineSize) {
                 const line = document.createElement('div');
                 line.className = 'sql-line';
@@ -179,13 +211,31 @@
                     const blank = document.createElement('span');
                     blank.className = `answer-blank${text === null ? '' : ' filled'}`;
                     blank.textContent = text === null ? '選択' : text;
+                    if (text === null) {
+                        blank.addEventListener('dragover', event => {
+                            event.preventDefault();
+                            event.dataTransfer.dropEffect = 'move';
+                        });
+                        blank.addEventListener('drop', event => {
+                            event.preventDefault();
+                            const value = event.dataTransfer.getData('text/plain') || draggedText;
+                            const chip = [...document.querySelectorAll('#chip-pool .sql-chip')].find(item => item.textContent === value);
+                            if (value && chip) placeToken(value, position, chip);
+                        });
+                    }
                     line.appendChild(blank);
                 });
                 zone.appendChild(line);
             }
         }
 
-        function undo() { userAns.pop(); updateUI(); }
+        function undo() {
+            const index = [...getBlankIndices()].reverse().find(position => userAns[position] !== null);
+            if (index === undefined) return;
+            userAns[index] = null;
+            renderPool();
+            updateUI();
+        }
 
         function showAnswer() {
             document.getElementById('model-answer').textContent = renderAnswer();
