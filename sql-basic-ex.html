@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL Training - Extra</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .sql-ex .drop-zone { display: flex; align-content: flex-start; min-height: 92px; max-height: 260px; overflow-y: auto; padding: 12px 16px; justify-content: flex-start; }
+        .sql-ex .sql-line { display: flex; flex: 0 0 100%; flex-wrap: wrap; gap: 8px; min-height: 44px; align-items: center; }
+        .sql-ex .sql-line::before { content: ''; width: 1.5em; flex: 0 0 1.5em; }
+        .sql-ex .answer-blank { min-width: 72px; min-height: 38px; padding: 5px 10px; border: 1px dashed var(--accent-yellow); border-radius: 4px; color: var(--accent-yellow); background: rgba(255, 235, 59, 0.08); font: inherit; }
+        .sql-ex .answer-blank.filled { border-style: solid; color: #fff; background: #1a2634; }
+        .sql-ex #model-answer { white-space: pre-wrap; overflow-wrap: anywhere; font: 1rem/1.6 monospace; color: #fff; margin: 0 0 12px; }
+    </style>
+</head>
+<body class="sql-training sql-ex">
+    <h1>SQL Training <span>(Extra)</span></h1>
+
+    <div class="sql-question-layout">
+        <div class="mission-box">
+            <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
+            <p id="mission">読み込み中...</p>
+        </div>
+        <div class="sql-table-panel">
+            <h2>サンプルデータ</h2>
+            <div id="sample-tables"></div>
+        </div>
+    </div>
+
+    <div class="result-hint">
+        <button id="result-toggle" class="btn-base control-btn" type="button" onclick="toggleResult()">実行結果(ヒント): OFF</button>
+        <div id="result-table" class="sql-table-panel result-table-container" hidden></div>
+    </div>
+
+    <div class="drop-zone" id="drop-zone"></div>
+    <div id="chip-pool" class="controls-row"></div>
+
+    <div class="controls-row">
+        <button class="btn-base start-btn" style="margin:0" onclick="check()">RUN SQL</button>
+        <button class="btn-base control-btn" onclick="showAnswer()">解答を表示</button>
+        <button class="btn-base control-btn" onclick="undo()">UNDO</button>
+    </div>
+
+    <div id="answer-panel" class="sql-table-panel" hidden>
+        <h2>模範解答</h2>
+        <pre id="model-answer"></pre>
+        <button class="btn-base start-btn" style="margin:0" onclick="nextProblem()">次の問題へ</button>
+    </div>
+
+    <div id="mark" class="judgment-mark">⭕️</div>
+    <a href="index.html" class="back-link">← Portalに戻る</a>
+
+    <script>
+        const users = {
+            name: "users", columns: ["id", "name", "department", "city"],
+            rows: [[1, "Alice", "Sales", "Tokyo"], [2, "Bob", "Sales", "Osaka"], [3, "Carol", "Engineering", "Tokyo"], [4, "Dave", "Engineering", "Nagoya"], [5, "Eve", "HR", "Tokyo"]]
+        };
+        const orders = {
+            name: "orders", columns: ["id", "user_id", "amount", "status", "ordered_at"],
+            rows: [[101, 1, 12000, "paid", "2024-01-10"], [102, 2, 8000, "paid", "2024-02-15"], [103, 1, 3500, "pending", "2024-03-01"], [104, 3, 22000, "paid", "2024-03-20"], [105, 4, 5000, "cancelled", "2024-04-05"], [106, 5, 15000, "paid", "2024-05-10"]]
+        };
+        const products = {
+            name: "products", columns: ["id", "name", "category", "price", "stock"],
+            rows: [[1, "Keyboard", "device", 8000, 12], [2, "Mouse", "device", 3000, 30], [3, "Desk", "furniture", 25000, 4], [4, "Monitor", "device", 30000, 7], [5, "Chair", "furniture", 12000, 15]]
+        };
+        const departments = {
+            name: "departments", columns: ["id", "name", "budget"],
+            rows: [[10, "Sales", 1000000], [20, "Engineering", 2000000], [30, "HR", 500000]]
+        };
+
+        const questions = [
+            { q: "usersからTokyo在住の人を取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "city", "=", "'Tokyo'"], tables: [users], result: { columns: users.columns, rows: [users.rows[0], users.rows[2], users.rows[4]] } },
+            { q: "ordersからamountが5000以上かつpaidの注文を取得せよ", ans: ["SELECT", "*", "FROM", "orders", "WHERE", "amount", ">=", "5000", "AND", "status", "=", "'paid'"], tables: [orders], result: { columns: orders.columns, rows: [orders.rows[0], orders.rows[1], orders.rows[3], orders.rows[5]] } },
+            { q: "ordersから2024年2月から4月までの注文を取得せよ", ans: ["SELECT", "*", "FROM", "orders", "WHERE", "ordered_at", "BETWEEN", "'2024-02-01'", "AND", "'2024-04-30'"], tables: [orders], result: { columns: orders.columns, rows: [orders.rows[1], orders.rows[2], orders.rows[3], orders.rows[4]] } },
+            { q: "productsでdeviceまたはfurnitureの商品をINで取得せよ", ans: ["SELECT", "*", "FROM", "products", "WHERE", "category", "IN", "('device',", "'furniture')"], tables: [products], result: { columns: products.columns, rows: products.rows } },
+            { q: "usersでSalesとHR以外の部署の人をNOT INで取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "department", "NOT", "IN", "('Sales',", "'HR')"], tables: [users], result: { columns: users.columns, rows: [users.rows[2], users.rows[3]] } },
+            { q: "productsのnameを別名product_nameとして取得せよ", ans: ["SELECT", "name", "AS", "product_name", "FROM", "products"], tables: [products], result: { columns: ["product_name"], rows: [["Keyboard"], ["Mouse"], ["Desk"], ["Monitor"], ["Chair"]] } },
+            { q: "productsのpriceを税込価格として別名を付けて取得せよ", ans: ["SELECT", "name", "AS", "product_name,", "price", "*", "1.1", "AS", "taxed_price", "FROM", "products"], tables: [products], result: { columns: ["product_name", "taxed_price"], rows: [["Keyboard", 8800], ["Mouse", 3300], ["Desk", 27500], ["Monitor", 33000], ["Chair", 13200]] } },
+            { q: "productsをpriceの高い順に取得せよ", ans: ["SELECT", "*", "FROM", "products", "ORDER", "BY", "price", "DESC"], tables: [products], result: { columns: products.columns, rows: [products.rows[3], products.rows[2], products.rows[4], products.rows[0], products.rows[1]] } },
+            { q: "productsをcategoryごとに平均価格を求め、別名avg_priceを付けよ", ans: ["SELECT", "category,", "AVG(price)", "AS", "avg_price", "FROM", "products", "GROUP", "BY", "category"], tables: [products], result: { columns: ["category", "avg_price"], rows: [["device", 13666.67], ["furniture", 18500]] } },
+            { q: "ordersのstatusごとの注文数を求めよ", ans: ["SELECT", "status,", "COUNT(*)", "AS", "order_count", "FROM", "orders", "GROUP", "BY", "status"], tables: [orders], result: { columns: ["status", "order_count"], rows: [["cancelled", 1], ["paid", 4], ["pending", 1]] } },
+            { q: "usersとordersをuser_id=idでWHERE結合し、名前と金額を取得せよ", ans: ["SELECT", "users.name,", "orders.amount", "FROM", "users,", "orders", "WHERE", "users.id", "=", "orders.user_id"], tables: [users, orders], result: { columns: ["name", "amount"], rows: [["Alice", 12000], ["Bob", 8000], ["Alice", 3500], ["Carol", 22000], ["Dave", 5000], ["Eve", 15000]] } },
+            { q: "usersとordersを結合し、Tokyoの注文だけ取得せよ", ans: ["SELECT", "users.name,", "orders.amount", "FROM", "users,", "orders", "WHERE", "users.id", "=", "orders.user_id", "AND", "users.city", "=", "'Tokyo'"], tables: [users, orders], result: { columns: ["name", "amount"], rows: [["Alice", 12000], ["Alice", 3500], ["Carol", 22000], ["Eve", 15000]] } },
+            { q: "usersとordersを結合し、paidの注文を高額順に取得せよ", ans: ["SELECT", "users.name,", "orders.amount", "FROM", "users,", "orders", "WHERE", "users.id", "=", "orders.user_id", "AND", "orders.status", "=", "'paid'", "ORDER", "BY", "orders.amount", "DESC"], tables: [users, orders], result: { columns: ["name", "amount"], rows: [["Carol", 22000], ["Eve", 15000], ["Alice", 12000], ["Bob", 8000]] } },
+            { q: "usersとordersを別名u,oで結合し、名前と注文日を取得せよ", ans: ["SELECT", "u.name,", "o.ordered_at", "FROM", "users", "AS", "u,", "orders", "AS", "o", "WHERE", "u.id", "=", "o.user_id"], tables: [users, orders], result: { columns: ["name", "ordered_at"], rows: [["Alice", "2024-01-10"], ["Bob", "2024-02-15"], ["Alice", "2024-03-01"], ["Carol", "2024-03-20"], ["Dave", "2024-04-05"], ["Eve", "2024-05-10"]] } },
+            { q: "注文が存在するユーザーをINサブクエリで取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "id", "IN", "(SELECT", "user_id", "FROM", "orders)"], tables: [users, orders], result: { columns: users.columns, rows: users.rows } },
+            { q: "注文がないユーザーをNOT INサブクエリで取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "id", "NOT", "IN", "(SELECT", "user_id", "FROM", "orders)"], tables: [users, orders], result: { columns: users.columns, rows: [] } },
+            { q: "注文が存在するユーザーをEXISTSで取得せよ", ans: ["SELECT", "*", "FROM", "users", "AS", "u", "WHERE", "EXISTS", "(SELECT", "1", "FROM", "orders", "AS", "o", "WHERE", "o.user_id", "=", "u.id)"], tables: [users, orders], result: { columns: users.columns, rows: users.rows } },
+            { q: "注文がないユーザーをNOT EXISTSで取得せよ", ans: ["SELECT", "*", "FROM", "users", "AS", "u", "WHERE", "NOT", "EXISTS", "(SELECT", "1", "FROM", "orders", "AS", "o", "WHERE", "o.user_id", "=", "u.id)"], tables: [users, orders], result: { columns: users.columns, rows: [] } },
+            { q: "productsの在庫が10以上の商品名と在庫を取得せよ", ans: ["SELECT", "name,", "stock", "FROM", "products", "WHERE", "stock", ">=", "10"], tables: [products], result: { columns: ["name", "stock"], rows: [["Keyboard", 12], ["Mouse", 30], ["Chair", 15]] } },
+            { q: "productsのpriceが10000から30000の範囲の商品を取得せよ", ans: ["SELECT", "*", "FROM", "products", "WHERE", "price", "BETWEEN", "10000", "AND", "30000"], tables: [products], result: { columns: products.columns, rows: [products.rows[2], products.rows[3], products.rows[4]] } },
+            { q: "ordersをユーザーごとに集計し、合計金額が10000以上だけ取得せよ", ans: ["SELECT", "user_id,", "SUM(amount)", "AS", "total_amount", "FROM", "orders", "GROUP", "BY", "user_id", "HAVING", "SUM(amount)", ">=", "10000"], tables: [orders], result: { columns: ["user_id", "total_amount"], rows: [[1, 15500], [3, 22000], [5, 15000]] } },
+            { q: "usersとordersを結合し、ユーザー名ごとの注文合計を求めよ", ans: ["SELECT", "users.name,", "SUM(orders.amount)", "AS", "total_amount", "FROM", "users,", "orders", "WHERE", "users.id", "=", "orders.user_id", "GROUP", "BY", "users.name"], tables: [users, orders], result: { columns: ["name", "total_amount"], rows: [["Alice", 15500], ["Bob", 8000], ["Carol", 22000], ["Dave", 5000], ["Eve", 15000]] } },
+            { q: "usersとordersを結合し、注文合計が10000以上のユーザーだけ取得せよ", ans: ["SELECT", "users.name,", "SUM(orders.amount)", "AS", "total_amount", "FROM", "users,", "orders", "WHERE", "users.id", "=", "orders.user_id", "GROUP", "BY", "users.name", "HAVING", "SUM(orders.amount)", ">=", "10000"], tables: [users, orders], result: { columns: ["name", "total_amount"], rows: [["Alice", 15500], ["Carol", 22000], ["Eve", 15000]] } },
+            { q: "Tokyoのユーザーが注文した商品をINで絞り込む形で取得せよ", ans: ["SELECT", "*", "FROM", "orders", "WHERE", "user_id", "IN", "(SELECT", "id", "FROM", "users", "WHERE", "city", "=", "'Tokyo')"], tables: [users, orders], result: { columns: orders.columns, rows: [orders.rows[0], orders.rows[2], orders.rows[3], orders.rows[5]] } },
+            { q: "Tokyo以外のユーザーの注文をNOT INで取得せよ", ans: ["SELECT", "*", "FROM", "orders", "WHERE", "user_id", "NOT", "IN", "(SELECT", "id", "FROM", "users", "WHERE", "city", "=", "'Tokyo')"], tables: [users, orders], result: { columns: orders.columns, rows: [orders.rows[1], orders.rows[4]] } },
+            { q: "departmentsの予算が1000000以上の部署を取得せよ", ans: ["SELECT", "name", "FROM", "departments", "WHERE", "budget", ">=", "1000000"], tables: [departments], result: { columns: ["name"], rows: [["Sales"], ["Engineering"]] } },
+            { q: "部署に所属するユーザーをEXISTSで取得せよ", ans: ["SELECT", "*", "FROM", "users", "AS", "u", "WHERE", "EXISTS", "(SELECT", "1", "FROM", "departments", "AS", "d", "WHERE", "d.name", "=", "u.department)"], tables: [users, departments], result: { columns: users.columns, rows: users.rows } },
+            { q: "部署に存在しない名前のユーザーをNOT EXISTSで取得せよ", ans: ["SELECT", "*", "FROM", "users", "AS", "u", "WHERE", "NOT", "EXISTS", "(SELECT", "1", "FROM", "departments", "AS", "d", "WHERE", "d.name", "=", "u.department)"], tables: [users, departments], result: { columns: users.columns, rows: [] } },
+            { q: "productsで名前に 'o' を含み、priceがBETWEENの範囲にある商品を取得せよ", ans: ["SELECT", "name", "AS", "product_name,", "price", "FROM", "products", "WHERE", "name", "LIKE", "'%o%'", "AND", "price", "BETWEEN", "5000", "AND", "30000"], tables: [products], result: { columns: ["product_name", "price"], rows: [["Keyboard", 8000], ["Monitor", 30000]] } },
+            { q: "paid注文のあるTokyoユーザーをEXISTSとBETWEENで取得せよ", ans: ["SELECT", "u.name", "AS", "customer_name", "FROM", "users", "AS", "u", "WHERE", "u.city", "=", "'Tokyo'", "AND", "EXISTS", "(SELECT", "1", "FROM", "orders", "AS", "o", "WHERE", "o.user_id", "=", "u.id", "AND", "o.status", "=", "'paid'", "AND", "o.amount", "BETWEEN", "10000", "AND", "25000)"], tables: [users, orders], result: { columns: ["customer_name"], rows: [["Alice"], ["Carol"], ["Eve"]] } },
+            { q: "ユーザーが存在しない部署をNOT EXISTSで取得せよ", ans: ["SELECT", "d.name", "AS", "department_name", "FROM", "departments", "AS", "d", "WHERE", "NOT", "EXISTS", "(SELECT", "1", "FROM", "users", "AS", "u", "WHERE", "u.department", "=", "d.name)"], tables: [departments, users], result: { columns: ["department_name"], rows: [] } }
+        ];
+
+        let current = 0;
+        let userAns = [];
+
+        function tableMarkup(table) {
+            const title = table.name ? `<h2>${table.name}</h2>` : '';
+            return `${title}<table class="sql-table"><thead><tr>${table.columns.map(column => `<th>${column}</th>`).join('')}</tr></thead><tbody>${table.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderTables() {
+            const question = questions[current];
+            document.getElementById('sample-tables').innerHTML = question.tables.map(tableMarkup).join('');
+            document.getElementById('result-table').innerHTML = `<h2>実行結果</h2>${tableMarkup({ name: "", ...question.result })}`;
+        }
+
+        function toggleResult() {
+            const result = document.getElementById('result-table');
+            result.hidden = !result.hidden;
+            document.getElementById('result-toggle').innerText = `実行結果(ヒント): ${result.hidden ? 'OFF' : 'ON'}`;
+        }
+
+        function renderAnswer() {
+            const lines = [];
+            const lineSize = Math.ceil(questions[current].ans.length / 3);
+            for (let i = 0; i < questions[current].ans.length; i += lineSize) lines.push(questions[current].ans.slice(i, i + lineSize).join(' '));
+            return lines.join('\n');
+        }
+
+        function getBlankIndices() {
+            const answer = questions[current].ans;
+            const candidates = answer.map((token, index) => ({ token, index })).filter(({ token }) =>
+                /^(SELECT|FROM|WHERE|AND|OR|GROUP|BY|HAVING|ORDER|AS|IN|NOT|EXISTS|BETWEEN|LIKE|DISTINCT|COUNT\(\*\)|SUM\(.+\)|AVG\(.+\)|MAX\(.+\)|MIN\(.+\)|[=<>]+)$/.test(token)
+            );
+            const selected = candidates.slice(0, 5).map(item => item.index);
+            for (let index = 0; selected.length < 5 && index < answer.length; index++) {
+                if (!selected.includes(index)) selected.push(index);
+            }
+            return selected.sort((a, b) => a - b);
+        }
+
+        function next() {
+            if (current >= questions.length) { alert('All Cleared!'); return location.reload(); }
+            userAns = [];
+            document.getElementById('mission').innerText = questions[current].q;
+            renderTables();
+            document.getElementById('result-table').hidden = true;
+            document.getElementById('result-toggle').innerText = '実行結果(ヒント): OFF';
+            document.getElementById('answer-panel').hidden = true;
+            const pool = document.getElementById('chip-pool');
+            pool.innerHTML = '';
+            userAns = questions[current].ans.map((token, index) => getBlankIndices().includes(index) ? null : token);
+            const missing = getBlankIndices().map(index => questions[current].ans[index]);
+            const distractors = ["WHERE", "ORDER", "BY", "AND", "OR", "IN", "NOT", "EXISTS", "AS", "BETWEEN", "LIKE", "GROUP", "HAVING", "ASC", "DESC"];
+            [...missing, ...distractors.filter(token => !missing.includes(token)).slice(0, Math.max(0, 5 - missing.length))].sort(() => Math.random() - 0.5).forEach(text => {
+                const chip = document.createElement('div');
+                chip.className = 'sql-chip';
+                chip.innerText = text;
+                chip.onclick = () => {
+                    const index = userAns.findIndex((token, position) => token === null && questions[current].ans[position] === text);
+                    if (index !== -1) { userAns[index] = text; chip.remove(); updateUI(); }
+                };
+                pool.appendChild(chip);
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = '';
+            const lineSize = Math.ceil(questions[current].ans.length / 3);
+            for (let i = 0; i < userAns.length; i += lineSize) {
+                const line = document.createElement('div');
+                line.className = 'sql-line';
+                userAns.slice(i, i + lineSize).forEach((text, offset) => {
+                    const position = i + offset;
+                    const blank = document.createElement('span');
+                    blank.className = `answer-blank${text === null ? '' : ' filled'}`;
+                    blank.textContent = text === null ? '選択' : text;
+                    line.appendChild(blank);
+                });
+                zone.appendChild(line);
+            }
+        }
+
+        function undo() { userAns.pop(); updateUI(); }
+
+        function showAnswer() {
+            document.getElementById('model-answer').textContent = renderAnswer();
+            document.getElementById('answer-panel').hidden = false;
+        }
+
+        function nextProblem() { current++; next(); }
+
+        function check() {
+            const win = userAns.every(token => token !== null) && userAns.join(' ') === questions[current].ans.join(' ');
+            const mark = document.getElementById('mark');
+            mark.innerText = win ? '⭕️' : '❌';
+            mark.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            if (win) {
+                current++;
+                setTimeout(() => { mark.className = 'judgment-mark'; next(); }, 1200);
+            } else setTimeout(() => mark.className = 'judgment-mark', 800);
+        }
+        window.onload = next;
+    </script>
+</body>
+</html>

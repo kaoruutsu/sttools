@@ -228,6 +228,8 @@ h1 span { font-size: 0.6em; margin-left: 10px; }
     align-items: center;
     padding: 10px 14px;
     font-size: 1rem;
+    font-family: inherit;
+    font-weight: 500;
 }
 .drop-zone {
     min-height: 50px; padding: 10px; border: 2px dashed #005c99; border-radius: 8px;
