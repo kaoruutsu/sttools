@@ -202,6 +202,33 @@ h1 span { font-size: 0.6em; margin-left: 10px; }
     border-radius: 4px; cursor: pointer; color: #fff; font-family: monospace;
 }
 .sql-chip:hover { background: var(--accent-blue); color: #020b14; }
+.sql-training .controls-row { gap: 10px; }
+.sql-training .controls-row .start-btn,
+.sql-training .controls-row .control-btn,
+.sql-training .result-hint .control-btn,
+.sql-training .sql-table-panel .start-btn {
+    min-height: 44px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+.sql-training .controls-row .start-btn,
+.sql-training .sql-table-panel .start-btn {
+    padding: 10px 24px;
+}
+.sql-training .controls-row .control-btn {
+    padding: 10px 16px;
+}
+.sql-training .result-hint .control-btn {
+    padding: 10px 16px;
+}
+.sql-training .sql-chip {
+    min-height: 44px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 14px;
+    font-size: 1rem;
+}
 .drop-zone {
     min-height: 50px; padding: 10px; border: 2px dashed #005c99; border-radius: 8px;
     background: rgba(0,0,0,0.3); display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
@@ -261,6 +288,13 @@ h1 span { font-size: 0.6em; margin-left: 10px; }
 
 .result-table-container[hidden] {
     display: none;
+}
+
+.result-table-container {
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
 }
 
 @media (max-width: 700px) {

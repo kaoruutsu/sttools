@@ -5,7 +5,7 @@
     <title>SQL Training - Easy</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="sql-training">
     <h1>SQL Training <span>(Easy)</span></h1>
 
     <div class="sql-question-layout">
@@ -20,7 +20,7 @@
     </div>
 
     <div class="result-hint">
-        <button id="result-toggle" class="btn-base control-btn" type="button" onclick="toggleResult()">実行結果ヒント: OFF</button>
+        <button id="result-toggle" class="btn-base control-btn" type="button" onclick="toggleResult()">実行結果(ヒント): OFF</button>
         <div id="result-table" class="sql-table-panel result-table-container" hidden></div>
     </div>
 
@@ -29,7 +29,14 @@
 
     <div class="controls-row">
         <button class="btn-base start-btn" style="margin:0" onclick="check()">RUN SQL</button>
+        <button class="btn-base control-btn" onclick="showAnswer()">解答を表示</button>
         <button class="btn-base control-btn" onclick="undo()">UNDO</button>
+    </div>
+
+    <div id="answer-panel" class="sql-table-panel" hidden>
+        <h2>模範解答</h2>
+        <pre id="model-answer"></pre>
+        <button class="btn-base start-btn" style="margin:0" onclick="nextProblem()">次の問題へ</button>
     </div>
 
     <div id="mark" class="judgment-mark">⭕️</div>
@@ -74,7 +81,7 @@
             const result = document.getElementById('result-table');
             const toggle = document.getElementById('result-toggle');
             result.hidden = !result.hidden;
-            toggle.innerText = `実行結果ヒント: ${result.hidden ? 'OFF' : 'ON'}`;
+            toggle.innerText = `実行結果(ヒント): ${result.hidden ? 'OFF' : 'ON'}`;
         }
 
         function next() {
@@ -83,7 +90,8 @@
             document.getElementById('mission').innerText = questions[current].q;
             renderTables();
             document.getElementById('result-table').hidden = true;
-            document.getElementById('result-toggle').innerText = '実行結果ヒント: OFF';
+            document.getElementById('result-toggle').innerText = '実行結果(ヒント): OFF';
+            document.getElementById('answer-panel').hidden = true;
             const pool = document.getElementById('chip-pool');
             pool.innerHTML = '';
             const chips = [...questions[current].ans, "WHERE", "id", "ORDER BY"].sort(() => Math.random() - 0.5);
@@ -107,6 +115,16 @@
         }
 
         function undo() { userAns.pop(); updateUI(); }
+
+        function showAnswer() {
+            document.getElementById('model-answer').textContent = questions[current].ans.join(' ');
+            document.getElementById('answer-panel').hidden = false;
+        }
+
+        function nextProblem() {
+            current++;
+            next();
+        }
 
         function check() {
             const win = userAns.join(' ') === questions[current].ans.join(' ');

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL Training - Hard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="sql-training">
+    <h1>SQL Training <span>(Hard)</span></h1>
+
+    <div class="sql-question-layout">
+        <div class="mission-box">
+            <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
+            <p id="mission">読み込み中...</p>
+        </div>
+        <div class="sql-table-panel">
+            <h2>サンプルデータ</h2>
+            <div id="sample-tables"></div>
+        </div>
+    </div>
+
+    <div class="result-hint">
+        <button id="result-toggle" class="btn-base control-btn" type="button" onclick="toggleResult()">実行結果(ヒント): OFF</button>
+        <div id="result-table" class="sql-table-panel result-table-container" hidden></div>
+    </div>
+
+    <div class="drop-zone" id="drop-zone"></div>
+    <div id="chip-pool" class="controls-row"></div>
+
+    <div class="controls-row">
+        <button class="btn-base start-btn" style="margin:0" onclick="check()">RUN SQL</button>
+        <button class="btn-base control-btn" onclick="showAnswer()">解答を表示</button>
+        <button class="btn-base control-btn" onclick="undo()">UNDO</button>
+    </div>
+
+    <div id="answer-panel" class="sql-table-panel" hidden>
+        <h2>模範解答</h2>
+        <pre id="model-answer"></pre>
+        <button class="btn-base start-btn" style="margin:0" onclick="nextProblem()">次の問題へ</button>
+    </div>
+
+    <div id="mark" class="judgment-mark">⭕️</div>
+
+    <a href="index.html" class="back-link">← Portalに戻る</a>
+
+    <script>
+        const sales = {
+            name: "sales",
+            columns: ["id", "product", "category", "price", "quantity", "customer"],
+            rows: [
+                [1, "Keyboard", "device", 8000, 2, "Alice"],
+                [2, "Mouse", "device", 3000, 5, "Bob"],
+                [3, "Desk", "furniture", 25000, 1, "Alice"],
+                [4, "Monitor", "device", 30000, 2, "Carol"],
+                [5, "Chair", "furniture", 12000, 4, "Bob"],
+                [6, "Mouse", "device", 3000, 3, "Alice"]
+            ]
+        };
+        const employees = {
+            name: "employees",
+            columns: ["id", "name", "department", "salary", "city"],
+            rows: [
+                [1, "Alice", "Sales", 320000, "Tokyo"],
+                [2, "Bob", "Sales", 280000, "Osaka"],
+                [3, "Carol", "Engineering", 450000, "Tokyo"],
+                [4, "Dave", "Engineering", 420000, "Nagoya"],
+                [5, "Eve", "HR", 300000, "Tokyo"],
+                [6, "Frank", "Sales", 350000, "Tokyo"]
+            ]
+        };
+        const books = {
+            name: "books",
+            columns: ["id", "title", "author", "genre", "price"],
+            rows: [
+                [1, "SQL入門", "Tanaka", "tech", 2800],
+                [2, "Java基礎", "Sato", "tech", 3200],
+                [3, "星の旅", "Suzuki", "novel", 1800],
+                [4, "SQL実践", "Tanaka", "tech", 3600],
+                [5, "海辺の町", "Yamada", "novel", 2200]
+            ]
+        };
+
+        const questions = [
+            { q: "salesの全レコード数を求めよ", ans: ["SELECT", "COUNT(*)", "FROM", "sales"], tables: [sales], result: { columns: ["COUNT(*)"], rows: [[6]] } },
+            { q: "salesのprice合計を求めよ", ans: ["SELECT", "SUM(price)", "FROM", "sales"], tables: [sales], result: { columns: ["SUM(price)"], rows: [[81000]] } },
+            { q: "salesのquantityの平均を求めよ", ans: ["SELECT", "AVG(quantity)", "FROM", "sales"], tables: [sales], result: { columns: ["AVG(quantity)"], rows: [[17 / 6]] } },
+            { q: "salesで最も高い商品のpriceを求めよ", ans: ["SELECT", "MAX(price)", "FROM", "sales"], tables: [sales], result: { columns: ["MAX(price)"], rows: [[30000]] } },
+            { q: "salesで最も安い商品のpriceを求めよ", ans: ["SELECT", "MIN(price)", "FROM", "sales"], tables: [sales], result: { columns: ["MIN(price)"], rows: [[3000]] } },
+            { q: "salesの商品名を重複なしで取得せよ", ans: ["SELECT", "DISTINCT", "product", "FROM", "sales"], tables: [sales], result: { columns: ["product"], rows: [["Keyboard"], ["Mouse"], ["Desk"], ["Monitor"], ["Chair"]] } },
+            { q: "salesのcategoryを重複なしで取得せよ", ans: ["SELECT", "DISTINCT", "category", "FROM", "sales"], tables: [sales], result: { columns: ["category"], rows: [["device"], ["furniture"]] } },
+            { q: "salesで商品名に 'Mo' を含む商品を取得せよ", ans: ["SELECT", "*", "FROM", "sales", "WHERE", "product", "LIKE", "'%Mo%'"], tables: [sales], result: { columns: sales.columns, rows: [sales.rows[1], sales.rows[5]] } },
+            { q: "booksでタイトルが 'SQL' で始まる本を取得せよ", ans: ["SELECT", "*", "FROM", "books", "WHERE", "title", "LIKE", "'SQL%'"], tables: [books], result: { columns: books.columns, rows: [books.rows[0], books.rows[3]] } },
+            { q: "employeesで名前が 'A' で始まる社員を取得せよ", ans: ["SELECT", "*", "FROM", "employees", "WHERE", "name", "LIKE", "'A%'"], tables: [employees], result: { columns: employees.columns, rows: [employees.rows[0]] } },
+            { q: "salesをcategoryごとに集計し、categoryと件数を取得せよ", ans: ["SELECT", "category", "COUNT(*)", "FROM", "sales", "GROUP", "BY", "category"], tables: [sales], result: { columns: ["category", "COUNT(*)"], rows: [["device", 4], ["furniture", 2]] } },
+            { q: "salesをcustomerごとに集計し、customerとquantity合計を取得せよ", ans: ["SELECT", "customer", "SUM(quantity)", "FROM", "sales", "GROUP", "BY", "customer"], tables: [sales], result: { columns: ["customer", "SUM(quantity)"], rows: [["Alice", 5], ["Bob", 9], ["Carol", 2]] } },
+            { q: "employeesをdepartmentごとに集計し、departmentと平均salaryを取得せよ", ans: ["SELECT", "department", "AVG(salary)", "FROM", "employees", "GROUP", "BY", "department"], tables: [employees], result: { columns: ["department", "AVG(salary)"], rows: [["Engineering", 435000], ["HR", 300000], ["Sales", 316666.6667]] } },
+            { q: "booksをgenreごとに集計し、genreと最高priceを取得せよ", ans: ["SELECT", "genre", "MAX(price)", "FROM", "books", "GROUP", "BY", "genre"], tables: [books], result: { columns: ["genre", "MAX(price)"], rows: [["novel", 2200], ["tech", 3600]] } },
+            { q: "salesをcategoryごとに集計し、quantity合計が5以上のcategoryだけ取得せよ", ans: ["SELECT", "category", "SUM(quantity)", "FROM", "sales", "GROUP", "BY", "category", "HAVING", "SUM(quantity)", ">=", "5"], tables: [sales], result: { columns: ["category", "SUM(quantity)"], rows: [["device", 12], ["furniture", 5]] } },
+            { q: "employeesをdepartmentごとに集計し、人数が2人以上のdepartmentだけ取得せよ", ans: ["SELECT", "department", "COUNT(*)", "FROM", "employees", "GROUP", "BY", "department", "HAVING", "COUNT(*)", ">=", "2"], tables: [employees], result: { columns: ["department", "COUNT(*)"], rows: [["Engineering", 2], ["Sales", 3]] } },
+            { q: "salesをcategoryごとに集計し、quantity合計の多い順に取得せよ", ans: ["SELECT", "category", "SUM(quantity)", "FROM", "sales", "GROUP", "BY", "category", "ORDER", "BY", "SUM(quantity)", "DESC"], tables: [sales], result: { columns: ["category", "SUM(quantity)"], rows: [["device", 12], ["furniture", 5]] } },
+            { q: "employeesからTokyo勤務の社員をdepartmentごとに数えよ", ans: ["SELECT", "department", "COUNT(*)", "FROM", "employees", "WHERE", "city", "=", "'Tokyo'", "GROUP", "BY", "department"], tables: [employees], result: { columns: ["department", "COUNT(*)"], rows: [["Engineering", 1], ["HR", 1], ["Sales", 2]] } },
+            { q: "salesでpriceが10000以上の商品をcategoryごとに数えよ", ans: ["SELECT", "category", "COUNT(*)", "FROM", "sales", "WHERE", "price", ">=", "10000", "GROUP", "BY", "category"], tables: [sales], result: { columns: ["category", "COUNT(*)"], rows: [["furniture", 2], ["device", 1]] } },
+            { q: "booksでauthorがTanakaの本をgenreごとに数えよ", ans: ["SELECT", "genre", "COUNT(*)", "FROM", "books", "WHERE", "author", "=", "'Tanaka'", "GROUP", "BY", "genre"], tables: [books], result: { columns: ["genre", "COUNT(*)"], rows: [["tech", 2]] } },
+            { q: "salesの商品名ごとの販売件数を求め、件数が1より多い商品だけ取得せよ", ans: ["SELECT", "product", "COUNT(*)", "FROM", "sales", "GROUP", "BY", "product", "HAVING", "COUNT(*)", ">", "1"], tables: [sales], result: { columns: ["product", "COUNT(*)"], rows: [["Mouse", 2]] } }
+        ];
+        let current = 0, userAns = [];
+
+        function tableMarkup(table) {
+            const title = table.name ? `<h2>${table.name}</h2>` : '';
+            return `${title}<table class="sql-table"><thead><tr>${table.columns.map(column => `<th>${column}</th>`).join('')}</tr></thead><tbody>${table.rows.map(row => `<tr>${row.map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderTables() {
+            const question = questions[current];
+            document.getElementById('sample-tables').innerHTML = question.tables.map(tableMarkup).join('');
+            document.getElementById('result-table').innerHTML = `<h2>実行結果</h2>${tableMarkup({ name: "", ...question.result })}`;
+        }
+
+        function toggleResult() {
+            const result = document.getElementById('result-table');
+            const toggle = document.getElementById('result-toggle');
+            result.hidden = !result.hidden;
+            toggle.innerText = `実行結果(ヒント): ${result.hidden ? 'OFF' : 'ON'}`;
+        }
+
+        function next() {
+            if (current >= questions.length) { alert("All Cleared!"); return location.reload(); }
+            userAns = [];
+            document.getElementById('mission').innerText = questions[current].q;
+            renderTables();
+            document.getElementById('result-table').hidden = true;
+            document.getElementById('result-toggle').innerText = '実行結果(ヒント): OFF';
+            document.getElementById('answer-panel').hidden = true;
+            const pool = document.getElementById('chip-pool');
+            pool.innerHTML = '';
+            const distractors = ["WHERE", "ORDER", "BY", "ASC", "LIMIT", "DISTINCT", "LIKE", "GROUP", "HAVING"];
+            const chips = [...questions[current].ans, ...distractors.slice(0, 3)].sort(() => Math.random() - 0.5);
+            chips.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'sql-chip';
+                div.innerText = text;
+                div.onclick = () => { userAns.push(text); updateUI(); };
+                pool.appendChild(div);
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            const zone = document.getElementById('drop-zone');
+            zone.innerHTML = '';
+            userAns.forEach(text => {
+                const div = document.createElement('div');
+                div.className = 'sql-chip';
+                div.innerText = text;
+                zone.appendChild(div);
+            });
+        }
+
+        function undo() { userAns.pop(); updateUI(); }
+
+        function showAnswer() {
+            document.getElementById('model-answer').textContent = questions[current].ans.join(' ');
+            document.getElementById('answer-panel').hidden = false;
+        }
+
+        function nextProblem() {
+            current++;
+            next();
+        }
+
+        function check() {
+            const win = userAns.join(' ') === questions[current].ans.join(' ');
+            const mark = document.getElementById('mark');
+            mark.innerText = win ? '⭕️' : '❌';
+            mark.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            if (win) {
+                current++;
+                setTimeout(() => { mark.className = 'judgment-mark'; next(); }, 1200);
+            } else {
+                setTimeout(() => mark.className = 'judgment-mark', 800);
+            }
+        }
+        window.onload = next;
+    </script>
+</body>
+</html>
