@@ -18,13 +18,12 @@
         input { box-sizing: border-box; width: 100%; padding: 9px; background: rgba(2, 11, 20, 0.8); color: #fff; border: 1px solid var(--accent-blue); border-radius: 4px; font: inherit; }
         input:focus { outline: 2px solid var(--accent-cyan); outline-offset: 1px; }
         .host-list { display: grid; gap: 8px; }
-        .host-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 34px 30px; gap: 5px; align-items: center; }
+        .host-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 34px 34px 30px; gap: 5px; align-items: center; }
         .host-row input { min-width: 0; padding: 7px; }
         .host-row input[type="number"] { font-size: 0.9rem; }
         .host-row button { width: 34px; height: 34px; padding: 0; background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); }
         .host-row button:hover { background: var(--accent-blue); color: #020b14; }
-        .host-row .move-host { position: relative; font-size: 1.1rem; }
-        .host-row .move-host::after { content: ''; position: absolute; left: 3px; right: 3px; top: 50%; border-top: 1px solid currentColor; pointer-events: none; }
+        .host-row .move-host { font-size: 1.1rem; }
         .host-row .remove-host { border-color: var(--accent-blue); color: var(--accent-blue); font-size: 1rem; }
         .actions { display: flex; gap: 8px; margin-top: 16px; }
         .actions button { flex: 1; padding: 10px; border: 0; border-radius: 6px; background: var(--accent-blue); color: #020b14; font-weight: bold; cursor: pointer; }
@@ -47,7 +46,7 @@
         .address-boundary.network { top: 4px; left: 5px; }
         .address-boundary.broadcast { right: 5px; bottom: 4px; }
         .empty-state { width: 100%; align-self: center; color: #78909c; text-align: center; font-size: 0.85rem; }
-        @media (max-width: 760px) { .vlsm-layout { grid-template-columns: 1fr; } .host-row { grid-template-columns: minmax(0, 1fr) 68px 30px 28px; gap: 4px; } .host-row button { width: 30px; height: 30px; } }
+        @media (max-width: 760px) { .vlsm-layout { grid-template-columns: 1fr; } .host-row { grid-template-columns: minmax(0, 1fr) 68px 30px 30px 28px; gap: 4px; } .host-row button { width: 30px; height: 30px; } }
     </style>
 </head>
 <body>
@@ -101,12 +100,14 @@
             row.className = 'host-row';
             row.innerHTML = `<input type="text" value="Seg${hostList.children.length + 1}" aria-label="セグメント名">
                 <input type="number" value="${value}" min="1" max="16777214" aria-label="必要ホスト数">
-                <button type="button" class="move-host" aria-label="セグメントを上下に移動" title="上半分で上へ、下半分で下へ">↕</button>
+                <button type="button" class="move-host move-up" aria-label="セグメントを上へ移動" title="セグメントを上へ移動">↑</button>
+                <button type="button" class="move-host move-down" aria-label="セグメントを下へ移動" title="セグメントを下へ移動">↓</button>
                 <button type="button" class="remove-host" aria-label="セグメントを削除" title="セグメントを削除">🗑</button>`;
-            row.querySelector('.move-host').addEventListener('click', event => {
-                const moveUp = event.offsetY < event.currentTarget.offsetHeight / 2;
-                if (moveUp && row.previousElementSibling) hostList.insertBefore(row, row.previousElementSibling);
-                if (!moveUp && row.nextElementSibling) hostList.insertBefore(row.nextElementSibling, row);
+            row.querySelector('.move-up').addEventListener('click', () => {
+                if (row.previousElementSibling) hostList.insertBefore(row, row.previousElementSibling);
+            });
+            row.querySelector('.move-down').addEventListener('click', () => {
+                if (row.nextElementSibling) hostList.insertBefore(row.nextElementSibling, row);
             });
             row.querySelector('.remove-host').addEventListener('click', () => {
                 if (hostList.children.length > 1) row.remove();
