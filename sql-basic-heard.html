@@ -80,7 +80,7 @@
             ]
         };
 
-        const questions = [
+        let questions = [
             { q: "salesの全レコード数を求めよ", ans: ["SELECT", "COUNT(*)", "FROM", "sales"], tables: [sales], result: { columns: ["COUNT(*)"], rows: [[6]] } },
             { q: "salesのprice合計を求めよ", ans: ["SELECT", "SUM(price)", "FROM", "sales"], tables: [sales], result: { columns: ["SUM(price)"], rows: [[81000]] } },
             { q: "salesのquantityの平均を求めよ", ans: ["SELECT", "AVG(quantity)", "FROM", "sales"], tables: [sales], result: { columns: ["AVG(quantity)"], rows: [[17 / 6]] } },
@@ -103,6 +103,11 @@
             { q: "booksでauthorがTanakaの本をgenreごとに数えよ", ans: ["SELECT", "genre", "COUNT(*)", "FROM", "books", "WHERE", "author", "=", "'Tanaka'", "GROUP", "BY", "genre"], tables: [books], result: { columns: ["genre", "COUNT(*)"], rows: [["tech", 2]] } },
             { q: "salesの商品名ごとの販売件数を求め、件数が1より多い商品だけ取得せよ", ans: ["SELECT", "product", "COUNT(*)", "FROM", "sales", "GROUP", "BY", "product", "HAVING", "COUNT(*)", ">", "1"], tables: [sales], result: { columns: ["product", "COUNT(*)"], rows: [["Mouse", 2]] } }
         ];
+        function shuffle(items) {
+            return [...items].sort(() => Math.random() - 0.5);
+        }
+
+        questions = shuffle(questions).slice(0, 5);
         let current = 0, userAns = [];
 
         function tableMarkup(table) {

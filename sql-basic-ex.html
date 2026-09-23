@@ -77,7 +77,7 @@
             rows: [[10, "Sales", 1000000], [20, "Engineering", 2000000], [30, "HR", 500000]]
         };
 
-        const questions = [
+        let questions = [
             { q: "usersからTokyo在住の人を取得せよ", ans: ["SELECT", "*", "FROM", "users", "WHERE", "city", "=", "'Tokyo'"], tables: [users], result: { columns: users.columns, rows: [users.rows[0], users.rows[2], users.rows[4]] } },
             { q: "ordersからamountが5000以上かつpaidの注文を取得せよ", ans: ["SELECT", "*", "FROM", "orders", "WHERE", "amount", ">=", "5000", "AND", "status", "=", "'paid'"], tables: [orders], result: { columns: orders.columns, rows: [orders.rows[0], orders.rows[1], orders.rows[3], orders.rows[5]] } },
             { q: "ordersから2024年2月から4月までの注文を取得せよ", ans: ["SELECT", "*", "FROM", "orders", "WHERE", "ordered_at", "BETWEEN", "'2024-02-01'", "AND", "'2024-04-30'"], tables: [orders], result: { columns: orders.columns, rows: [orders.rows[1], orders.rows[2], orders.rows[3], orders.rows[4]] } },
@@ -110,6 +110,18 @@
             { q: "paid注文のあるTokyoユーザーをEXISTSとBETWEENで取得せよ", ans: ["SELECT", "u.name", "AS", "customer_name", "FROM", "users", "AS", "u", "WHERE", "u.city", "=", "'Tokyo'", "AND", "EXISTS", "(SELECT", "1", "FROM", "orders", "AS", "o", "WHERE", "o.user_id", "=", "u.id", "AND", "o.status", "=", "'paid'", "AND", "o.amount", "BETWEEN", "10000", "AND", "25000)"], tables: [users, orders], result: { columns: ["customer_name"], rows: [["Alice"], ["Carol"], ["Eve"]] } },
             { q: "ユーザーが存在しない部署をNOT EXISTSで取得せよ", ans: ["SELECT", "d.name", "AS", "department_name", "FROM", "departments", "AS", "d", "WHERE", "NOT", "EXISTS", "(SELECT", "1", "FROM", "users", "AS", "u", "WHERE", "u.department", "=", "d.name)"], tables: [departments, users], result: { columns: ["department_name"], rows: [] } }
         ];
+
+        function shuffle(items) {
+            return [...items].sort(() => Math.random() - 0.5);
+        }
+
+        const whereJoinQuestions = questions.filter(question =>
+            question.tables.length === 2 &&
+            question.ans.includes('WHERE') &&
+            question.ans.some(token => token.endsWith(','))
+        );
+        const firstQuestion = whereJoinQuestions[Math.floor(Math.random() * whereJoinQuestions.length)];
+        questions = [firstQuestion, ...shuffle(questions.filter(question => question !== firstQuestion)).slice(0, 4)];
 
         let current = 0;
         let userAns = [];
