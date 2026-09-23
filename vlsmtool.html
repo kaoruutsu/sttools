@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLSM Addressing Simulator</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        header { margin-bottom: 15px; }
+        header p { color: #b2ebf2; font-size: 0.9rem; }
+        .vlsm-container { max-width: 1100px; margin: 0 auto; }
+        .vlsm-layout { display: grid; grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr); gap: 15px; align-items: start; }
+        .vlsm-card { background: var(--card-bg); border: 1px solid #005c99; border-left: 5px solid var(--accent-blue); border-radius: 12px; padding: 20px; text-align: left; }
+        .vlsm-card h2 { margin: 0 0 15px; color: var(--accent-cyan); font-size: 1.05rem; border-bottom: 1px solid #005c99; padding-bottom: 8px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; color: #b2ebf2; font-size: 0.85rem; }
+        input { box-sizing: border-box; width: 100%; padding: 9px; background: rgba(2, 11, 20, 0.8); color: #fff; border: 1px solid var(--accent-blue); border-radius: 4px; font: inherit; }
+        input:focus { outline: 2px solid var(--accent-cyan); outline-offset: 1px; }
+        .host-list { display: grid; gap: 8px; }
+        .host-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 34px 30px; gap: 5px; align-items: center; }
+        .host-row input { min-width: 0; padding: 7px; }
+        .host-row input[type="number"] { font-size: 0.9rem; }
+        .host-row button { width: 34px; height: 34px; padding: 0; background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); }
+        .host-row button:hover { background: var(--accent-blue); color: #020b14; }
+        .host-row .move-host { position: relative; font-size: 1.1rem; }
+        .host-row .move-host::after { content: ''; position: absolute; left: 3px; right: 3px; top: 50%; border-top: 1px solid currentColor; pointer-events: none; }
+        .host-row .remove-host { border-color: var(--accent-blue); color: var(--accent-blue); font-size: 1rem; }
+        .actions { display: flex; gap: 8px; margin-top: 16px; }
+        .actions button { flex: 1; padding: 10px; border: 0; border-radius: 6px; background: var(--accent-blue); color: #020b14; font-weight: bold; cursor: pointer; }
+        .actions button:hover { background: var(--accent-cyan); }
+        .actions .secondary { background: transparent; border: 1px solid var(--accent-blue); color: var(--accent-blue); }
+        .actions .secondary:hover { color: #020b14; }
+        .result-message { min-height: 1.2em; margin: 12px 0 0; color: var(--error-red); font-size: 0.85rem; }
+        .table-wrap { overflow-x: auto; }
+        .vlsm-table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.82rem; }
+        .vlsm-table th, .vlsm-table td { border: 1px solid #23627f; padding: 8px; text-align: left; white-space: nowrap; }
+        .vlsm-table th { color: var(--accent-cyan); background: rgba(0, 92, 153, 0.3); }
+        .address-map { position: relative; aspect-ratio: 1; max-width: 520px; margin: 15px auto 0; background: rgba(0, 0, 0, 0.3); border: 2px solid var(--accent-blue); border-radius: 8px; overflow: hidden; }
+        .address-grid { position: absolute; z-index: 3; inset: 0; }
+        .split-line { position: absolute; background: rgba(77, 208, 225, 0.75); pointer-events: none; }
+        .split-line.vertical { width: 2px; }
+        .split-line.horizontal { height: 2px; }
+        .address-block { position: absolute; z-index: 2; display: flex; justify-content: center; align-items: center; overflow: hidden; box-sizing: border-box; background: rgba(0, 92, 153, 0.42); border: 2px solid var(--accent-cyan); color: #fff; font-size: 0.7rem; text-align: center; pointer-events: none; }
+        .address-block strong { color: var(--accent-cyan); }
+        .address-boundary { position: absolute; z-index: 4; color: #b2ebf2; font: 0.62rem monospace; line-height: 1; }
+        .address-boundary.network { top: 4px; left: 5px; }
+        .address-boundary.broadcast { right: 5px; bottom: 4px; }
+        .empty-state { width: 100%; align-self: center; color: #78909c; text-align: center; font-size: 0.85rem; }
+        @media (max-width: 760px) { .vlsm-layout { grid-template-columns: 1fr; } .host-row { grid-template-columns: minmax(0, 1fr) 68px 30px 28px; gap: 4px; } .host-row button { width: 30px; height: 30px; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>VLSM Addressing Simulator</h1>
+        <p>必要ホスト数に合わせて、可変長サブネットマスクを設計しよう</p>
+    </header>
+
+    <main class="vlsm-container">
+        <div class="vlsm-layout">
+            <section class="vlsm-card">
+                <h2>NETWORK SETTINGS</h2>
+                <div class="form-group">
+                    <label for="network">ネットワークアドレス</label>
+                    <input id="network" value="192.168.1.0/24" spellcheck="false">
+                </div>
+                <div class="form-group">
+                    <label>必要ホスト数</label>
+                    <div id="host-list" class="host-list"></div>
+                </div>
+                <div class="actions">
+                    <button type="button" class="secondary" id="add-host">+ セグメント追加</button>
+                    <button type="button" id="calculate">CALCULATE</button>
+                </div>
+                <p id="message" class="result-message" role="status"></p>
+            </section>
+
+            <section class="vlsm-card">
+                <h2>SUBNET ALLOCATION</h2>
+                <div class="table-wrap">
+                    <table class="vlsm-table">
+                        <thead><tr><th>Segment</th><th>Network</th><th>Broadcast</th><th>Hosts</th></tr></thead>
+                        <tbody id="result-body"><tr><td colspan="4" class="empty-state">左側の条件を入力して CALCULATE を押してください</td></tr></tbody>
+                    </table>
+                </div>
+                <div id="address-map" class="address-map"><span class="empty-state">アドレス割り当てをここに表示します</span></div>
+            </section>
+        </div>
+    </main>
+
+    <a href="index.html" class="back-link">← Portalに戻る</a>
+
+    <script>
+        const hostList = document.getElementById('host-list');
+        const message = document.getElementById('message');
+        const resultBody = document.getElementById('result-body');
+        const addressMap = document.getElementById('address-map');
+
+        function addHost(value = 50) {
+            const row = document.createElement('div');
+            row.className = 'host-row';
+            row.innerHTML = `<input type="text" value="Seg${hostList.children.length + 1}" aria-label="セグメント名">
+                <input type="number" value="${value}" min="1" max="16777214" aria-label="必要ホスト数">
+                <button type="button" class="move-host" aria-label="セグメントを上下に移動" title="上半分で上へ、下半分で下へ">↕</button>
+                <button type="button" class="remove-host" aria-label="セグメントを削除" title="セグメントを削除">🗑</button>`;
+            row.querySelector('.move-host').addEventListener('click', event => {
+                const moveUp = event.offsetY < event.currentTarget.offsetHeight / 2;
+                if (moveUp && row.previousElementSibling) hostList.insertBefore(row, row.previousElementSibling);
+                if (!moveUp && row.nextElementSibling) hostList.insertBefore(row.nextElementSibling, row);
+            });
+            row.querySelector('.remove-host').addEventListener('click', () => {
+                if (hostList.children.length > 1) row.remove();
+                else message.textContent = 'セグメントは1つ以上必要です。';
+            });
+            hostList.appendChild(row);
+        }
+
+        function ipToNumber(ip) {
+            const octets = ip.split('.').map(Number);
+            if (octets.length !== 4 || octets.some(o => !Number.isInteger(o) || o < 0 || o > 255)) throw new Error('ネットワークアドレスが正しくありません。');
+            return (((octets[0] * 256 + octets[1]) * 256 + octets[2]) * 256 + octets[3]) >>> 0;
+        }
+
+        function numberToIp(number) {
+            return [number >>> 24, (number >>> 16) & 255, (number >>> 8) & 255, number & 255].join('.');
+        }
+
+        function calculate() {
+            message.textContent = '';
+            try {
+                const match = document.getElementById('network').value.trim().match(/^(.+)\/(\d{1,2})$/);
+                if (!match) throw new Error('ネットワークは 192.168.10.0/24 の形式で入力してください。');
+                const prefix = Number(match[2]);
+                if (prefix < 0 || prefix > 30) throw new Error('プレフィックスは /0 から /30 で指定してください。');
+                const base = ipToNumber(match[1]);
+                const networkSize = 2 ** (32 - prefix);
+                const network = Math.floor(base / networkSize) * networkSize;
+                const segments = [...hostList.children].map(row => ({
+                    name: row.children[0].value.trim() || 'Segment',
+                    hosts: Number(row.children[1].value)
+                }));
+                if (segments.some(segment => !Number.isInteger(segment.hosts) || segment.hosts < 1)) throw new Error('ホスト数は1以上の整数で入力してください。');
+
+                const allocations = [];
+                segments.forEach(segment => {
+                    const size = 2 ** Math.ceil(Math.log2(segment.hosts + 2));
+                    const subnetPrefix = 32 - Math.log2(size);
+                    let segmentNetwork = network;
+                    while (segmentNetwork + size <= network + networkSize && allocations.some(item => segmentNetwork < item.broadcast + 1 && segmentNetwork + size > item.network)) {
+                        segmentNetwork += size;
+                    }
+                    const end = segmentNetwork + size - 1;
+                    if (subnetPrefix < prefix || end >= network + networkSize) throw new Error('指定したネットワーク内にすべてのセグメントを収められません。');
+                    const allocation = { ...segment, prefix: subnetPrefix, network: segmentNetwork, first: segmentNetwork + 1, last: end - 1, broadcast: end, size };
+                    allocations.push(allocation);
+                });
+                render(allocations, network, networkSize);
+            } catch (error) {
+                resultBody.innerHTML = '<tr><td colspan="4" class="empty-state">入力を確認してください</td></tr>';
+                addressMap.innerHTML = '<span class="empty-state">アドレス割り当てをここに表示します</span>';
+                message.textContent = error.message;
+            }
+        }
+
+        function render(allocations, network, networkSize) {
+            resultBody.innerHTML = allocations.map(item => `<tr><td>${item.name}</td><td>${numberToIp(item.network)}/${item.prefix}</td><td>${numberToIp(item.broadcast)}</td><td>${item.hosts}</td></tr>`).join('');
+            addressMap.innerHTML = '<div class="address-grid"></div>';
+            const grid = addressMap.querySelector('.address-grid');
+            const drawnLines = new Set();
+            allocations.forEach(item => {
+                const depth = Math.log2(networkSize / item.size);
+                const relativeAddress = item.network - network;
+                let block = { left: 0, top: 0, width: 100, height: 100 };
+                for (let level = 0; level < depth; level++) {
+                    const direction = level % 2 === 0 ? 'vertical' : 'horizontal';
+                    const halfSize = networkSize / 2 ** (level + 1);
+                    const goesHigh = Math.floor(relativeAddress / halfSize) % 2 === 1;
+                    const lineKey = `${level}:${block.left}:${block.top}:${direction}`;
+                    if (!drawnLines.has(lineKey)) {
+                        drawnLines.add(lineKey);
+                        const line = document.createElement('span');
+                        line.className = `split-line ${direction}`;
+                        line.style.left = `${direction === 'vertical' ? block.left + block.width / 2 : block.left}%`;
+                        line.style.top = `${direction === 'horizontal' ? block.top + block.height / 2 : block.top}%`;
+                        if (direction === 'horizontal') line.style.width = `${block.width}%`;
+                        if (direction === 'vertical') line.style.height = `${block.height}%`;
+                        grid.appendChild(line);
+                    }
+                    if (direction === 'vertical') {
+                        block.width /= 2;
+                        if (goesHigh) block.left += block.width;
+                    } else {
+                        block.height /= 2;
+                        if (goesHigh) block.top += block.height;
+                    }
+                }
+                const visualBlock = document.createElement('div');
+                visualBlock.className = 'address-block';
+                visualBlock.style.left = `${block.left}%`;
+                visualBlock.style.top = `${block.top}%`;
+                visualBlock.style.width = `${block.width}%`;
+                visualBlock.style.height = `${block.height}%`;
+                const networkOctet = numberToIp(item.network).split('.').pop();
+                const broadcastOctet = numberToIp(item.broadcast).split('.').pop();
+                visualBlock.innerHTML = `<span class="address-boundary network">${networkOctet}</span><strong>${item.name}</strong><span>/${item.prefix}</span><span class="address-boundary broadcast">${broadcastOctet}</span>`;
+                addressMap.appendChild(visualBlock);
+            });
+        }
+
+        document.getElementById('add-host').addEventListener('click', () => addHost());
+        document.getElementById('calculate').addEventListener('click', calculate);
+        addHost(100);
+        addHost(50);
+        addHost(20);
+        calculate();
+    </script>
+</body>
+</html>
