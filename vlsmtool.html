@@ -35,6 +35,7 @@
         .vlsm-table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: 0.82rem; }
         .vlsm-table th, .vlsm-table td { border: 1px solid #23627f; padding: 8px; text-align: left; white-space: nowrap; }
         .vlsm-table th { color: var(--accent-cyan); background: rgba(0, 92, 153, 0.3); }
+        .vlsm-table .max-hosts-header { font-size: 0.72rem; }
         .address-map { position: relative; aspect-ratio: 1; max-width: 520px; margin: 15px auto 0; background: rgba(0, 0, 0, 0.3); border: 2px solid var(--accent-blue); border-radius: 8px; overflow: hidden; }
         .address-grid { position: absolute; z-index: 3; inset: 0; }
         .split-line { position: absolute; background: rgba(77, 208, 225, 0.75); pointer-events: none; }
@@ -78,7 +79,7 @@
                 <h2>SUBNET ALLOCATION</h2>
                 <div class="table-wrap">
                     <table class="vlsm-table">
-                        <thead><tr><th>Segment</th><th>Network</th><th>Broadcast</th><th>Hosts</th></tr></thead>
+                        <thead><tr><th>Segment</th><th>Network</th><th>Broadcast</th><th class="max-hosts-header">Max Hosts</th></tr></thead>
                         <tbody id="result-body"><tr><td colspan="4" class="empty-state">左側の条件を入力して CALCULATE を押してください</td></tr></tbody>
                     </table>
                 </div>
@@ -152,7 +153,7 @@
                     }
                     const end = segmentNetwork + size - 1;
                     if (subnetPrefix < prefix || end >= network + networkSize) throw new Error('指定したネットワーク内にすべてのセグメントを収められません。');
-                    const allocation = { ...segment, prefix: subnetPrefix, network: segmentNetwork, first: segmentNetwork + 1, last: end - 1, broadcast: end, size };
+                    const allocation = { ...segment, prefix: subnetPrefix, network: segmentNetwork, first: segmentNetwork + 1, last: end - 1, broadcast: end, maxHosts: size - 2, size };
                     allocations.push(allocation);
                 });
                 render(allocations, network, networkSize);
@@ -164,7 +165,7 @@
         }
 
         function render(allocations, network, networkSize) {
-            resultBody.innerHTML = allocations.map(item => `<tr><td>${item.name}</td><td>${numberToIp(item.network)}/${item.prefix}</td><td>${numberToIp(item.broadcast)}</td><td>${item.hosts}</td></tr>`).join('');
+            resultBody.innerHTML = allocations.map(item => `<tr><td>${item.name}</td><td>${numberToIp(item.network)}/${item.prefix}</td><td>${numberToIp(item.broadcast)}</td><td>${item.maxHosts}</td></tr>`).join('');
             addressMap.innerHTML = '<div class="address-grid"></div>';
             const grid = addressMap.querySelector('.address-grid');
             const drawnLines = new Set();
