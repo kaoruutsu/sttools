@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subnet Master - Extra 2</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .speed-select { margin-bottom: 20px; }
+        .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .speed-btn {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--accent-blue);
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+        }
+        .speed-btn.active { background: var(--accent-blue); color: #000; font-weight: bold; }
+        .choice-grid {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .prefix-option {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .answer-label {
+            display: block;
+            height: 24px;
+            line-height: 24px;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .prefix-btn {
+            width: 100%;
+            box-sizing: border-box;
+            min-width: 0;
+            padding: 15px 6px;
+            font-size: 1.1rem;
+        }
+        .nav-controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .nav-btn {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-size: 13px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 7px 18px;
+            border-radius: 20px;
+            background: transparent;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: rgba(0, 255, 204, 0.1); border-color: var(--accent-cyan); }
+        @media (max-width: 560px) {
+            .choice-grid { gap: 4px; }
+            .prefix-btn { padding: 13px 2px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Subnet Master <span style="font-size: 0.6em; color: var(--accent-blue);">(Extra 2)</span></h1>
+    <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
+
+    <div class="game-container">
+        <div id="start-screen" class="overlay">
+            <h2>Prefix Length Attack</h2>
+            <p>必要なホスト数を収容できる中で、最大ホスト数が最も小さくなるプレフィックス長を選択してください。</p>
+            <div class="speed-select">
+                <p>落下速度を選択</p>
+                <div class="speed-btns">
+                    <button class="speed-btn" onclick="setSpeed(0.8, this)">Slow</button>
+                    <button class="speed-btn active" onclick="setSpeed(1.5, this)">Normal</button>
+                    <button class="speed-btn" onclick="setSpeed(2.5, this)">Fast</button>
+                </div>
+            </div>
+            <button class="start-btn" onclick="start()">START</button>
+        </div>
+
+        <div id="result-screen" class="overlay" style="display:none;">
+            <h2>FINISH!</h2>
+            <div style="font-size: 24px; color: #fff;">正解数: <span id="final-score">0</span> / 5</div>
+            <div id="final-time" style="font-size: 48px; color: var(--accent-cyan);">0.00</div>
+            <button class="start-btn" onclick="resetGame()">RETRY</button>
+        </div>
+
+        <div id="target" class="target-val" style="position:absolute; width:100%; top:-50px; font-size:50px; font-weight:bold; color:var(--accent-yellow);">1</div>
+        <div id="mark" class="judgment-mark">⭕️</div>
+    </div>
+
+    <div class="choice-grid" id="choices">
+        <div class="prefix-option">
+            <span class="answer-label">Prefix Length</span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(24)">/24</button>
+        </div>
+        <div class="prefix-option">
+            <span class="answer-label"></span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(25)">/25</button>
+        </div>
+        <div class="prefix-option">
+            <span class="answer-label"></span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(26)">/26</button>
+        </div>
+        <div class="prefix-option">
+            <span class="answer-label"></span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(27)">/27</button>
+        </div>
+        <div class="prefix-option">
+            <span class="answer-label"></span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(28)">/28</button>
+        </div>
+        <div class="prefix-option">
+            <span class="answer-label"></span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(29)">/29</button>
+        </div>
+        <div class="prefix-option">
+            <span class="answer-label"></span>
+            <button class="btn-base choice-btn prefix-btn" onclick="answer(30)">/30</button>
+        </div>
+    </div>
+
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="resetGame()">↺ RESET</button>
+        <a href="index.html" class="nav-btn">← Portalに戻る</a>
+    </div>
+
+    <script>
+        const capacities = [
+            { prefix: 30, hosts: 2 },
+            { prefix: 29, hosts: 6 },
+            { prefix: 28, hosts: 14 },
+            { prefix: 27, hosts: 30 },
+            { prefix: 26, hosts: 62 },
+            { prefix: 25, hosts: 126 },
+            { prefix: 24, hosts: 254 }
+        ];
+        let correct, correctCount = 0, previousPrefix = null;
+        let qCount = 0, startTime, y = -50, anim, transitionTimer;
+        let isWait = false, dropSpeed = 1.5;
+
+        function setSpeed(speed, button) {
+            dropSpeed = speed;
+            document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        }
+
+        function start() {
+            document.getElementById('start-screen').style.display = 'none';
+            startTime = Date.now();
+            correctCount = 0;
+            previousPrefix = null;
+            next();
+        }
+
+        function next() {
+            if (qCount >= 5) {
+                endGame();
+                return;
+            }
+            qCount++;
+            document.getElementById('q-count').innerText = qCount;
+
+            let hosts, prefix;
+            do {
+                hosts = Math.floor(Math.random() * 254) + 1;
+                prefix = capacities.find(item => item.hosts >= hosts).prefix;
+            } while (prefix === previousPrefix);
+            previousPrefix = prefix;
+            correct = prefix;
+            document.getElementById('target').innerText = hosts;
+            y = -50;
+            isWait = false;
+            drop();
+        }
+
+        function drop() {
+            if (isWait) return;
+            y += dropSpeed;
+            document.getElementById('target').style.top = y + 'px';
+            if (y > 320) handle(false);
+            else anim = requestAnimationFrame(drop);
+        }
+
+        function answer(value) {
+            if (!isWait) handle(value === correct);
+        }
+
+        function handle(win) {
+            isWait = true;
+            cancelAnimationFrame(anim);
+            if (win) correctCount++;
+            const mark = document.getElementById('mark');
+            mark.innerText = win ? '⭕️' : '❌';
+            mark.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
+            transitionTimer = setTimeout(() => {
+                mark.className = 'judgment-mark';
+                next();
+            }, 800);
+        }
+
+        function resetGame() {
+            cancelAnimationFrame(anim);
+            clearTimeout(transitionTimer);
+            qCount = 0;
+            correctCount = 0;
+            previousPrefix = null;
+            isWait = true;
+            document.getElementById('q-count').innerText = '0';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'block';
+            document.getElementById('target').style.top = '-50px';
+            document.getElementById('mark').className = 'judgment-mark';
+        }
+
+        function endGame() {
+            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('final-score').innerText = correctCount;
+            document.getElementById('final-time').innerText = duration;
+            document.getElementById('result-screen').style.display = 'flex';
+            document.getElementById('target').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
