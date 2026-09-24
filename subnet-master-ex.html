@@ -89,6 +89,7 @@
 
         <div id="result-screen" class="overlay" style="display:none;">
             <h2>FINISH!</h2>
+            <div style="font-size: 24px; color: #fff;">正解数: <span id="final-score">0</span> / 5</div>
             <div id="final-time" style="font-size: 48px; color: var(--accent-cyan);">0.00</div>
             <button class="start-btn" onclick="resetGame()">RETRY</button>
         </div>
@@ -135,7 +136,8 @@
 
     <script>
         const hostCounts = { 24: 254, 25: 126, 26: 62, 27: 30, 28: 14, 29: 6, 30: 2 };
-        let correct, qCount = 0, startTime, y = -50, anim, transitionTimer, isWait = false, dropSpeed = 1.5;
+        let correct, correctCount = 0, previousPrefix = null;
+        let qCount = 0, startTime, y = -50, anim, transitionTimer, isWait = false, dropSpeed = 1.5;
 
         function setSpeed(speed, button) {
             dropSpeed = speed;
@@ -146,6 +148,8 @@
         function start() {
             document.getElementById('start-screen').style.display = 'none';
             startTime = Date.now();
+            correctCount = 0;
+            previousPrefix = null;
             next();
         }
 
@@ -156,7 +160,11 @@
             }
             qCount++;
             document.getElementById('q-count').innerText = qCount;
-            const prefix = Math.floor(Math.random() * 7) + 24;
+            let prefix;
+            do {
+                prefix = Math.floor(Math.random() * 7) + 24;
+            } while (prefix === previousPrefix);
+            previousPrefix = prefix;
             correct = hostCounts[prefix];
             document.getElementById('target').innerText = '/' + prefix;
             y = -50;
@@ -179,6 +187,7 @@
         function handle(win) {
             isWait = true;
             cancelAnimationFrame(anim);
+            if (win) correctCount++;
             const mark = document.getElementById('mark');
             mark.innerText = win ? '⭕️' : '❌';
             mark.className = `judgment-mark show-mark ${win ? 'mark-o' : 'mark-x'}`;
@@ -192,6 +201,8 @@
             cancelAnimationFrame(anim);
             clearTimeout(transitionTimer);
             qCount = 0;
+            correctCount = 0;
+            previousPrefix = null;
             isWait = true;
             document.getElementById('q-count').innerText = '0';
             document.getElementById('result-screen').style.display = 'none';
@@ -203,6 +214,7 @@
 
         function endGame() {
             const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+            document.getElementById('final-score').innerText = correctCount;
             document.getElementById('final-time').innerText = duration;
             document.getElementById('result-screen').style.display = 'flex';
             document.getElementById('target').style.display = 'none';
