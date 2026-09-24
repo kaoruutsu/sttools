@@ -59,57 +59,71 @@
                 <p>Network・SQLを使った実践的なトレーニング</p>
             </summary>
             <div class="training-menu">
-                <div class="section-label">Network Training</div>
-                <a href="packet-cs.html" class="card card-network">
-                    <h3>Network Switching</h3>
-                    <p>パケット交換方式と回線交換方式のシミュレーター</p>
-                </a>
-                <a href="ip-class.html" class="card card-network">
-                    <h3>IP Class Checker</h3>
-                    <p>第1オクテットからクラス(A/B/C)を判別</p>
-                </a>
-                <a href="subnet-master.html" class="card card-network">
-                    <h3>Subnet Master</h3>
-                    <p>サブネットマスクからプレフィックス長を答える</p>
-                </a>
-                <a href="subnet-master-ex.html" class="card card-network">
-                    <h3>Subnet Master (Extra)</h3>
-                    <p>プレフィックス長から最大ホスト数を答える</p>
-                </a>
-                <a href="subnet-master-ex2.html" class="card card-network">
-                    <h3>Subnet Master (Extra 2)</h3>
-                    <p>必要なホスト数からプレフィックス長を答える</p>
-                </a>
-                <a href="vlsmtool.html" class="card card-network">
-                    <h3>VLSM Addressing Simulator</h3>
-                    <p>必要ホスト数に合わせてサブネットを分割・設計する</p>
-                </a>
-                <a href="pingtool.html" class="card card-network">
-                    <h3>Network Connection Simulator</h3>
-                    <p>ネットワーク構成を設定してPing通信をシミュレーション</p>
-                </a>
+                <details class="training-subgroup">
+                    <summary class="card training-subcard training-network">
+                        <h3>ネットワーク</h3>
+                        <p>Networkに関するトレーニング</p>
+                    </summary>
+                    <div class="training-submenu">
+                        <a href="packet-cs.html" class="card card-network">
+                            <h3>Network Switching</h3>
+                            <p>パケット交換方式と回線交換方式のシミュレーター</p>
+                        </a>
+                        <a href="ip-class.html" class="card card-network">
+                            <h3>IP Class Checker</h3>
+                            <p>第1オクテットからクラス(A/B/C)を判別</p>
+                        </a>
+                        <a href="subnet-master.html" class="card card-network">
+                            <h3>Subnet Master</h3>
+                            <p>サブネットマスクからプレフィックス長を答える</p>
+                        </a>
+                        <a href="subnet-master-ex.html" class="card card-network">
+                            <h3>Subnet Master (Extra)</h3>
+                            <p>プレフィックス長から最大ホスト数を答える</p>
+                        </a>
+                        <a href="subnet-master-ex2.html" class="card card-network">
+                            <h3>Subnet Master (Extra 2)</h3>
+                            <p>必要なホスト数からプレフィックス長を答える</p>
+                        </a>
+                        <a href="vlsmtool.html" class="card card-network">
+                            <h3>VLSM Addressing Simulator</h3>
+                            <p>必要ホスト数に合わせてサブネットを分割・設計する</p>
+                        </a>
+                        <a href="pingtool.html" class="card card-network">
+                            <h3>Network Connection Simulator</h3>
+                            <p>ネットワーク構成を設定してPing通信をシミュレーション</p>
+                        </a>
+                    </div>
+                </details>
 
-                <div class="section-label">SQL Training</div>
-                <a href="sql-basic-easy.html" class="card card-sql">
-                    <h3>SQL Basic (Easy)</h3>
-                    <p>基礎的なSELECT文の構築パズル</p>
-                </a>
-                <a href="sql-basic-normal.html" class="card card-sql">
-                    <h3>SQL Basic (Normal)</h3>
-                    <p>WHERE句やORDER BYを含むクエリ作成</p>
-                </a>
-                <a href="sql-basic-heard.html" class="card card-sql">
-                    <h3>SQL Basic (Hard)</h3>
-                    <p>集計関数、GROUP BY、DISTINCT、LIKEを含むクエリ作成</p>
-                </a>
-                <a href="sql-basic-ex.html" class="card card-sql">
-                    <h3>SQL Basic (Extra)</h3>
-                    <p>WHERE結合、サブクエリ、IN、EXISTS、AS、BETWEENを含む総合問題</p>
-                </a>
-                <a href="sql-simulator.html" class="card card-sql">
-                    <h3>SQL Command Simulator</h3>
-                    <p>school_dbにアクセスするSQLコマンドシミュレータ</p>
-                </a>
+                <details class="training-subgroup">
+                    <summary class="card training-subcard training-database">
+                        <h3>データベース</h3>
+                        <p>SQL・データベースに関するトレーニング</p>
+                    </summary>
+                    <div class="training-submenu">
+                        <a href="sql-basic-easy.html" class="card card-sql">
+                            <h3>SQL Basic (Easy)</h3>
+                            <p>基礎的なSELECT文の構築パズル</p>
+                        </a>
+                        <a href="sql-basic-normal.html" class="card card-sql">
+                            <h3>SQL Basic (Normal)</h3>
+                            <p>WHERE句やORDER BYを含むクエリ作成</p>
+                        </a>
+                        <a href="sql-basic-heard.html" class="card card-sql">
+                            <h3>SQL Basic (Hard)</h3>
+                            <p>集計関数、GROUP BY、DISTINCT、LIKEを含むクエリ作成</p>
+                        </a>
+                        <a href="sql-basic-ex.html" class="card card-sql">
+                            <h3>SQL Basic (Extra)</h3>
+                            <p>WHERE結合、サブクエリ、IN、EXISTS、AS、BETWEENを含む総合問題</p>
+                        </a>
+                        <a href="sql-simulator.html" class="card card-sql">
+                            <h3>SQL Command Simulator</h3>
+                            <p>school_dbにアクセスするSQLコマンドシミュレータ</p>
+                        </a>
+                    </div>
+                </details>
             </div>
         </details>
     </div>

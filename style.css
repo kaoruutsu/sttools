@@ -66,6 +66,19 @@ h1 span { font-size: 0.6em; margin-left: 10px; }
 .training-group:first-child .training-menu .section-label { color: var(--success-green); border-color: rgba(0, 255, 0, 0.45); }
 .training-group:last-child .training-menu .section-label { color: var(--error-red); border-color: rgba(255, 51, 51, 0.45); }
 
+.training-subgroup { display: flex; flex-direction: column; gap: 15px; }
+.training-subcard { cursor: pointer; list-style: none; position: relative; padding: 15px 20px; }
+.training-subcard::-webkit-details-marker { display: none; }
+.training-subcard::after { content: '+'; position: absolute; top: 50%; right: 22px; transform: translateY(-50%); font-size: 1.8rem; }
+.training-subgroup[open] .training-subcard::after { content: '−'; }
+.training-network { border-left: 5px solid var(--accent-blue); background: rgba(77, 208, 225, 0.1); }
+.training-network h3,
+.training-network::after { color: var(--accent-blue); }
+.training-database { border-left: 5px solid var(--accent-yellow); background: rgba(255, 235, 59, 0.1); }
+.training-database h3,
+.training-database::after { color: var(--accent-yellow); }
+.training-submenu { display: flex; flex-direction: column; gap: 15px; padding-left: 15px; border-left: 1px solid rgba(255, 255, 255, 0.35); }
+
 /* カードアクセント */
 .card-binary { border-left: 5px solid var(--accent-cyan); }
 .card-hex { border-left: 5px solid var(--accent-yellow); }
