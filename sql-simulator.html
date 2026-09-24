@@ -48,7 +48,7 @@
 </head>
 <body class="sql-training">
   <h1>SQL Command Simulator</h1>
-  <p class="simulator-intro">SQLへログインして school_db を選択してから、SELECT文を実行しましょう。<br>ログインID: <strong>student</strong>　パスワード: <strong>student</strong><br><code>mysql -u student -p student;</code> → <code>USE school_db;</code> の順に入力してください。</p>
+  <p class="simulator-intro">SQLへログインして school_db を選択してから、SELECT文を実行しましょう。<br>ログインID: <strong>student</strong>　パスワード: <strong>student</strong><br><code>mysql -u student -p student;</code> → <code>use school_db;</code> の順に入力してください。</p>
 
   <main class="simulator-layout">
     <aside class="schema-panel">
@@ -78,7 +78,7 @@
       </div>
       <form id="queryForm" class="console-input">
         <label for="sqlInput" id="sqlPrompt">cmd &gt;</label>
-        <input id="sqlInput" type="text" placeholder="mysql -u student -p student;" autocomplete="off" spellcheck="false">
+        <input id="sqlInput" type="text" placeholder="Type your SQL command here..." autocomplete="off" spellcheck="false">
         <button type="submit">実行</button>
       </form>
     </section>
@@ -90,6 +90,7 @@
     let commandHistory = [];
     let historyIndex = 0;
     let pendingSql = [];
+    let pendingEntry = null;
     let isLoggedIn = false;
     let isDatabaseSelected = false;
     let useGuiTableFormat = false;
@@ -155,7 +156,8 @@
 
     function clearTerminal() {
       pendingSql = [];
-      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'cmd >';
+      pendingEntry = null;
+      $('sqlPrompt').textContent = isLoggedIn ? 'sql >' : 'cmd >';
       $('terminalBody').innerHTML = '<div class="welcome-msg">Terminal cleared.</div>';
     }
 
@@ -169,23 +171,25 @@
       return `ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your SQL server version for the right syntax to use near '${near}' at line 1`;
     }
 
-    function executeQuery(sqlText) {
-      const entry = document.createElement('div');
-      entry.className = 'terminal-entry';
-      const queryLines = sqlText.split('\n');
-      entry.innerHTML = queryLines.map((line, index) => (
-        `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql&gt;' : 'cmd &gt;') : '-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
-      )).join('');
+    function executeQuery(sqlText, entry = null) {
+      if (!entry) {
+        entry = document.createElement('div');
+        entry.className = 'terminal-entry';
+        const queryLines = sqlText.split('\n');
+        entry.innerHTML = queryLines.map((line, index) => (
+          `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql &gt;' : 'cmd &gt;') : '-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
+        )).join('');
+      }
       const upperSql = sqlText.toUpperCase().trim();
       const firstWord = upperSql.split(/\s+/)[0];
       const forbidden = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'CREATE', 'ALTER', 'TRUNCATE', 'GRANT', 'FLUSH', 'RENAME'];
       const loginCommand = /^mysql\s+-u\s+student\s+-p\s+student\s*;?$/i.test(sqlText.trim());
-      const useCommand = /^use\s+school_db\s*;?$/i.test(sqlText.trim());
+      const useCommand = /^USE\s+SCHOOL_DB\s*;?$/i.test(sqlText.trim().toUpperCase());
       if (!isLoggedIn) {
         if (loginCommand) {
           isLoggedIn = true;
           entry.insertAdjacentHTML('beforeend', '<div class="output-info">Welcome to the SQL monitor. Commands end with ; or \\g.<br>Your SQL connection id is 42<br>Server version: 8.0.32-educational</div>');
-          $('sqlPrompt').textContent = 'sql>';
+          $('sqlPrompt').textContent = 'sql >';
         } else {
           entry.insertAdjacentHTML('beforeend', '<div class="output-error">ERROR 1045 (28000): Access denied for user \'student\'@\'localhost\' (using password: YES)</div>');
         }
@@ -237,14 +241,28 @@
       pendingSql.push(line);
       input.value = '';
       if (!line.includes(';')) {
+        if (!pendingEntry) {
+          pendingEntry = document.createElement('div');
+          pendingEntry.className = 'terminal-entry';
+          $('terminalBody').appendChild(pendingEntry);
+        }
+        const prompt = pendingEntry.childElementCount === 0
+          ? (isLoggedIn ? 'sql &gt;' : 'cmd &gt;')
+          : '-&gt;';
+        pendingEntry.insertAdjacentHTML('beforeend', `<div class="prompt-line">${prompt} <span class="prompt-query">${escapeHtml(line)}</span></div>`);
+        $('terminalBody').scrollTop = $('terminalBody').scrollHeight;
         $('sqlPrompt').textContent = '->';
         return;
       }
       const sqlText = pendingSql.join('\n');
       pendingSql = [];
-      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'cmd >';
+      $('sqlPrompt').textContent = isLoggedIn ? 'sql >' : 'cmd >';
       commandHistory.push(sqlText); historyIndex = commandHistory.length;
-      executeQuery(sqlText);
+      if (pendingEntry) {
+        pendingEntry.insertAdjacentHTML('beforeend', `<div class="prompt-line">-&gt; <span class="prompt-query">${escapeHtml(line)}</span></div>`);
+      }
+      executeQuery(sqlText, pendingEntry);
+      pendingEntry = null;
     });
     $('sqlInput').addEventListener('keydown', (event) => {
       if (event.key === 'ArrowUp') { historyIndex = Math.max(0, historyIndex - 1); event.target.value = commandHistory[historyIndex] || ''; }
