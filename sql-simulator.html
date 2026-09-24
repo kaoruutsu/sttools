@@ -77,7 +77,7 @@
         <div class="welcome-msg">SQL Command Simulator</div>
       </div>
       <form id="queryForm" class="console-input">
-        <label for="sqlInput" id="sqlPrompt">comm&gt;</label>
+        <label for="sqlInput" id="sqlPrompt">cmd &gt;</label>
         <input id="sqlInput" type="text" placeholder="mysql -u student -p student;" autocomplete="off" spellcheck="false">
         <button type="submit">実行</button>
       </form>
@@ -155,7 +155,7 @@
 
     function clearTerminal() {
       pendingSql = [];
-      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'comm>';
+      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'cmd >';
       $('terminalBody').innerHTML = '<div class="welcome-msg">Terminal cleared.</div>';
     }
 
@@ -174,7 +174,7 @@
       entry.className = 'terminal-entry';
       const queryLines = sqlText.split('\n');
       entry.innerHTML = queryLines.map((line, index) => (
-        `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql&gt;' : 'comm&gt;') : '-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
+        `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql&gt;' : 'cmd &gt;') : '-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
       )).join('');
       const upperSql = sqlText.toUpperCase().trim();
       const firstWord = upperSql.split(/\s+/)[0];
@@ -242,7 +242,7 @@
       }
       const sqlText = pendingSql.join('\n');
       pendingSql = [];
-      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'comm>';
+      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'cmd >';
       commandHistory.push(sqlText); historyIndex = commandHistory.length;
       executeQuery(sqlText);
     });
