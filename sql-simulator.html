@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Command Simulator</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/alasql@4"></script>
+  <style>
+    .sql-simulator { max-width: 1180px; margin: 0 auto; }
+    .simulator-intro { color: #b2ebf2; margin: 0 auto 18px; max-width: 900px; }
+    .simulator-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; max-width: 1180px; margin: 0 auto; text-align: left; }
+    .schema-panel, .console-panel { background: rgba(0, 0, 0, .4); border: 1px solid #005c99; border-radius: 10px; }
+    .schema-panel { padding: 14px; }
+    .schema-panel h2, .console-panel h2 { color: var(--accent-blue); font-size: 1rem; margin: 0 0 12px; }
+    .schema-status { color: var(--accent-cyan); font-size: .8rem; margin-bottom: 12px; }
+    .schema-table { border: 1px solid #23627f; border-radius: 6px; padding: 9px; margin-bottom: 8px; background: rgba(0, 34, 68, .35); }
+    .schema-table summary { color: var(--accent-cyan); cursor: pointer; font-family: monospace; font-weight: bold; }
+    .schema-columns { color: #b2ebf2; font-family: monospace; font-size: .8rem; line-height: 1.7; margin: 8px 0 0 18px; }
+    .preset-list { border-top: 1px solid #005c99; margin-top: 14px; padding-top: 12px; }
+    .preset-list button { display: block; width: 100%; margin: 6px 0; padding: 8px; text-align: left; color: #e0f7fa; background: rgba(0, 92, 153, .2); border: 1px solid #23627f; border-radius: 5px; cursor: pointer; font-family: monospace; }
+    .preset-list button:hover { border-color: var(--accent-cyan); background: rgba(0, 92, 153, .4); }
+    .console-panel { min-width: 0; overflow: hidden; }
+    .console-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #005c99; }
+    .console-header h2 { margin: 0; }
+    .console-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .console-actions button { padding: 5px 9px; color: var(--accent-blue); background: transparent; border: 1px solid #23627f; border-radius: 4px; cursor: pointer; }
+    .console-output { min-height: 430px; max-height: 62vh; overflow: auto; padding: 14px; color: #e0f7fa; font: .84rem/1.5 Consolas, Monaco, monospace; }
+    .welcome-msg { color: #8ac6d1; white-space: pre-wrap; }
+    .terminal-entry { margin-top: 15px; }
+    .prompt-line { color: var(--accent-cyan); word-break: break-word; }
+    .prompt-query { color: #fff; }
+    .output-result { overflow-x: auto; margin-top: 6px; color: #e0f7fa; white-space: pre; }
+    .output-info { margin-top: 6px; color: var(--accent-blue); white-space: pre-wrap; }
+    .output-error { margin-top: 6px; color: var(--error-red); white-space: pre-wrap; }
+    .gui-table { width: 100%; border-collapse: collapse; white-space: normal; font-size: .8rem; }
+    .gui-table th, .gui-table td { border: 1px solid #23627f; padding: 6px 8px; text-align: left; }
+    .gui-table th { color: var(--accent-cyan); background: rgba(0, 92, 153, .35); }
+    .gui-table tr:nth-child(even) { background: rgba(0, 92, 153, .12); }
+    .console-input { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid #005c99; }
+    .console-input label { color: var(--accent-cyan); font: bold .95rem monospace; padding-top: 9px; }
+    #sqlInput { flex: 1; min-width: 0; padding: 8px 10px; color: #fff; background: #020b14; border: 1px solid #23627f; border-radius: 5px; font: .9rem monospace; }
+    #sqlInput:focus { outline: 1px solid var(--accent-cyan); }
+    .console-input button { padding: 8px 16px; color: #020b14; background: var(--accent-blue); border: 0; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    @media (max-width: 760px) { .simulator-layout { grid-template-columns: 1fr; } .schema-panel { order: 2; } .console-output { min-height: 300px; } }
+  </style>
+</head>
+<body class="sql-training">
+  <h1>SQL Command Simulator</h1>
+  <p class="simulator-intro">SQLへログインして school_db を選択してから、SELECT文を実行しましょう。<br>ログインID: <strong>student</strong>　パスワード: <strong>student</strong><br><code>mysql -u student -p student;</code> → <code>USE school_db;</code> の順に入力してください。</p>
+
+  <main class="simulator-layout">
+    <aside class="schema-panel">
+      <h2>データベース構造</h2>
+      <div id="schema-status" class="schema-status">読み込み中...</div>
+      <div id="schema-list"></div>
+      <div class="preset-list">
+        <h2>クエリ例</h2>
+        <button type="button" data-query="SHOW TABLES;">SHOW TABLES;</button>
+        <button type="button" data-query="SELECT * FROM student LIMIT 10;">SELECT * FROM student LIMIT 10;</button>
+        <button type="button" data-query="SELECT de_code, COUNT(*) AS students FROM student GROUP BY de_code;">集計・GROUP BY</button>
+        <button type="button" data-query="DESCRIBE enrollments;">DESCRIBE enrollments;</button>
+      </div>
+    </aside>
+
+    <section class="console-panel">
+      <div class="console-header">
+        <h2>mysql -u student -p student</h2>
+        <div class="console-actions">
+          <button type="button" id="formatToggleBtn">表示: ASCII</button>
+          <button type="button" id="clearBtn">クリア</button>
+        </div>
+      </div>
+      <div id="terminalBody" class="console-output">
+        <div class="welcome-msg">SQL Command Simulator
+ログイン前です。コマンドの最後に ; を入力してください。
+ログインID: student
+パスワード: student
+
+mysql -u student -p student;
+USE school_db;</div>
+      </div>
+      <form id="queryForm" class="console-input">
+        <label for="sqlInput" id="sqlPrompt">comm&gt;</label>
+        <input id="sqlInput" type="text" placeholder="mysql -u student -p student;" autocomplete="off" spellcheck="false">
+        <button type="submit">実行</button>
+      </form>
+    </section>
+  </main>
+  <a href="index.html" class="back-link">← Portalに戻る</a>
+
+  <script>
+    let dbData = null;
+    let commandHistory = [];
+    let historyIndex = 0;
+    let pendingSql = [];
+    let isLoggedIn = false;
+    let isDatabaseSelected = false;
+    let useGuiTableFormat = false;
+
+    const $ = (id) => document.getElementById(id);
+    const escapeHtml = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    async function initDatabase() {
+      try {
+        const response = await fetch('db_data.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        dbData = await response.json();
+        if (!dbData.database || !dbData.tables) throw new Error('データベース形式が不正です');
+        alasql(`CREATE DATABASE IF NOT EXISTS ${dbData.database}`);
+        alasql(`USE ${dbData.database}`);
+        Object.entries(dbData.tables).forEach(([tableName, rows]) => {
+          alasql(`DROP TABLE IF EXISTS ${tableName}`);
+          alasql(`CREATE TABLE ${tableName}`);
+          alasql(`SELECT * INTO ${tableName} FROM ?`, [rows]);
+        });
+        renderSchema();
+        $('schema-status').textContent = `${dbData.database} / ${Object.keys(dbData.tables).length} tables`;
+      } catch (error) {
+        $('schema-status').textContent = '読み込みに失敗しました';
+        appendMessage('error', `データベースを読み込めませんでした: ${error.message}`);
+      }
+    }
+
+    function renderSchema() {
+      $('schema-list').innerHTML = Object.entries(dbData.tables).map(([name, rows]) => {
+        const columns = rows.length ? Object.keys(rows[0]) : [];
+        return `<details class="schema-table"><summary>${escapeHtml(name)} (${rows.length} rows)</summary><div class="schema-columns">${columns.map(escapeHtml).join('<br>')}</div></details>`;
+      }).join('');
+    }
+
+    function appendMessage(type, message) {
+      const entry = document.createElement('div');
+      entry.className = type === 'error' ? 'output-error' : 'output-info';
+      entry.textContent = message;
+      $('terminalBody').appendChild(entry);
+      $('terminalBody').scrollTop = $('terminalBody').scrollHeight;
+    }
+
+    function displayWidth(value) {
+      return [...String(value)].reduce((width, char) => /[\u3000-\u9fff\uff00-\uffef]/.test(char) ? width + 2 : width + 1, 0);
+    }
+
+    function renderAsciiTable(rows) {
+      if (!rows.length) return 'Empty set';
+      const headers = Object.keys(rows[0]);
+      const widths = Object.fromEntries(headers.map((header) => [header, displayWidth(header)]));
+      rows.forEach((row) => headers.forEach((header) => { widths[header] = Math.max(widths[header], displayWidth(row[header] ?? 'NULL')); }));
+      const border = `+${headers.map((header) => '-'.repeat(widths[header] + 2)).join('+')}+`;
+      const line = (row) => `|${headers.map((header) => { const value = String(row[header] ?? 'NULL'); return ` ${value}${' '.repeat(widths[header] - displayWidth(value))} `; }).join('|')}|`;
+      return [border, line(Object.fromEntries(headers.map((header) => [header, header]))), border, ...rows.map(line), border].join('\n');
+    }
+
+    function renderGuiTable(rows) {
+      if (!rows.length) return '<span class="output-info">Empty set</span>';
+      const headers = Object.keys(rows[0]);
+      return `<table class="gui-table"><thead><tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${headers.map((h) => `<td>${escapeHtml(row[h] ?? 'NULL')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    }
+
+    function clearTerminal() {
+      pendingSql = [];
+      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'comm>';
+      $('terminalBody').innerHTML = '<div class="welcome-msg">Terminal cleared.</div>';
+    }
+
+    function formatSqlError(error, sqlText) {
+      const message = String(error.message || error);
+      const tableMatch = message.match(/Table ['"`]?([^'"`.]+)['"`]? doesn't exist/i);
+      if (tableMatch) {
+        return `ERROR 1146 (42S02): Table 'school_db.${tableMatch[1]}' doesn't exist`;
+      }
+      const near = sqlText.replace(/\s+/g, ' ').trim().slice(0, 40);
+      return `ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your SQL server version for the right syntax to use near '${near}' at line 1`;
+    }
+
+    function executeQuery(sqlText) {
+      const entry = document.createElement('div');
+      entry.className = 'terminal-entry';
+      const queryLines = sqlText.split('\n');
+      entry.innerHTML = queryLines.map((line, index) => (
+        `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql&gt;' : 'comm&gt;') : '-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
+      )).join('');
+      const upperSql = sqlText.toUpperCase().trim();
+      const firstWord = upperSql.split(/\s+/)[0];
+      const forbidden = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'CREATE', 'ALTER', 'TRUNCATE', 'GRANT', 'FLUSH', 'RENAME'];
+      const loginCommand = /^mysql\s+-u\s+student\s+-p\s+student\s*;?$/i.test(sqlText.trim());
+      const useCommand = /^use\s+school_db\s*;?$/i.test(sqlText.trim());
+      if (!isLoggedIn) {
+        if (loginCommand) {
+          isLoggedIn = true;
+          entry.insertAdjacentHTML('beforeend', '<div class="output-info">Welcome to the SQL monitor. Commands end with ; or \\g.<br>Your SQL connection id is 42<br>Server version: 8.0.32-educational</div>');
+          $('sqlPrompt').textContent = 'sql>';
+        } else {
+          entry.insertAdjacentHTML('beforeend', '<div class="output-error">ERROR 1045 (28000): Access denied for user \'student\'@\'localhost\' (using password: YES)</div>');
+        }
+      } else if (useCommand) {
+        isDatabaseSelected = true;
+        alasql(`USE ${dbData.database}`);
+        entry.insertAdjacentHTML('beforeend', '<div class="output-info">Database changed</div>');
+      } else if (!isDatabaseSelected) {
+        entry.insertAdjacentHTML('beforeend', '<div class="output-error">ERROR 1046 (3D000): No database selected</div>');
+      } else if (forbidden.includes(firstWord)) {
+        entry.insertAdjacentHTML('beforeend', `<div class="output-error">ERROR 1142 (42000): ${firstWord} command denied to user 'student'@'localhost' for table (Only SELECT queries are supported in this simulator).</div>`);
+      } else {
+        try {
+          let results;
+          if (/^(CLEAR|CLS);?$/.test(upperSql)) { clearTerminal(); return; }
+          if (/^(HELP|\\H);?$/.test(upperSql)) {
+            entry.insertAdjacentHTML('beforeend', '<div class="output-info">SHOW TABLES; / DESCRIBE table; / SELECT ... FROM ...;<br>CLEAR; で表示を消去できます。</div>');
+          } else if (upperSql.startsWith('SHOW TABLES')) {
+            results = Object.keys(dbData.tables).map((table) => ({ [`Tables_in_${dbData.database}`]: table }));
+          } else if (/^(DESCRIBE|DESC) /.test(upperSql)) {
+            const tableName = sqlText.replace(/;$/, '').trim().split(/\s+/)[1].toLowerCase();
+            if (!dbData.tables[tableName]) throw new Error(`Table '${tableName}' doesn't exist`);
+            const sample = dbData.tables[tableName][0] || {};
+            results = Object.keys(sample).map((field) => ({ Field: field, Type: typeof sample[field] === 'number' ? 'int' : 'varchar(50)', Null: 'YES', Key: field.endsWith('_code') ? 'PRI' : '', Default: 'NULL' }));
+          } else {
+            results = alasql(sqlText);
+          }
+          if (Array.isArray(results)) {
+            const rendered = useGuiTableFormat ? renderGuiTable(results) : `<div class="output-result">${escapeHtml(renderAsciiTable(results))}</div>`;
+            entry.insertAdjacentHTML('beforeend', rendered);
+            entry.insertAdjacentHTML('beforeend', `<div class="output-info">${results.length} row${results.length === 1 ? '' : 's'} in set</div>`);
+          }
+        } catch (error) {
+          entry.insertAdjacentHTML('beforeend', `<div class="output-error">${escapeHtml(formatSqlError(error, sqlText))}</div>`);
+        }
+      }
+      $('terminalBody').appendChild(entry);
+      $('terminalBody').scrollTop = $('terminalBody').scrollHeight;
+    }
+
+    $('queryForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = $('sqlInput');
+      const line = input.value.trim();
+      if (!line || !dbData) return;
+      pendingSql.push(line);
+      input.value = '';
+      if (!line.includes(';')) {
+        $('sqlPrompt').textContent = '->';
+        return;
+      }
+      const sqlText = pendingSql.join('\n');
+      pendingSql = [];
+      $('sqlPrompt').textContent = isLoggedIn ? 'sql>' : 'comm>';
+      commandHistory.push(sqlText); historyIndex = commandHistory.length;
+      executeQuery(sqlText);
+    });
+    $('sqlInput').addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp') { historyIndex = Math.max(0, historyIndex - 1); event.target.value = commandHistory[historyIndex] || ''; }
+      if (event.key === 'ArrowDown') { historyIndex = Math.min(commandHistory.length, historyIndex + 1); event.target.value = commandHistory[historyIndex] || ''; }
+    });
+    $('clearBtn').addEventListener('click', clearTerminal);
+    $('formatToggleBtn').addEventListener('click', () => { useGuiTableFormat = !useGuiTableFormat; $('formatToggleBtn').textContent = `表示: ${useGuiTableFormat ? 'GUI' : 'ASCII'}`; });
+    document.querySelectorAll('[data-query]').forEach((button) => button.addEventListener('click', () => { $('sqlInput').value = button.dataset.query; $('sqlInput').focus(); }));
+    initDatabase();
+  </script>
+</body>
+</html>

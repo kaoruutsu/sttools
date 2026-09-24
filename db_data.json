@@ -1,0 +1,4061 @@
+{
+  "database": "school_db",
+  "tables": {
+    "department": [
+      {
+        "de_code": "IT",
+        "de_name": "情報処理科"
+      },
+      {
+        "de_code": "SE",
+        "de_name": "システムエンジニアリング科"
+      },
+      {
+        "de_code": "CD",
+        "de_name": "クリエイティブデザイン科"
+      },
+      {
+        "de_code": "GB",
+        "de_name": "グローバルビジネス科"
+      },
+      {
+        "de_code": "GS",
+        "de_name": "総合科学科"
+      }
+    ],
+    "subject": [
+      {
+        "sub_code": "MA",
+        "sub_name": "数学Ⅰ"
+      },
+      {
+        "sub_code": "EN",
+        "sub_name": "英語コミュニケーション"
+      },
+      {
+        "sub_code": "JA",
+        "sub_name": "現代国語"
+      },
+      {
+        "sub_code": "IP",
+        "sub_name": "情報Ⅰ"
+      },
+      {
+        "sub_code": "PR",
+        "sub_name": "プログラミング"
+      },
+      {
+        "sub_code": "DB",
+        "sub_name": "データベース基礎"
+      },
+      {
+        "sub_code": "NW",
+        "sub_name": "ネットワーク技術"
+      }
+    ],
+    "student": [
+      {
+        "st_code": "ST1001",
+        "st_name": "山崎 樹",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1002",
+        "st_name": "石川 樹",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1003",
+        "st_name": "山口 樹",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1004",
+        "st_name": "山本 悠人",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1005",
+        "st_name": "伊藤 健太",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1006",
+        "st_name": "小林 悠真",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1007",
+        "st_name": "山田 彩花",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1008",
+        "st_name": "木村 結菜",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1009",
+        "st_name": "木村 健太",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1010",
+        "st_name": "加藤 悠真",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1011",
+        "st_name": "池田 悠真",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1012",
+        "st_name": "松本 結衣",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1013",
+        "st_name": "橋本 心春",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1014",
+        "st_name": "佐藤 颯太",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1015",
+        "st_name": "石井 美月",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1016",
+        "st_name": "中村 湊",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1017",
+        "st_name": "吉田 健太",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1018",
+        "st_name": "田中 悠真",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1019",
+        "st_name": "中村 莉子",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1020",
+        "st_name": "小林 響",
+        "de_code": "IT"
+      },
+      {
+        "st_code": "ST1021",
+        "st_name": "斎藤 結衣",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1022",
+        "st_name": "橋本 美月",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1023",
+        "st_name": "山口 楓",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1024",
+        "st_name": "佐々木 結衣",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1025",
+        "st_name": "池田 陽菜",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1026",
+        "st_name": "井上 悠真",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1027",
+        "st_name": "森 陸",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1028",
+        "st_name": "林 芽依",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1029",
+        "st_name": "松本 美月",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1030",
+        "st_name": "伊藤 七海",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1031",
+        "st_name": "高橋 心春",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1032",
+        "st_name": "山崎 大智",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1033",
+        "st_name": "林 悠人",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1034",
+        "st_name": "渡辺 葵",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1035",
+        "st_name": "山田 悠人",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1036",
+        "st_name": "山崎 莉子",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1037",
+        "st_name": "伊藤 陸",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1038",
+        "st_name": "吉田 結衣",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1039",
+        "st_name": "橋本 陽翔",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1040",
+        "st_name": "石川 彩花",
+        "de_code": "SE"
+      },
+      {
+        "st_code": "ST1041",
+        "st_name": "伊藤 大翔",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1042",
+        "st_name": "斎藤 楓",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1043",
+        "st_name": "佐藤 美月",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1044",
+        "st_name": "伊藤 悠人",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1045",
+        "st_name": "佐藤 響",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1046",
+        "st_name": "斎藤 大翔",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1047",
+        "st_name": "山本 凛",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1048",
+        "st_name": "井上 結衣",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1049",
+        "st_name": "中村 樹",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1050",
+        "st_name": "池田 芽依",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1051",
+        "st_name": "佐々木 健太",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1052",
+        "st_name": "佐々木 悠真",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1053",
+        "st_name": "阿部 蓮",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1054",
+        "st_name": "林 響",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1055",
+        "st_name": "小川 葵",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1056",
+        "st_name": "中村 響",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1057",
+        "st_name": "山本 陸",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1058",
+        "st_name": "山田 大翔",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1059",
+        "st_name": "山下 葵",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1060",
+        "st_name": "鈴木 颯太",
+        "de_code": "CD"
+      },
+      {
+        "st_code": "ST1061",
+        "st_name": "清水 悠真",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1062",
+        "st_name": "佐藤 悠真",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1063",
+        "st_name": "松本 翔太",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1064",
+        "st_name": "鈴木 翼",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1065",
+        "st_name": "田中 凛",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1066",
+        "st_name": "森 健太",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1067",
+        "st_name": "小林 未来",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1068",
+        "st_name": "山下 響",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1069",
+        "st_name": "森 陽菜",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1070",
+        "st_name": "林 拓海",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1071",
+        "st_name": "高橋 結菜",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1072",
+        "st_name": "小川 陽翔",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1073",
+        "st_name": "山口 蓮",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1074",
+        "st_name": "鈴木 未来",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1075",
+        "st_name": "田中 拓海",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1076",
+        "st_name": "渡辺 未来",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1077",
+        "st_name": "石井 凛",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1078",
+        "st_name": "山下 陸",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1079",
+        "st_name": "小林 悠人",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1080",
+        "st_name": "林 彩花",
+        "de_code": "GB"
+      },
+      {
+        "st_code": "ST1081",
+        "st_name": "佐々木 陽翔",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1082",
+        "st_name": "山崎 陽菜",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1083",
+        "st_name": "森 芽依",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1084",
+        "st_name": "林 健太",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1085",
+        "st_name": "中村 明日香",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1086",
+        "st_name": "森 楓",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1087",
+        "st_name": "山本 大智",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1088",
+        "st_name": "斎藤 健太",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1089",
+        "st_name": "阿部 陽菜",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1090",
+        "st_name": "林 翼",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1091",
+        "st_name": "清水 莉子",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1092",
+        "st_name": "佐藤 翼",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1093",
+        "st_name": "小林 凛",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1094",
+        "st_name": "清水 楓",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1095",
+        "st_name": "山崎 陽翔",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1096",
+        "st_name": "森 翼",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1097",
+        "st_name": "松本 陸",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1098",
+        "st_name": "池田 凛",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1099",
+        "st_name": "山田 結菜",
+        "de_code": "GS"
+      },
+      {
+        "st_code": "ST1100",
+        "st_name": "小川 悠人",
+        "de_code": "GS"
+      }
+    ],
+    "enrollments": [
+      {
+        "st_code": "ST1001",
+        "sub_code": "MA",
+        "score": 58
+      },
+      {
+        "st_code": "ST1001",
+        "sub_code": "EN",
+        "score": 89
+      },
+      {
+        "st_code": "ST1001",
+        "sub_code": "JA",
+        "score": 47
+      },
+      {
+        "st_code": "ST1001",
+        "sub_code": "IP",
+        "score": 87
+      },
+      {
+        "st_code": "ST1001",
+        "sub_code": "PR",
+        "score": 61
+      },
+      {
+        "st_code": "ST1001",
+        "sub_code": "DB",
+        "score": 95
+      },
+      {
+        "st_code": "ST1001",
+        "sub_code": "NW",
+        "score": 74
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "MA",
+        "score": 89
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "EN",
+        "score": 50
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "JA",
+        "score": 44
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "IP",
+        "score": 78
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "PR",
+        "score": 65
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "DB",
+        "score": 89
+      },
+      {
+        "st_code": "ST1002",
+        "sub_code": "NW",
+        "score": 88
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "MA",
+        "score": 25
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "EN",
+        "score": 66
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "JA",
+        "score": 87
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "IP",
+        "score": 56
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "PR",
+        "score": 62
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "DB",
+        "score": 78
+      },
+      {
+        "st_code": "ST1003",
+        "sub_code": "NW",
+        "score": 74
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "MA",
+        "score": 55
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "EN",
+        "score": 32
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "JA",
+        "score": 55
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "IP",
+        "score": 91
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "PR",
+        "score": 60
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "DB",
+        "score": 60
+      },
+      {
+        "st_code": "ST1004",
+        "sub_code": "NW",
+        "score": 86
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "MA",
+        "score": 33
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "EN",
+        "score": 93
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "JA",
+        "score": 41
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "IP",
+        "score": 63
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "PR",
+        "score": 97
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "DB",
+        "score": 85
+      },
+      {
+        "st_code": "ST1005",
+        "sub_code": "NW",
+        "score": 90
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "MA",
+        "score": 46
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "EN",
+        "score": 58
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "JA",
+        "score": 92
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "IP",
+        "score": 93
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "PR",
+        "score": 82
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "DB",
+        "score": 68
+      },
+      {
+        "st_code": "ST1006",
+        "sub_code": "NW",
+        "score": 89
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "MA",
+        "score": 50
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "EN",
+        "score": 64
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "JA",
+        "score": 76
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "IP",
+        "score": 97
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "PR",
+        "score": 96
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "DB",
+        "score": 78
+      },
+      {
+        "st_code": "ST1007",
+        "sub_code": "NW",
+        "score": 83
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "MA",
+        "score": 91
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "EN",
+        "score": 82
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "JA",
+        "score": 40
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "IP",
+        "score": 70
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "PR",
+        "score": 69
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "DB",
+        "score": 59
+      },
+      {
+        "st_code": "ST1008",
+        "sub_code": "NW",
+        "score": 76
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "MA",
+        "score": 27
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "EN",
+        "score": 95
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "JA",
+        "score": 54
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "IP",
+        "score": 92
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "PR",
+        "score": 69
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "DB",
+        "score": 55
+      },
+      {
+        "st_code": "ST1009",
+        "sub_code": "NW",
+        "score": 59
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "MA",
+        "score": 32
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "EN",
+        "score": 54
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "JA",
+        "score": 33
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "IP",
+        "score": 57
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "PR",
+        "score": 76
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "DB",
+        "score": 59
+      },
+      {
+        "st_code": "ST1010",
+        "sub_code": "NW",
+        "score": 87
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "MA",
+        "score": 55
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "EN",
+        "score": 60
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "JA",
+        "score": 87
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "IP",
+        "score": 68
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "PR",
+        "score": 89
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "DB",
+        "score": 63
+      },
+      {
+        "st_code": "ST1011",
+        "sub_code": "NW",
+        "score": 91
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "MA",
+        "score": 85
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "EN",
+        "score": 56
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "JA",
+        "score": 85
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "IP",
+        "score": 81
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "PR",
+        "score": 67
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "DB",
+        "score": 61
+      },
+      {
+        "st_code": "ST1012",
+        "sub_code": "NW",
+        "score": 61
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "MA",
+        "score": 80
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "EN",
+        "score": 70
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "JA",
+        "score": 79
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "IP",
+        "score": 81
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "PR",
+        "score": 84
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "DB",
+        "score": 58
+      },
+      {
+        "st_code": "ST1013",
+        "sub_code": "NW",
+        "score": 98
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "MA",
+        "score": 37
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "EN",
+        "score": 32
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "JA",
+        "score": 76
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "IP",
+        "score": 76
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "PR",
+        "score": 61
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "DB",
+        "score": 70
+      },
+      {
+        "st_code": "ST1014",
+        "sub_code": "NW",
+        "score": 67
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "MA",
+        "score": 49
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "EN",
+        "score": 93
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "JA",
+        "score": 82
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "IP",
+        "score": 63
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "PR",
+        "score": 82
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "DB",
+        "score": 66
+      },
+      {
+        "st_code": "ST1015",
+        "sub_code": "NW",
+        "score": 72
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "MA",
+        "score": 84
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "EN",
+        "score": 56
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "JA",
+        "score": 34
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "IP",
+        "score": 83
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "PR",
+        "score": 90
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "DB",
+        "score": 61
+      },
+      {
+        "st_code": "ST1016",
+        "sub_code": "NW",
+        "score": 58
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "MA",
+        "score": 94
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "EN",
+        "score": 26
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "JA",
+        "score": 36
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "IP",
+        "score": 70
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "PR",
+        "score": 65
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "DB",
+        "score": 81
+      },
+      {
+        "st_code": "ST1017",
+        "sub_code": "NW",
+        "score": 86
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "MA",
+        "score": 86
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "EN",
+        "score": 52
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "JA",
+        "score": 76
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "IP",
+        "score": 58
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "PR",
+        "score": 65
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "DB",
+        "score": 79
+      },
+      {
+        "st_code": "ST1018",
+        "sub_code": "NW",
+        "score": 55
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "MA",
+        "score": 74
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "EN",
+        "score": 58
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "JA",
+        "score": 83
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "IP",
+        "score": 73
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "PR",
+        "score": 82
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "DB",
+        "score": 90
+      },
+      {
+        "st_code": "ST1019",
+        "sub_code": "NW",
+        "score": 97
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "MA",
+        "score": 87
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "EN",
+        "score": 44
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "JA",
+        "score": 49
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "IP",
+        "score": 73
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "PR",
+        "score": 68
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "DB",
+        "score": 58
+      },
+      {
+        "st_code": "ST1020",
+        "sub_code": "NW",
+        "score": 92
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "MA",
+        "score": 94
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "EN",
+        "score": 32
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "JA",
+        "score": 65
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "IP",
+        "score": 58
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "PR",
+        "score": 58
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "DB",
+        "score": 92
+      },
+      {
+        "st_code": "ST1021",
+        "sub_code": "NW",
+        "score": 85
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "MA",
+        "score": 89
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "EN",
+        "score": 92
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "JA",
+        "score": 45
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "IP",
+        "score": 58
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "PR",
+        "score": 87
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "DB",
+        "score": 60
+      },
+      {
+        "st_code": "ST1022",
+        "sub_code": "NW",
+        "score": 66
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "MA",
+        "score": 33
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "EN",
+        "score": 33
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "JA",
+        "score": 55
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "IP",
+        "score": 80
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "PR",
+        "score": 62
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "DB",
+        "score": 91
+      },
+      {
+        "st_code": "ST1023",
+        "sub_code": "NW",
+        "score": 70
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "MA",
+        "score": 30
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "EN",
+        "score": 35
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "JA",
+        "score": 78
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "IP",
+        "score": 97
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "PR",
+        "score": 92
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "DB",
+        "score": 91
+      },
+      {
+        "st_code": "ST1024",
+        "sub_code": "NW",
+        "score": 88
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "MA",
+        "score": 65
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "EN",
+        "score": 58
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "JA",
+        "score": 51
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "IP",
+        "score": 97
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "PR",
+        "score": 75
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "DB",
+        "score": 70
+      },
+      {
+        "st_code": "ST1025",
+        "sub_code": "NW",
+        "score": 71
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "MA",
+        "score": 75
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "EN",
+        "score": 41
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "JA",
+        "score": 63
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "IP",
+        "score": 84
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "PR",
+        "score": 75
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "DB",
+        "score": 59
+      },
+      {
+        "st_code": "ST1026",
+        "sub_code": "NW",
+        "score": 55
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "MA",
+        "score": 83
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "EN",
+        "score": 37
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "JA",
+        "score": 34
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "IP",
+        "score": 89
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "PR",
+        "score": 68
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "DB",
+        "score": 87
+      },
+      {
+        "st_code": "ST1027",
+        "sub_code": "NW",
+        "score": 71
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "MA",
+        "score": 41
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "EN",
+        "score": 69
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "JA",
+        "score": 33
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "IP",
+        "score": 70
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "PR",
+        "score": 78
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "DB",
+        "score": 73
+      },
+      {
+        "st_code": "ST1028",
+        "sub_code": "NW",
+        "score": 65
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "MA",
+        "score": 81
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "EN",
+        "score": 94
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "JA",
+        "score": 63
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "IP",
+        "score": 94
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "PR",
+        "score": 96
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "DB",
+        "score": 88
+      },
+      {
+        "st_code": "ST1029",
+        "sub_code": "NW",
+        "score": 55
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "MA",
+        "score": 95
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "EN",
+        "score": 63
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "JA",
+        "score": 38
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "IP",
+        "score": 63
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "PR",
+        "score": 71
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "DB",
+        "score": 62
+      },
+      {
+        "st_code": "ST1030",
+        "sub_code": "NW",
+        "score": 61
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "MA",
+        "score": 95
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "EN",
+        "score": 44
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "JA",
+        "score": 59
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "IP",
+        "score": 73
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "PR",
+        "score": 93
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "DB",
+        "score": 68
+      },
+      {
+        "st_code": "ST1031",
+        "sub_code": "NW",
+        "score": 76
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "MA",
+        "score": 51
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "EN",
+        "score": 58
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "JA",
+        "score": 89
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "IP",
+        "score": 86
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "PR",
+        "score": 71
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "DB",
+        "score": 58
+      },
+      {
+        "st_code": "ST1032",
+        "sub_code": "NW",
+        "score": 60
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "MA",
+        "score": 79
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "EN",
+        "score": 60
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "JA",
+        "score": 30
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "IP",
+        "score": 55
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "PR",
+        "score": 76
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "DB",
+        "score": 63
+      },
+      {
+        "st_code": "ST1033",
+        "sub_code": "NW",
+        "score": 95
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "MA",
+        "score": 58
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "EN",
+        "score": 45
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "JA",
+        "score": 81
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "IP",
+        "score": 90
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "PR",
+        "score": 82
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "DB",
+        "score": 90
+      },
+      {
+        "st_code": "ST1034",
+        "sub_code": "NW",
+        "score": 55
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "MA",
+        "score": 39
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "EN",
+        "score": 34
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "JA",
+        "score": 44
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "IP",
+        "score": 89
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "PR",
+        "score": 57
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "DB",
+        "score": 78
+      },
+      {
+        "st_code": "ST1035",
+        "sub_code": "NW",
+        "score": 92
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "MA",
+        "score": 95
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "EN",
+        "score": 43
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "JA",
+        "score": 80
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "IP",
+        "score": 63
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "PR",
+        "score": 57
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "DB",
+        "score": 74
+      },
+      {
+        "st_code": "ST1036",
+        "sub_code": "NW",
+        "score": 78
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "MA",
+        "score": 30
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "EN",
+        "score": 70
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "JA",
+        "score": 51
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "IP",
+        "score": 98
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "PR",
+        "score": 70
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "DB",
+        "score": 97
+      },
+      {
+        "st_code": "ST1037",
+        "sub_code": "NW",
+        "score": 61
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "MA",
+        "score": 70
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "EN",
+        "score": 77
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "JA",
+        "score": 44
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "IP",
+        "score": 70
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "PR",
+        "score": 65
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "DB",
+        "score": 66
+      },
+      {
+        "st_code": "ST1038",
+        "sub_code": "NW",
+        "score": 81
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "MA",
+        "score": 28
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "EN",
+        "score": 47
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "JA",
+        "score": 67
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "IP",
+        "score": 81
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "PR",
+        "score": 97
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "DB",
+        "score": 70
+      },
+      {
+        "st_code": "ST1039",
+        "sub_code": "NW",
+        "score": 72
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "MA",
+        "score": 45
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "EN",
+        "score": 38
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "JA",
+        "score": 73
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "IP",
+        "score": 57
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "PR",
+        "score": 85
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "DB",
+        "score": 69
+      },
+      {
+        "st_code": "ST1040",
+        "sub_code": "NW",
+        "score": 67
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "MA",
+        "score": 83
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "EN",
+        "score": 69
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "JA",
+        "score": 64
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "IP",
+        "score": 54
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "PR",
+        "score": 53
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "DB",
+        "score": 28
+      },
+      {
+        "st_code": "ST1041",
+        "sub_code": "NW",
+        "score": 49
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "MA",
+        "score": 76
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "EN",
+        "score": 67
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "JA",
+        "score": 60
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "IP",
+        "score": 33
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "PR",
+        "score": 60
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "DB",
+        "score": 69
+      },
+      {
+        "st_code": "ST1042",
+        "sub_code": "NW",
+        "score": 90
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "MA",
+        "score": 76
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "EN",
+        "score": 93
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "JA",
+        "score": 67
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "IP",
+        "score": 28
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "PR",
+        "score": 39
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "DB",
+        "score": 58
+      },
+      {
+        "st_code": "ST1043",
+        "sub_code": "NW",
+        "score": 47
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "MA",
+        "score": 58
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "EN",
+        "score": 29
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "JA",
+        "score": 38
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "IP",
+        "score": 80
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "PR",
+        "score": 69
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "DB",
+        "score": 65
+      },
+      {
+        "st_code": "ST1044",
+        "sub_code": "NW",
+        "score": 80
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "MA",
+        "score": 90
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "EN",
+        "score": 39
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "JA",
+        "score": 74
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "IP",
+        "score": 49
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "PR",
+        "score": 57
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "DB",
+        "score": 30
+      },
+      {
+        "st_code": "ST1045",
+        "sub_code": "NW",
+        "score": 80
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "MA",
+        "score": 25
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "EN",
+        "score": 91
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "JA",
+        "score": 93
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "IP",
+        "score": 50
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "PR",
+        "score": 71
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "DB",
+        "score": 80
+      },
+      {
+        "st_code": "ST1046",
+        "sub_code": "NW",
+        "score": 33
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "MA",
+        "score": 67
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "EN",
+        "score": 65
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "JA",
+        "score": 40
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "IP",
+        "score": 63
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "PR",
+        "score": 89
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "DB",
+        "score": 64
+      },
+      {
+        "st_code": "ST1047",
+        "sub_code": "NW",
+        "score": 77
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "MA",
+        "score": 66
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "EN",
+        "score": 76
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "JA",
+        "score": 62
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "IP",
+        "score": 95
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "PR",
+        "score": 41
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "DB",
+        "score": 49
+      },
+      {
+        "st_code": "ST1048",
+        "sub_code": "NW",
+        "score": 78
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "MA",
+        "score": 73
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "EN",
+        "score": 47
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "JA",
+        "score": 63
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "IP",
+        "score": 76
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "PR",
+        "score": 95
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "DB",
+        "score": 25
+      },
+      {
+        "st_code": "ST1049",
+        "sub_code": "NW",
+        "score": 63
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "MA",
+        "score": 61
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "EN",
+        "score": 51
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "JA",
+        "score": 80
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "IP",
+        "score": 66
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "PR",
+        "score": 84
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "DB",
+        "score": 81
+      },
+      {
+        "st_code": "ST1050",
+        "sub_code": "NW",
+        "score": 81
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "MA",
+        "score": 52
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "EN",
+        "score": 90
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "JA",
+        "score": 85
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "IP",
+        "score": 46
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "PR",
+        "score": 35
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "DB",
+        "score": 61
+      },
+      {
+        "st_code": "ST1051",
+        "sub_code": "NW",
+        "score": 90
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "MA",
+        "score": 67
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "EN",
+        "score": 36
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "JA",
+        "score": 55
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "IP",
+        "score": 64
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "PR",
+        "score": 53
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "DB",
+        "score": 50
+      },
+      {
+        "st_code": "ST1052",
+        "sub_code": "NW",
+        "score": 43
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "MA",
+        "score": 28
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "EN",
+        "score": 30
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "JA",
+        "score": 56
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "IP",
+        "score": 85
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "PR",
+        "score": 34
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "DB",
+        "score": 83
+      },
+      {
+        "st_code": "ST1053",
+        "sub_code": "NW",
+        "score": 78
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "MA",
+        "score": 49
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "EN",
+        "score": 74
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "JA",
+        "score": 88
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "IP",
+        "score": 76
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "PR",
+        "score": 56
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "DB",
+        "score": 43
+      },
+      {
+        "st_code": "ST1054",
+        "sub_code": "NW",
+        "score": 25
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "MA",
+        "score": 38
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "EN",
+        "score": 79
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "JA",
+        "score": 53
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "IP",
+        "score": 47
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "PR",
+        "score": 91
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "DB",
+        "score": 84
+      },
+      {
+        "st_code": "ST1055",
+        "sub_code": "NW",
+        "score": 31
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "MA",
+        "score": 56
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "EN",
+        "score": 40
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "JA",
+        "score": 83
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "IP",
+        "score": 42
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "PR",
+        "score": 84
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "DB",
+        "score": 92
+      },
+      {
+        "st_code": "ST1056",
+        "sub_code": "NW",
+        "score": 65
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "MA",
+        "score": 81
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "EN",
+        "score": 89
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "JA",
+        "score": 79
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "IP",
+        "score": 95
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "PR",
+        "score": 82
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "DB",
+        "score": 45
+      },
+      {
+        "st_code": "ST1057",
+        "sub_code": "NW",
+        "score": 85
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "MA",
+        "score": 82
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "EN",
+        "score": 58
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "JA",
+        "score": 56
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "IP",
+        "score": 60
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "PR",
+        "score": 91
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "DB",
+        "score": 87
+      },
+      {
+        "st_code": "ST1058",
+        "sub_code": "NW",
+        "score": 55
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "MA",
+        "score": 60
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "EN",
+        "score": 81
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "JA",
+        "score": 34
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "IP",
+        "score": 61
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "PR",
+        "score": 55
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "DB",
+        "score": 59
+      },
+      {
+        "st_code": "ST1059",
+        "sub_code": "NW",
+        "score": 67
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "MA",
+        "score": 65
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "EN",
+        "score": 94
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "JA",
+        "score": 35
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "IP",
+        "score": 42
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "PR",
+        "score": 44
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "DB",
+        "score": 54
+      },
+      {
+        "st_code": "ST1060",
+        "sub_code": "NW",
+        "score": 74
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "MA",
+        "score": 44
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "EN",
+        "score": 52
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "JA",
+        "score": 33
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "IP",
+        "score": 78
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "PR",
+        "score": 77
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "DB",
+        "score": 67
+      },
+      {
+        "st_code": "ST1061",
+        "sub_code": "NW",
+        "score": 94
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "MA",
+        "score": 84
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "EN",
+        "score": 78
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "JA",
+        "score": 32
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "IP",
+        "score": 51
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "PR",
+        "score": 78
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "DB",
+        "score": 74
+      },
+      {
+        "st_code": "ST1062",
+        "sub_code": "NW",
+        "score": 27
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "MA",
+        "score": 73
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "EN",
+        "score": 86
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "JA",
+        "score": 25
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "IP",
+        "score": 70
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "PR",
+        "score": 63
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "DB",
+        "score": 74
+      },
+      {
+        "st_code": "ST1063",
+        "sub_code": "NW",
+        "score": 78
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "MA",
+        "score": 93
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "EN",
+        "score": 94
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "JA",
+        "score": 53
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "IP",
+        "score": 87
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "PR",
+        "score": 53
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "DB",
+        "score": 59
+      },
+      {
+        "st_code": "ST1064",
+        "sub_code": "NW",
+        "score": 80
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "MA",
+        "score": 87
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "EN",
+        "score": 28
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "JA",
+        "score": 74
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "IP",
+        "score": 68
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "PR",
+        "score": 76
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "DB",
+        "score": 46
+      },
+      {
+        "st_code": "ST1065",
+        "sub_code": "NW",
+        "score": 84
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "MA",
+        "score": 41
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "EN",
+        "score": 93
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "JA",
+        "score": 28
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "IP",
+        "score": 75
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "PR",
+        "score": 28
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "DB",
+        "score": 35
+      },
+      {
+        "st_code": "ST1066",
+        "sub_code": "NW",
+        "score": 79
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "MA",
+        "score": 42
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "EN",
+        "score": 84
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "JA",
+        "score": 48
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "IP",
+        "score": 31
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "PR",
+        "score": 58
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "DB",
+        "score": 73
+      },
+      {
+        "st_code": "ST1067",
+        "sub_code": "NW",
+        "score": 66
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "MA",
+        "score": 52
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "EN",
+        "score": 83
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "JA",
+        "score": 66
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "IP",
+        "score": 68
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "PR",
+        "score": 73
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "DB",
+        "score": 60
+      },
+      {
+        "st_code": "ST1068",
+        "sub_code": "NW",
+        "score": 78
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "MA",
+        "score": 57
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "EN",
+        "score": 35
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "JA",
+        "score": 85
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "IP",
+        "score": 27
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "PR",
+        "score": 94
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "DB",
+        "score": 31
+      },
+      {
+        "st_code": "ST1069",
+        "sub_code": "NW",
+        "score": 69
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "MA",
+        "score": 53
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "EN",
+        "score": 33
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "JA",
+        "score": 30
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "IP",
+        "score": 28
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "PR",
+        "score": 56
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "DB",
+        "score": 50
+      },
+      {
+        "st_code": "ST1070",
+        "sub_code": "NW",
+        "score": 27
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "MA",
+        "score": 44
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "EN",
+        "score": 55
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "JA",
+        "score": 41
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "IP",
+        "score": 85
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "PR",
+        "score": 39
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "DB",
+        "score": 52
+      },
+      {
+        "st_code": "ST1071",
+        "sub_code": "NW",
+        "score": 84
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "MA",
+        "score": 57
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "EN",
+        "score": 72
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "JA",
+        "score": 46
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "IP",
+        "score": 39
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "PR",
+        "score": 45
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "DB",
+        "score": 64
+      },
+      {
+        "st_code": "ST1072",
+        "sub_code": "NW",
+        "score": 38
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "MA",
+        "score": 28
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "EN",
+        "score": 64
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "JA",
+        "score": 73
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "IP",
+        "score": 75
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "PR",
+        "score": 50
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "DB",
+        "score": 34
+      },
+      {
+        "st_code": "ST1073",
+        "sub_code": "NW",
+        "score": 56
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "MA",
+        "score": 38
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "EN",
+        "score": 63
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "JA",
+        "score": 40
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "IP",
+        "score": 30
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "PR",
+        "score": 69
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "DB",
+        "score": 93
+      },
+      {
+        "st_code": "ST1074",
+        "sub_code": "NW",
+        "score": 79
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "MA",
+        "score": 72
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "EN",
+        "score": 33
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "JA",
+        "score": 89
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "IP",
+        "score": 68
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "PR",
+        "score": 26
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "DB",
+        "score": 78
+      },
+      {
+        "st_code": "ST1075",
+        "sub_code": "NW",
+        "score": 87
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "MA",
+        "score": 38
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "EN",
+        "score": 80
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "JA",
+        "score": 71
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "IP",
+        "score": 83
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "PR",
+        "score": 44
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "DB",
+        "score": 80
+      },
+      {
+        "st_code": "ST1076",
+        "sub_code": "NW",
+        "score": 47
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "MA",
+        "score": 91
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "EN",
+        "score": 59
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "JA",
+        "score": 93
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "IP",
+        "score": 86
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "PR",
+        "score": 84
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "DB",
+        "score": 80
+      },
+      {
+        "st_code": "ST1077",
+        "sub_code": "NW",
+        "score": 59
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "MA",
+        "score": 66
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "EN",
+        "score": 56
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "JA",
+        "score": 36
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "IP",
+        "score": 60
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "PR",
+        "score": 82
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "DB",
+        "score": 56
+      },
+      {
+        "st_code": "ST1078",
+        "sub_code": "NW",
+        "score": 84
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "MA",
+        "score": 73
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "EN",
+        "score": 68
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "JA",
+        "score": 28
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "IP",
+        "score": 88
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "PR",
+        "score": 66
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "DB",
+        "score": 48
+      },
+      {
+        "st_code": "ST1079",
+        "sub_code": "NW",
+        "score": 87
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "MA",
+        "score": 52
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "EN",
+        "score": 70
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "JA",
+        "score": 58
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "IP",
+        "score": 68
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "PR",
+        "score": 60
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "DB",
+        "score": 60
+      },
+      {
+        "st_code": "ST1080",
+        "sub_code": "NW",
+        "score": 26
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "MA",
+        "score": 83
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "EN",
+        "score": 49
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "JA",
+        "score": 35
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "IP",
+        "score": 55
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "PR",
+        "score": 77
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "DB",
+        "score": 87
+      },
+      {
+        "st_code": "ST1081",
+        "sub_code": "NW",
+        "score": 55
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "MA",
+        "score": 94
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "EN",
+        "score": 85
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "JA",
+        "score": 87
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "IP",
+        "score": 82
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "PR",
+        "score": 27
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "DB",
+        "score": 36
+      },
+      {
+        "st_code": "ST1082",
+        "sub_code": "NW",
+        "score": 62
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "MA",
+        "score": 64
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "EN",
+        "score": 76
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "JA",
+        "score": 56
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "IP",
+        "score": 64
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "PR",
+        "score": 72
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "DB",
+        "score": 85
+      },
+      {
+        "st_code": "ST1083",
+        "sub_code": "NW",
+        "score": 95
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "MA",
+        "score": 83
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "EN",
+        "score": 69
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "JA",
+        "score": 79
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "IP",
+        "score": 95
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "PR",
+        "score": 67
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "DB",
+        "score": 70
+      },
+      {
+        "st_code": "ST1084",
+        "sub_code": "NW",
+        "score": 83
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "MA",
+        "score": 67
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "EN",
+        "score": 64
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "JA",
+        "score": 57
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "IP",
+        "score": 54
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "PR",
+        "score": 40
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "DB",
+        "score": 49
+      },
+      {
+        "st_code": "ST1085",
+        "sub_code": "NW",
+        "score": 65
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "MA",
+        "score": 57
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "EN",
+        "score": 93
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "JA",
+        "score": 48
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "IP",
+        "score": 49
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "PR",
+        "score": 52
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "DB",
+        "score": 86
+      },
+      {
+        "st_code": "ST1086",
+        "sub_code": "NW",
+        "score": 60
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "MA",
+        "score": 87
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "EN",
+        "score": 92
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "JA",
+        "score": 61
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "IP",
+        "score": 37
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "PR",
+        "score": 49
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "DB",
+        "score": 62
+      },
+      {
+        "st_code": "ST1087",
+        "sub_code": "NW",
+        "score": 54
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "MA",
+        "score": 73
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "EN",
+        "score": 47
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "JA",
+        "score": 63
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "IP",
+        "score": 26
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "PR",
+        "score": 93
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "DB",
+        "score": 41
+      },
+      {
+        "st_code": "ST1088",
+        "sub_code": "NW",
+        "score": 60
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "MA",
+        "score": 52
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "EN",
+        "score": 31
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "JA",
+        "score": 95
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "IP",
+        "score": 62
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "PR",
+        "score": 41
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "DB",
+        "score": 87
+      },
+      {
+        "st_code": "ST1089",
+        "sub_code": "NW",
+        "score": 38
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "MA",
+        "score": 50
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "EN",
+        "score": 61
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "JA",
+        "score": 85
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "IP",
+        "score": 86
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "PR",
+        "score": 81
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "DB",
+        "score": 68
+      },
+      {
+        "st_code": "ST1090",
+        "sub_code": "NW",
+        "score": 48
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "MA",
+        "score": 53
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "EN",
+        "score": 57
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "JA",
+        "score": 86
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "IP",
+        "score": 39
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "PR",
+        "score": 33
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "DB",
+        "score": 76
+      },
+      {
+        "st_code": "ST1091",
+        "sub_code": "NW",
+        "score": 87
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "MA",
+        "score": 54
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "EN",
+        "score": 31
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "JA",
+        "score": 44
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "IP",
+        "score": 44
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "PR",
+        "score": 63
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "DB",
+        "score": 35
+      },
+      {
+        "st_code": "ST1092",
+        "sub_code": "NW",
+        "score": 56
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "MA",
+        "score": 57
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "EN",
+        "score": 78
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "JA",
+        "score": 53
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "IP",
+        "score": 91
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "PR",
+        "score": 73
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "DB",
+        "score": 82
+      },
+      {
+        "st_code": "ST1093",
+        "sub_code": "NW",
+        "score": 81
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "MA",
+        "score": 69
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "EN",
+        "score": 79
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "JA",
+        "score": 64
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "IP",
+        "score": 32
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "PR",
+        "score": 37
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "DB",
+        "score": 51
+      },
+      {
+        "st_code": "ST1094",
+        "sub_code": "NW",
+        "score": 52
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "MA",
+        "score": 66
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "EN",
+        "score": 35
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "JA",
+        "score": 45
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "IP",
+        "score": 55
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "PR",
+        "score": 47
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "DB",
+        "score": 95
+      },
+      {
+        "st_code": "ST1095",
+        "sub_code": "NW",
+        "score": 34
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "MA",
+        "score": 60
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "EN",
+        "score": 25
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "JA",
+        "score": 77
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "IP",
+        "score": 82
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "PR",
+        "score": 85
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "DB",
+        "score": 62
+      },
+      {
+        "st_code": "ST1096",
+        "sub_code": "NW",
+        "score": 29
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "MA",
+        "score": 64
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "EN",
+        "score": 61
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "JA",
+        "score": 61
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "IP",
+        "score": 83
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "PR",
+        "score": 34
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "DB",
+        "score": 54
+      },
+      {
+        "st_code": "ST1097",
+        "sub_code": "NW",
+        "score": 58
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "MA",
+        "score": 90
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "EN",
+        "score": 50
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "JA",
+        "score": 79
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "IP",
+        "score": 39
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "PR",
+        "score": 94
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "DB",
+        "score": 53
+      },
+      {
+        "st_code": "ST1098",
+        "sub_code": "NW",
+        "score": 44
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "MA",
+        "score": 67
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "EN",
+        "score": 43
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "JA",
+        "score": 34
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "IP",
+        "score": 32
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "PR",
+        "score": 46
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "DB",
+        "score": 64
+      },
+      {
+        "st_code": "ST1099",
+        "sub_code": "NW",
+        "score": 61
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "MA",
+        "score": 78
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "EN",
+        "score": 40
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "JA",
+        "score": 84
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "IP",
+        "score": 63
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "PR",
+        "score": 76
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "DB",
+        "score": 59
+      },
+      {
+        "st_code": "ST1100",
+        "sub_code": "NW",
+        "score": 89
+      }
+    ]
+  }
+}
