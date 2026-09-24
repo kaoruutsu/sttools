@@ -58,6 +58,7 @@
       <div class="preset-list">
         <h2>クエリ例</h2>
         <button type="button" data-query="SHOW TABLES;">SHOW TABLES;</button>
+        <button type="button" data-query="SHOW DATABASES;">SHOW DATABASES;</button>
         <button type="button" data-query="SELECT * FROM student LIMIT 10;">SELECT * FROM student LIMIT 10;</button>
         <button type="button" data-query="SELECT de_code, COUNT(*) AS students FROM student GROUP BY de_code;">集計・GROUP BY</button>
         <button type="button" data-query="DESCRIBE enrollments;">DESCRIBE enrollments;</button>
@@ -66,7 +67,7 @@
 
     <section class="console-panel">
       <div class="console-header">
-        <h2>mysql -u student -p student</h2>
+        <h2>ターミナル</h2>
         <div class="console-actions">
           <button type="button" id="formatToggleBtn">表示: ASCII</button>
           <button type="button" id="clearBtn">クリア</button>
@@ -198,6 +199,9 @@ USE school_db;</div>
         isDatabaseSelected = true;
         alasql(`USE ${dbData.database}`);
         entry.insertAdjacentHTML('beforeend', '<div class="output-info">Database changed</div>');
+      } else if (/^SHOW\s+DATABASES\s*;?$/i.test(sqlText.trim())) {
+        entry.insertAdjacentHTML('beforeend', `<div class="output-result">${escapeHtml(renderAsciiTable([{ Database: dbData.database }]))}</div>`);
+        entry.insertAdjacentHTML('beforeend', '<div class="output-info">1 row in set</div>');
       } else if (!isDatabaseSelected) {
         entry.insertAdjacentHTML('beforeend', '<div class="output-error">ERROR 1046 (3D000): No database selected</div>');
       } else if (forbidden.includes(firstWord)) {
