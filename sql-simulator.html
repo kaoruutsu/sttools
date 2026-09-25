@@ -28,10 +28,11 @@
     .console-actions button { padding: 5px 9px; color: var(--accent-blue); background: transparent; border: 1px solid #23627f; border-radius: 4px; cursor: pointer; }
     .console-output { min-height: 430px; max-height: 62vh; overflow: auto; padding: 14px; color: #e0f7fa; font: .84rem/1.5 Consolas, Monaco, monospace; }
     .welcome-msg { color: #8ac6d1; white-space: pre-wrap; }
+    .version-msg { margin-top: 2px; color: var(--accent-blue); font: .72rem/1.4 Consolas, Monaco, monospace; letter-spacing: .08em; }
     .terminal-entry { margin-top: 15px; }
     .prompt-line { color: var(--accent-cyan); word-break: break-word; }
     .prompt-query { color: #fff; }
-    .output-result { overflow-x: auto; margin-top: 6px; color: #e0f7fa; white-space: pre; }
+    .output-result { overflow-x: auto; margin-top: 6px; color: #e0f7fa; white-space: pre; font-family: "Noto Sans Mono CJK JP", "Yu Gothic Mono", "MS Gothic", monospace; }
     .output-info { margin-top: 6px; color: var(--accent-blue); white-space: pre-wrap; }
     .output-error { margin-top: 6px; color: var(--error-red); white-space: pre-wrap; }
     .gui-table { width: 100%; border-collapse: collapse; white-space: normal; font-size: .8rem; }
@@ -75,6 +76,7 @@
       </div>
       <div id="terminalBody" class="console-output">
         <div class="welcome-msg">SQL Command Simulator</div>
+        <div class="version-msg">v1.0925.01 // Terminal Edition</div>
       </div>
       <form id="queryForm" class="console-input">
         <label for="sqlInput" id="sqlPrompt">cmd &gt;</label>
@@ -177,7 +179,7 @@
         entry.className = 'terminal-entry';
         const queryLines = sqlText.split('\n');
         entry.innerHTML = queryLines.map((line, index) => (
-          `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql &gt;' : 'cmd &gt;') : '-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
+          `<div class="prompt-line">${index === 0 ? (isLoggedIn ? 'sql &gt;' : 'cmd &gt;') : '&nbsp;&nbsp;&nbsp;-&gt;'} <span class="prompt-query">${escapeHtml(line)}</span></div>`
         )).join('');
       }
       const upperSql = sqlText.toUpperCase().trim();
@@ -209,11 +211,12 @@
           let results;
           if (/^(CLEAR|CLS);?$/.test(upperSql)) { clearTerminal(); return; }
           if (/^(HELP|\\H);?$/.test(upperSql)) {
-            entry.insertAdjacentHTML('beforeend', '<div class="output-info">SHOW TABLES; / DESCRIBE table; / SELECT ... FROM ...;<br>CLEAR; で表示を消去できます。</div>');
+            entry.insertAdjacentHTML('beforeend', '<div class="output-info">SHOW TABLES; / DESCRIBE table; / SHOW COLUMNS FROM table; / SELECT ... FROM ...;<br>CLEAR; で表示を消去できます。</div>');
           } else if (upperSql.startsWith('SHOW TABLES')) {
             results = Object.keys(dbData.tables).map((table) => ({ [`Tables_in_${dbData.database}`]: table }));
-          } else if (/^(DESCRIBE|DESC) /.test(upperSql)) {
-            const tableName = sqlText.replace(/;$/, '').trim().split(/\s+/)[1].toLowerCase();
+          } else if (/^(?:DESCRIBE|DESC)\s+|^SHOW\s+COLUMNS\s+FROM\s+/.test(upperSql)) {
+            const columnCommand = /^(?:DESCRIBE|DESC)\s+([^\s;]+)|^SHOW\s+COLUMNS\s+FROM\s+([^\s;]+)/.exec(upperSql);
+            const tableName = (columnCommand[1] || columnCommand[2]).toLowerCase();
             if (!dbData.tables[tableName]) throw new Error(`Table '${tableName}' doesn't exist`);
             const sample = dbData.tables[tableName][0] || {};
             results = Object.keys(sample).map((field) => ({ Field: field, Type: typeof sample[field] === 'number' ? 'int' : 'varchar(50)', Null: 'YES', Key: field.endsWith('_code') ? 'PRI' : '', Default: 'NULL' }));
@@ -248,7 +251,7 @@
         }
         const prompt = pendingEntry.childElementCount === 0
           ? (isLoggedIn ? 'sql &gt;' : 'cmd &gt;')
-          : '-&gt;';
+          : '&nbsp;&nbsp;&nbsp;-&gt;';
         pendingEntry.insertAdjacentHTML('beforeend', `<div class="prompt-line">${prompt} <span class="prompt-query">${escapeHtml(line)}</span></div>`);
         $('terminalBody').scrollTop = $('terminalBody').scrollHeight;
         $('sqlPrompt').textContent = '->';
@@ -259,7 +262,7 @@
       $('sqlPrompt').textContent = isLoggedIn ? 'sql >' : 'cmd >';
       commandHistory.push(sqlText); historyIndex = commandHistory.length;
       if (pendingEntry) {
-        pendingEntry.insertAdjacentHTML('beforeend', `<div class="prompt-line">-&gt; <span class="prompt-query">${escapeHtml(line)}</span></div>`);
+        pendingEntry.insertAdjacentHTML('beforeend', `<div class="prompt-line">&nbsp;&nbsp;&nbsp;-&gt; <span class="prompt-query">${escapeHtml(line)}</span></div>`);
       }
       executeQuery(sqlText, pendingEntry);
       pendingEntry = null;
