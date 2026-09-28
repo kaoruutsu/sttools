@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SQL Command Simulator</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="../style.css">
   <script src="https://cdn.jsdelivr.net/npm/alasql@4"></script>
   <style>
     .sql-simulator { max-width: 1180px; margin: 0 auto; }
@@ -85,7 +85,7 @@
       </form>
     </section>
   </main>
-  <a href="index.html" class="back-link">← Portalに戻る</a>
+  <a href="../index.html" class="back-link">← Portalに戻る</a>
 
   <script>
     let dbData = null;
@@ -102,7 +102,7 @@
 
     async function initDatabase() {
       try {
-        const response = await fetch('db_data.json');
+        const response = await fetch('../db_data.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         dbData = await response.json();
         if (!dbData.database || !dbData.tables) throw new Error('データベース形式が不正です');
