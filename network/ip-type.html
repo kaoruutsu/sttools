@@ -3,92 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subnet Master - Extra</title>
+    <title>IP Address Type Attack</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <link rel="stylesheet" href="../style.css">
     <style>
         .speed-select { margin-bottom: 20px; }
         .speed-btns { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
         .speed-btn {
+            flex: 1;
             padding: 8px 15px;
+            color: #fff;
             background: rgba(255,255,255,0.1);
             border: 1px solid var(--accent-blue);
-            color: #fff;
             border-radius: 4px;
             cursor: pointer;
             transition: 0.2s;
-            flex: 1;
         }
-        .speed-btn.active { background: var(--accent-blue); color: #000; font-weight: bold; }
-        .choice-grid {
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 8px;
-        }
-        .host-btn {
+        .speed-btn.active { color: #000; background: var(--accent-blue); font-weight: bold; }
+        .ip-target {
+            position: absolute;
+            top: -50px;
             width: 100%;
-            box-sizing: border-box;
-            min-width: 0;
-            padding: 15px 6px;
-            font-size: 1.1rem;
-        }
-        .host-option {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-        .answer-label {
-            display: block;
-            height: 24px;
-            line-height: 24px;
-            color: var(--accent-cyan);
-            font-size: 0.85rem;
+            color: var(--accent-yellow);
+            font-size: clamp(1.8rem, 6vw, 3rem);
             font-weight: bold;
+            font-family: monospace;
+            text-align: center;
             white-space: nowrap;
         }
         .correct-answer {
             position: absolute;
             top: 68%;
             left: 50%;
-            transform: translateX(-50%);
+            z-index: 201;
             color: var(--accent-cyan);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: bold;
             opacity: 0;
-            z-index: 201;
+            transform: translateX(-50%);
             pointer-events: none;
+            white-space: nowrap;
         }
         .correct-answer.show { opacity: 1; }
+        .choice-grid.ip-type-choices {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .ip-type-btn {
+            min-width: 0;
+            min-height: 64px;
+            padding: 10px 4px;
+            font-size: 1rem;
+            word-break: keep-all;
+        }
         .nav-controls {
-            margin-top: 40px;
             display: flex;
             justify-content: center;
             gap: 15px;
+            margin-top: 35px;
         }
         .nav-btn {
-            color: var(--accent-cyan);
-            text-decoration: none;
-            font-size: 13px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
             padding: 7px 18px;
-            border-radius: 20px;
+            color: var(--accent-cyan);
             background: transparent;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 20px;
             cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
             transition: 0.3s;
         }
         .nav-btn:hover { background: rgba(0, 255, 204, 0.1); border-color: var(--accent-cyan); }
         @media (max-width: 560px) {
-            .choice-grid { gap: 4px; }
-            .host-btn { padding: 13px 2px; font-size: 0.95rem; }
+            .choice-grid.ip-type-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+            .ip-type-btn { min-height: 52px; padding: 8px 4px; font-size: 0.95rem; }
         }
     </style>
 </head>
 <body>
-    <h1>Subnet Master <span style="font-size: 0.6em; color: var(--accent-blue);">(Extra)</span></h1>
+    <h1>IP Address Type Attack</h1>
     <div id="stats-bar"><span>Quest: <span id="q-count">0</span> / 5</span></div>
 
     <div class="game-container">
         <div id="start-screen" class="overlay">
-            <h2>Host Count Attack</h2>
+            <h2>IP Address Type</h2>
+            <p>落ちてくるIPアドレスの種類を選択してください。</p>
             <div class="speed-select">
                 <p>落下速度を選択</p>
                 <div class="speed-btns">
@@ -107,40 +106,17 @@
             <button class="start-btn" onclick="resetGame()">RETRY</button>
         </div>
 
-        <div id="target" class="target-val" style="position:absolute; width:100%; top:-50px; font-size:50px; font-weight:bold; color:var(--accent-yellow);">/24</div>
+        <div id="target" class="ip-target">127.0.0.1</div>
         <div id="mark" class="judgment-mark">⭕️</div>
         <div id="correct-answer" class="correct-answer"></div>
     </div>
 
-    <div class="choice-grid" id="choices">
-        <div class="host-option">
-            <span class="answer-label">Max Hosts</span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(254)">254</button>
-        </div>
-        <div class="host-option">
-            <span class="answer-label"></span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(126)">126</button>
-        </div>
-        <div class="host-option">
-            <span class="answer-label"></span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(62)">62</button>
-        </div>
-        <div class="host-option">
-            <span class="answer-label"></span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(30)">30</button>
-        </div>
-        <div class="host-option">
-            <span class="answer-label"></span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(14)">14</button>
-        </div>
-        <div class="host-option">
-            <span class="answer-label"></span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(6)">6</button>
-        </div>
-        <div class="host-option">
-            <span class="answer-label"></span>
-            <button class="btn-base choice-btn host-btn" onclick="answer(2)">2</button>
-        </div>
+    <div class="choice-grid ip-type-choices">
+        <button class="btn-base choice-btn ip-type-btn" onclick="answer('グローバル')">グローバル</button>
+        <button class="btn-base choice-btn ip-type-btn" onclick="answer('プライベート')">プライベート</button>
+        <button class="btn-base choice-btn ip-type-btn" onclick="answer('マルチキャスト')">マルチキャスト<br>(プライベート)</button>
+        <button class="btn-base choice-btn ip-type-btn" onclick="answer('ループバック')">ループバック<br>(プライベート)</button>
+        <button class="btn-base choice-btn ip-type-btn" onclick="answer('リンクローカル')">リンクローカル<br>(プライベート)</button>
     </div>
 
     <div class="nav-controls">
@@ -149,9 +125,17 @@
     </div>
 
     <script>
-        const hostCounts = { 24: 254, 25: 126, 26: 62, 27: 30, 28: 14, 29: 6, 30: 2 };
-        let correct, correctCount = 0, previousPrefix = null;
-        let qCount = 0, startTime, y = -50, anim, transitionTimer, isWait = false, dropSpeed = 1.5;
+        const addressExamples = {
+            'グローバル': ['8.8.8.8', '1.1.1.1', '9.9.9.9', '208.67.222.222', '4.2.2.2'],
+            'プライベート': ['10.0.0.1', '10.10.10.10', '172.16.0.1', '172.20.10.5', '172.31.255.254', '192.168.0.1', '192.168.1.1', '192.168.10.20'],
+            'マルチキャスト': ['224.0.0.1', '224.0.0.5', '224.0.0.251', '239.1.1.1', '239.255.255.250'],
+            'ループバック': ['127.0.0.1'],
+            'リンクローカル': ['169.254.1.1', '169.254.10.20', '169.254.100.200']
+        };
+        const addressTypes = Object.keys(addressExamples);
+        let correct, correctCount = 0, previousType = null;
+        let qCount = 0, startTime, y = -50, anim, transitionTimer;
+        let isWait = true, dropSpeed = 1.5;
 
         function setSpeed(speed, button) {
             dropSpeed = speed;
@@ -162,8 +146,9 @@
         function start() {
             document.getElementById('start-screen').style.display = 'none';
             startTime = Date.now();
+            qCount = 0;
             correctCount = 0;
-            previousPrefix = null;
+            previousType = null;
             next();
         }
 
@@ -174,13 +159,12 @@
             }
             qCount++;
             document.getElementById('q-count').innerText = qCount;
-            let prefix;
-            do {
-                prefix = Math.floor(Math.random() * 7) + 24;
-            } while (prefix === previousPrefix);
-            previousPrefix = prefix;
-            correct = hostCounts[prefix];
-            document.getElementById('target').innerText = '/' + prefix;
+
+            const availableTypes = addressTypes.filter(type => type !== previousType);
+            correct = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+            previousType = correct;
+            const examples = addressExamples[correct];
+            document.getElementById('target').innerText = examples[Math.floor(Math.random() * examples.length)];
             y = -50;
             isWait = false;
             drop();
@@ -196,8 +180,8 @@
             else anim = requestAnimationFrame(drop);
         }
 
-        function answer(value) {
-            if (!isWait) handle(value === correct);
+        function answer(type) {
+            if (!isWait) handle(type === correct);
         }
 
         function handle(win) {
@@ -222,7 +206,7 @@
             clearTimeout(transitionTimer);
             qCount = 0;
             correctCount = 0;
-            previousPrefix = null;
+            previousType = null;
             isWait = true;
             document.getElementById('q-count').innerText = '0';
             document.getElementById('result-screen').style.display = 'none';

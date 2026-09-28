@@ -87,7 +87,9 @@
             if(isWait) return;
             y += speed;
             document.getElementById('target').style.top = y + 'px';
-            if(y > 330) handle(false); else anim = requestAnimationFrame(drop);
+            const targetHeight = document.getElementById('target').offsetHeight;
+            const targetCenter = y + targetHeight / 2;
+            if(targetCenter > 330 + targetHeight) handle(false); else anim = requestAnimationFrame(drop);
         }
 
         function check(val) { if(!isWait) handle(val === targetVal); }

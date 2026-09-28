@@ -51,7 +51,9 @@
         function drop() {
             if(isWait) return;
             y += 0.8; document.getElementById('target').style.top = y + 'px';
-            if(y > 320) handle(false); else anim = requestAnimationFrame(drop);
+            const targetHeight = document.getElementById('target').offsetHeight;
+            const targetCenter = y + targetHeight / 2;
+            if(targetCenter > 320 + targetHeight) handle(false); else anim = requestAnimationFrame(drop);
         }
 
         function check(c) { if(!isWait) handle(c === correct); }

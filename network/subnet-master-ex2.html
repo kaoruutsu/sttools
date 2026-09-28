@@ -202,7 +202,9 @@
             if (isWait) return;
             y += dropSpeed;
             document.getElementById('target').style.top = y + 'px';
-            if (y > 320) handle(false);
+            const targetHeight = document.getElementById('target').offsetHeight;
+            const targetCenter = y + targetHeight / 2;
+            if (targetCenter > 320 + targetHeight) handle(false);
             else anim = requestAnimationFrame(drop);
         }
 
