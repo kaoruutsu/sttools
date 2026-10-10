@@ -18,6 +18,12 @@
             <p>第1オクテットからクラスを判別せよ</p>
             <button class="btn-base start-btn" onclick="start()">INITIATE</button>
         </div>
+        <div id="result-screen" class="overlay hidden">
+            <h2>FINISH!</h2>
+            <div style="font-size: 24px; color: #fff;">Score: <span id="final-score">0</span> / 5</div>
+            <div id="final-time" style="font-size: 2.5rem; color: var(--accent-cyan);">0.0s</div>
+            <button class="btn-base start-btn" onclick="location.reload()">RETRY</button>
+        </div>
         <div id="target" class="bin-display" style="position:absolute; width:100%; top:-100px;">0.0.0.0</div>
         <div id="mark" class="judgment-mark">⭕️</div>
     </div>
@@ -69,8 +75,9 @@
 
         function endGame() {
             const time = ((Date.now()-startTime)/1000).toFixed(1);
-            alert(`Finish! Score: ${score}/5 in ${time}s`);
-            location.reload();
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-time').innerText = `${time}s`;
+            document.getElementById('result-screen').classList.remove('hidden');
         }
     </script>
 </body>

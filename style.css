@@ -107,6 +107,12 @@ h1 span { font-size: 0.6em; margin-left: 10px; }
     z-index: 100;
 }
 
+.result-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+}
+
 .hidden { display: none !important; }
 
 /* 4. ボタン標準化 */

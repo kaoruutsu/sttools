@@ -8,6 +8,13 @@
 <body class="sql-training">
     <h1>SQL Training <span>(Normal)</span></h1>
 
+    <div id="result-screen" class="overlay result-screen hidden">
+        <h2>FINISH!</h2>
+        <p>全問クリアしました</p>
+        <div style="font-size: 24px; color: #fff;">完了問題数: <span id="final-count">0</span></div>
+        <button class="btn-base start-btn" onclick="location.reload()">RETRY</button>
+    </div>
+
     <div class="sql-question-layout">
         <div class="mission-box">
             <div style="color:var(--accent-yellow); font-weight:bold;">MISSION:</div>
@@ -85,7 +92,11 @@
         }
 
         function next() {
-            if(current >= questions.length) { alert("Excellent!"); return location.reload(); }
+            if(current >= questions.length) {
+                document.getElementById('final-count').innerText = questions.length;
+                document.getElementById('result-screen').classList.remove('hidden');
+                return;
+            }
             userAns = [];
             document.getElementById('mission').innerText = questions[current].q;
             renderTables();
