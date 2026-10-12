@@ -61,7 +61,7 @@
         <button type="button" data-query="SHOW TABLES;">SHOW TABLES;</button>
         <button type="button" data-query="SHOW DATABASES;">SHOW DATABASES;</button>
         <button type="button" data-query="SELECT * FROM student LIMIT 10;">SELECT * FROM student LIMIT 10;</button>
-        <button type="button" data-query="SELECT de_code, COUNT(*) AS students FROM student GROUP BY de_code;">集計・GROUP BY</button>
+        <button type="button" data-query="SELECT de_code, COUNT(de_code) AS 学生数 FROM student GROUP BY de_code;">集計・GROUP BY</button>
         <button type="button" data-query="DESCRIBE enrollments;">DESCRIBE enrollments;</button>
       </div>
     </aside>
@@ -169,8 +169,298 @@
       if (tableMatch) {
         return `ERROR 1146 (42S02): Table 'school_db.${tableMatch[1]}' doesn't exist`;
       }
+      const ambiguousColumn = message.match(/Column ['"`]?([^'"`.]+)['"`]? is ambiguous/i);
+      if (ambiguousColumn) {
+        return `ERROR 1052 (23000): Column '${ambiguousColumn[1]}' in field list is ambiguous`;
+      }
       const near = sqlText.replace(/\s+/g, ' ').trim().slice(0, 40);
       return `ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your SQL server version for the right syntax to use near '${near}' at line 1`;
+    }
+
+    function prepareSqlAliases(sqlText) {
+      const aliases = new Map();
+      let normalizedSql = '';
+      let index = 0;
+      let aliasIndex = 0;
+      let inFromClause = false;
+      let expectTable = false;
+      let pendingTableAlias = false;
+      let explicitAlias = false;
+      while (index < sqlText.length) {
+        const char = sqlText[index];
+        if (char === "'" || char === '"' || char === '`') {
+          const quote = char;
+          normalizedSql += char;
+          index += 1;
+          while (index < sqlText.length) {
+            normalizedSql += sqlText[index];
+            if (sqlText[index] === quote) {
+              if (sqlText[index + 1] === quote) {
+                normalizedSql += sqlText[index + 1];
+                index += 2;
+                continue;
+              }
+              index += 1;
+              break;
+            }
+            if (sqlText[index] === '\\' && index + 1 < sqlText.length) {
+              normalizedSql += sqlText[index + 1];
+              index += 2;
+            } else {
+              index += 1;
+            }
+          }
+          continue;
+        }
+        if (sqlText.startsWith('--', index)) {
+          const lineEnd = sqlText.indexOf('\n', index);
+          const end = lineEnd === -1 ? sqlText.length : lineEnd;
+          normalizedSql += sqlText.slice(index, end);
+          index = end;
+          continue;
+        }
+        if (sqlText.startsWith('/*', index)) {
+          const commentEnd = sqlText.indexOf('*/', index + 2);
+          const end = commentEnd === -1 ? sqlText.length : commentEnd + 2;
+          normalizedSql += sqlText.slice(index, end);
+          index = end;
+          continue;
+        }
+        const aliasMatch = /^AS(\s+)([\p{L}_][\p{L}\p{N}_$]*)/iu.exec(sqlText.slice(index));
+        const previousChar = sqlText[index - 1] || '';
+        if (aliasMatch && !/[\p{L}\p{N}_$]/u.test(previousChar) && /[^\x00-\x7f]/.test(aliasMatch[2])) {
+          let safeAlias;
+          do {
+            safeAlias = `__simulator_alias_${aliasIndex}`;
+            aliasIndex += 1;
+          } while (sqlText.toLowerCase().includes(safeAlias.toLowerCase()));
+          aliases.set(safeAlias, aliasMatch[2]);
+          normalizedSql += `${aliasMatch[0].slice(0, aliasMatch[0].length - aliasMatch[2].length)}${safeAlias}`;
+          index += aliasMatch[0].length;
+          continue;
+        }
+        if (char === ',' && inFromClause) {
+          normalizedSql += char;
+          index += 1;
+          expectTable = true;
+          pendingTableAlias = false;
+          explicitAlias = false;
+          continue;
+        }
+        const wordMatch = /^[A-Za-z_][A-Za-z0-9_$]*/.exec(sqlText.slice(index));
+        if (wordMatch) {
+          const word = wordMatch[0];
+          const upperWord = word.toUpperCase();
+          if (upperWord === 'FROM') {
+            inFromClause = true;
+            expectTable = true;
+            pendingTableAlias = false;
+            explicitAlias = false;
+          } else if (['WHERE', 'ON', 'GROUP', 'ORDER', 'HAVING', 'LIMIT', 'OFFSET', 'UNION', 'RETURNING'].includes(upperWord)) {
+            inFromClause = false;
+            expectTable = false;
+            pendingTableAlias = false;
+            explicitAlias = false;
+          } else if (upperWord === 'JOIN' || ['LEFT', 'RIGHT', 'INNER', 'OUTER', 'CROSS'].includes(upperWord)) {
+            inFromClause = true;
+            expectTable = upperWord === 'JOIN';
+            pendingTableAlias = false;
+            explicitAlias = false;
+          } else if (inFromClause && pendingTableAlias && upperWord === 'AS') {
+            pendingTableAlias = false;
+            explicitAlias = true;
+          } else if (inFromClause && explicitAlias) {
+            explicitAlias = false;
+          } else if (inFromClause && expectTable) {
+            expectTable = false;
+            pendingTableAlias = true;
+          } else if (inFromClause && pendingTableAlias) {
+            normalizedSql += 'AS ';
+            pendingTableAlias = false;
+          }
+          normalizedSql += word;
+          index += word.length;
+          continue;
+        }
+        normalizedSql += char;
+        index += 1;
+      }
+      const aliasNames = new Map([...aliases].map(([safeAlias, originalAlias]) => [originalAlias, safeAlias]));
+      if (aliasNames.size) {
+        let rewrittenSql = '';
+        index = 0;
+        while (index < normalizedSql.length) {
+          const char = normalizedSql[index];
+          if (char === "'" || char === '"' || char === '`') {
+            const quote = char;
+            rewrittenSql += char;
+            index += 1;
+            while (index < normalizedSql.length) {
+              rewrittenSql += normalizedSql[index];
+              if (normalizedSql[index] === quote) {
+                if (normalizedSql[index + 1] === quote) {
+                  rewrittenSql += normalizedSql[index + 1];
+                  index += 2;
+                  continue;
+                }
+                index += 1;
+                break;
+              }
+              if (normalizedSql[index] === '\\' && index + 1 < normalizedSql.length) {
+                rewrittenSql += normalizedSql[index + 1];
+                index += 2;
+              } else {
+                index += 1;
+              }
+            }
+            continue;
+          }
+          if (normalizedSql.startsWith('--', index)) {
+            const lineEnd = normalizedSql.indexOf('\n', index);
+            const end = lineEnd === -1 ? normalizedSql.length : lineEnd;
+            rewrittenSql += normalizedSql.slice(index, end);
+            index = end;
+            continue;
+          }
+          if (normalizedSql.startsWith('/*', index)) {
+            const commentEnd = normalizedSql.indexOf('*/', index + 2);
+            const end = commentEnd === -1 ? normalizedSql.length : commentEnd + 2;
+            rewrittenSql += normalizedSql.slice(index, end);
+            index = end;
+            continue;
+          }
+          const identifierMatch = /^[\p{L}_][\p{L}\p{N}_$]*/u.exec(normalizedSql.slice(index));
+          if (identifierMatch && aliasNames.has(identifierMatch[0])) {
+            rewrittenSql += aliasNames.get(identifierMatch[0]);
+            index += identifierMatch[0].length;
+            continue;
+          }
+          rewrittenSql += char;
+          index += 1;
+        }
+        normalizedSql = rewrittenSql;
+      }
+      return { sql: normalizedSql, aliases };
+    }
+
+    function assertUnambiguousColumns(sqlText) {
+      const fromMatch = /\bFROM\s+([\s\S]*?)(?=\bWHERE\b|\bGROUP\s+BY\b|\bORDER\s+BY\b|\bHAVING\b|\bLIMIT\b|;|$)/i.exec(sqlText);
+      if (!fromMatch) return;
+      const tableNames = [...fromMatch[1].matchAll(/(?:^|,|\bJOIN\b)\s*([A-Za-z_][A-Za-z0-9_$]*)/gi)]
+        .map((match) => match[1].toLowerCase())
+        .filter((tableName) => dbData.tables[tableName]);
+      if (tableNames.length < 2) return;
+      const columnOwners = new Map();
+      tableNames.forEach((tableName) => {
+        const sample = dbData.tables[tableName][0] || {};
+        Object.keys(sample).forEach((column) => {
+          columnOwners.set(column.toLowerCase(), (columnOwners.get(column.toLowerCase()) || 0) + 1);
+        });
+      });
+      const relevantClauses = [
+        /\bSELECT\s+([\s\S]*?)\bFROM\b/i.exec(sqlText)?.[1],
+        /\bGROUP\s+BY\s+([\s\S]*?)(?=\bHAVING\b|\bORDER\s+BY\b|\bLIMIT\b|;|$)/i.exec(sqlText)?.[1]
+      ].filter(Boolean);
+      for (const clause of relevantClauses) {
+        const unquotedClause = clause.replace(
+          /'(?:''|\\.|[^'])*'|"(?:\"\"|\\.|[^"])*"|`(?:``|\\.|[^`])*`|--[^\n]*|\/\*[\s\S]*?\*\//g,
+          (match) => ' '.repeat(match.length)
+        );
+        const identifiers = /(?<![\w$.])([A-Za-z_][A-Za-z0-9_$]*)(?![\w$])/g;
+        let match;
+        while ((match = identifiers.exec(unquotedClause))) {
+          if (columnOwners.get(match[1].toLowerCase()) > 1) {
+            throw new Error(`Column '${match[1]}' is ambiguous`);
+          }
+        }
+      }
+    }
+
+    function qualifyUniqueColumns(sqlText) {
+      const fromMatch = /\bFROM\s+([\s\S]*?)(?=\bWHERE\b|\bGROUP\s+BY\b|\bORDER\s+BY\b|\bHAVING\b|\bLIMIT\b|;|$)/i.exec(sqlText);
+      if (!fromMatch) return sqlText;
+      const tableAliases = [...fromMatch[1].matchAll(/(?:^|,|\bJOIN\b)\s*([A-Za-z_][A-Za-z0-9_$]*)(?:\s+(?:AS\s+)?([A-Za-z_][A-Za-z0-9_$]*))?/gi)]
+        .map((match) => {
+          const tableName = match[1].toLowerCase();
+          return dbData.tables[tableName] ? [tableName, match[2] || match[1]] : null;
+        })
+        .filter(Boolean);
+      if (tableAliases.length < 2) return sqlText;
+      const columnOwners = new Map();
+      tableAliases.forEach(([tableName, tableAlias]) => {
+        Object.keys(dbData.tables[tableName][0] || {}).forEach((column) => {
+          const owners = columnOwners.get(column.toLowerCase()) || [];
+          owners.push(tableAlias);
+          columnOwners.set(column.toLowerCase(), owners);
+        });
+      });
+      const keywords = new Set([
+        'ALL', 'AND', 'AS', 'ASC', 'BETWEEN', 'BY', 'CASE', 'DESC', 'DISTINCT', 'ELSE', 'END',
+        'FROM', 'GROUP', 'HAVING', 'IN', 'IS', 'JOIN', 'LIKE', 'NOT', 'NULL', 'ON', 'OR', 'ORDER',
+        'SELECT', 'THEN', 'WHERE'
+      ]);
+      let qualifiedSql = '';
+      let index = 0;
+      while (index < sqlText.length) {
+        const char = sqlText[index];
+        if (char === "'" || char === '"' || char === '`') {
+          const quote = char;
+          qualifiedSql += char;
+          index += 1;
+          while (index < sqlText.length) {
+            qualifiedSql += sqlText[index];
+            if (sqlText[index] === quote) {
+              if (sqlText[index + 1] === quote) {
+                qualifiedSql += sqlText[index + 1];
+                index += 2;
+                continue;
+              }
+              index += 1;
+              break;
+            }
+            if (sqlText[index] === '\\' && index + 1 < sqlText.length) {
+              qualifiedSql += sqlText[index + 1];
+              index += 2;
+            } else {
+              index += 1;
+            }
+          }
+          continue;
+        }
+        if (sqlText.startsWith('--', index)) {
+          const lineEnd = sqlText.indexOf('\n', index);
+          const end = lineEnd === -1 ? sqlText.length : lineEnd;
+          qualifiedSql += sqlText.slice(index, end);
+          index = end;
+          continue;
+        }
+        if (sqlText.startsWith('/*', index)) {
+          const commentEnd = sqlText.indexOf('*/', index + 2);
+          const end = commentEnd === -1 ? sqlText.length : commentEnd + 2;
+          qualifiedSql += sqlText.slice(index, end);
+          index = end;
+          continue;
+        }
+        const identifierMatch = /^[A-Za-z_][A-Za-z0-9_$]*/.exec(sqlText.slice(index));
+        if (identifierMatch) {
+          const identifier = identifierMatch[0];
+          const previousChar = sqlText[index - 1] || '';
+          const nextIndex = index + identifier.length;
+          const nextChar = sqlText.slice(nextIndex).match(/^\s*(.)/)?.[1] || '';
+          const owners = columnOwners.get(identifier.toLowerCase());
+          if (owners?.length === 1 && !keywords.has(identifier.toUpperCase())
+              && !/[A-Za-z0-9_$\.]/.test(previousChar) && nextChar !== '.' && nextChar !== '(') {
+            qualifiedSql += `${owners[0]}.${identifier}`;
+          } else {
+            qualifiedSql += identifier;
+          }
+          index = nextIndex;
+          continue;
+        }
+        qualifiedSql += char;
+        index += 1;
+      }
+      return qualifiedSql;
     }
 
     function executeQuery(sqlText, entry = null) {
@@ -221,7 +511,14 @@
             const sample = dbData.tables[tableName][0] || {};
             results = Object.keys(sample).map((field) => ({ Field: field, Type: typeof sample[field] === 'number' ? 'int' : 'varchar(50)', Null: 'YES', Key: field.endsWith('_code') ? 'PRI' : '', Default: 'NULL' }));
           } else {
-            results = alasql(sqlText);
+            const preparedQuery = prepareSqlAliases(sqlText);
+            assertUnambiguousColumns(preparedQuery.sql);
+            results = alasql(qualifyUniqueColumns(preparedQuery.sql));
+            if (Array.isArray(results) && preparedQuery.aliases.size) {
+              results = results.map((row) => Object.fromEntries(
+                Object.entries(row).map(([column, value]) => [preparedQuery.aliases.get(column) || column, value])
+              ));
+            }
           }
           if (Array.isArray(results)) {
             const rendered = useGuiTableFormat ? renderGuiTable(results) : `<div class="output-result">${escapeHtml(renderAsciiTable(results))}</div>`;
